@@ -60,11 +60,9 @@ const CustomSlider = ({ callback = () => console.log("Swipe callback") }) => {
           source={require("../assets/arrows.png")} // Import your image here
           style={{
             justifyContent: "center",
-            // Position image at the top of the slider
-            height: 10, // Adjust height as needed
-            width: 70,
+            height: 15, // Adjust height as needed
+            width: "25%",
             marginLeft: "70%",
-            // Adjust width as needed
           }}
         />
         <Animated.View

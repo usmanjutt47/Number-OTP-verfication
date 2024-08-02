@@ -3,23 +3,37 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import SendOtpScreen from "./src/screens/SendOtpScreen";
 import VerifyOtpScreen from "./src/screens/VerifyOtpScreen";
+import { useFonts } from "expo-font";
+import CustoomKeyboard from "./components/CustoomKeyboard";
+import OnBoarding from "./src/screens/OnBoarding";
 
 const Stack = createStackNavigator();
 
 const App = () => {
+  const [loaded] = useFonts({
+    Outfit_Black: require("../client/assets/fonts/Outfit-Black.ttf"),
+    Outfit_Bold: require("../client/assets/fonts/Outfit-Bold.ttf"),
+    Outfit_Extra_Bold: require("../client/assets/fonts/Outfit-ExtraBold.ttf"),
+    Outfit_Extra_Light: require("../client/assets/fonts/Outfit-ExtraLight.ttf"),
+    Outfit_Light: require("../client/assets/fonts/Outfit-Light.ttf"),
+    Outfit_Medium: require("../client/assets/fonts/Outfit-Medium.ttf"),
+    Outfit_Regular: require("../client/assets/fonts/Outfit-Regular.ttf"),
+    Outfit_Semi_Bold: require("../client/assets/fonts/Outfit-SemiBold.ttf"),
+    Outfit_Thin: require("../client/assets/fonts/Outfit-SemiBold.ttf"),
+  });
+  if (!loaded) {
+    return null;
+  }
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="SendOtp">
-        <Stack.Screen
-          name="SendOtp"
-          component={SendOtpScreen}
-          options={{ title: "Send OTP" }}
-        />
-        <Stack.Screen
-          name="VerifyOtp"
-          component={VerifyOtpScreen}
-          options={{ title: "Verify OTP" }}
-        />
+      <Stack.Navigator
+        initialRouteName="OnBoarding"
+        screenOptions={{ headerShown: false }}
+      >
+        <Stack.Screen name="SendOtp" component={SendOtpScreen} />
+        <Stack.Screen name="VerifyOtp" component={VerifyOtpScreen} />
+        <Stack.Screen name="CustoomKeyboard" component={CustoomKeyboard} />
+        <Stack.Screen name="OnBoarding" component={OnBoarding} />
       </Stack.Navigator>
     </NavigationContainer>
   );

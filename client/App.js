@@ -39,7 +39,6 @@ const App = () => {
           name="NumberVerification"
           component={NumberVerification}
         />
-
         <Stack.Screen name="OnBoarding" component={OnBoarding} />
       </Stack.Navigator>
     </NavigationContainer>

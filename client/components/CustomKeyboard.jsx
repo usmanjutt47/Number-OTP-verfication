@@ -40,7 +40,7 @@ export default function CustomKeyboard({
           ))}
         </View>
         <View style={styles.row}>
-          {[9, 0, "."].map((number) => (
+          {[9, 0, "+"].map((number) => (
             <TouchableOpacity
               key={number}
               style={styles.button}

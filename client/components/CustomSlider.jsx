@@ -56,17 +56,17 @@ const CustomSlider = ({ callback = () => console.log("Swipe callback") }) => {
           backgroundColor: "#075856",
         }}
       >
-        <Animated.Text
+        <Animated.Image
+          source={require("../assets/arrows.png")} // Import your image here
           style={{
-            position: "absolute",
-            top: 10, // Position text at the top of the slider
-            color: textColor, // Apply dynamic color here
-            fontSize: 16,
-            alignSelf: "center",
+            justifyContent: "center",
+            // Position image at the top of the slider
+            height: 10, // Adjust height as needed
+            width: 80,
+            marginLeft: 200,
+            // Adjust width as needed
           }}
-        >
-          Slide Left to Right
-        </Animated.Text>
+        />
         <Animated.View
           style={[
             {

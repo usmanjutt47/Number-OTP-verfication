@@ -1,7 +1,6 @@
 import React, { useRef } from "react";
 import { Animated, Dimensions, PanResponder, Text, View } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 const BUTTON_WIDTH = 126;
@@ -18,10 +17,7 @@ const CustomSlider = ({ callback = () => console.log("Swipe callback") }) => {
       onMoveShouldSetPanResponder: () => true,
       onPanResponderMove: (_, gestureState) => {
         // Restrict movement within bounds
-        let newX = Math.max(
-          0,
-          Math.min(MAX_X, gestureState.dx, MAX_Y, gestureState.dy)
-        );
+        let newX = Math.max(0, Math.min(MAX_X, gestureState.dx));
         pan.setValue({ x: newX, y: 0 });
       },
       onPanResponderRelease: (_, gestureState) => {
@@ -50,14 +46,14 @@ const CustomSlider = ({ callback = () => console.log("Swipe callback") }) => {
 
   return (
     <View style={{ marginTop: 40, width: windowWidth * 0.9 }}>
-      <LinearGradient
-        colors={["transparent", "#075856"]}
+      <View
         style={{
           height: 60,
           borderRadius: 50,
           borderWidth: 1,
           padding: 5,
           justifyContent: "center",
+          backgroundColor: "#075856",
         }}
       >
         <Animated.Text
@@ -81,15 +77,13 @@ const CustomSlider = ({ callback = () => console.log("Swipe callback") }) => {
           ]}
           {...panResponder.panHandlers}
         >
-          <LinearGradient
-            colors={["white", "transparent"]}
-            start={{ x: 0.99, y: 0.99 }}
-            end={{ x: 1, y: 1 }}
+          <View
             style={{
               width: BUTTON_WIDTH,
               height: BUTTON_HEIGHT,
               borderRadius: 50,
               justifyContent: "center",
+              backgroundColor: "white",
             }}
           >
             <Text
@@ -101,9 +95,9 @@ const CustomSlider = ({ callback = () => console.log("Swipe callback") }) => {
             >
               Send Now
             </Text>
-          </LinearGradient>
+          </View>
         </Animated.View>
-      </LinearGradient>
+      </View>
     </View>
   );
 };

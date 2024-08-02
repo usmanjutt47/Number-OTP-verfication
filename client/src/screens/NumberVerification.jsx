@@ -3,6 +3,7 @@ import React, { useRef, useState } from "react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StatusBar } from "expo-status-bar";
 import CustomKeyboard from "../../components/CustomKeyboard";
+import CustomSlider from "../../components/CustomSlider";
 
 const NumberVerification = () => {
   const [inputValue, setInputValue] = useState("");
@@ -59,7 +60,9 @@ const NumberVerification = () => {
             stopRemoving={stopRemoving}
           />
         </View>
-        <View style={styles.customSliderContainer}></View>
+        <View style={styles.customSliderContainer}>
+          <CustomSlider />
+        </View>
       </View>
     </View>
   );
@@ -86,16 +89,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#CBCBCB",
+    paddingLeft: 10,
   },
   logoContainer: {
     alignSelf: "center",
+    marginTop: 50,
   },
   logo: {
     fontFamily: "Kanit_Bold",
     fontSize: 36,
   },
   phoneInputContainer: {
-    marginTop: 20,
+    marginTop: 80,
   },
   input: {
     width: "100%",
@@ -106,7 +111,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
   },
   keyBoardContainer: {
-    marginTop: "40%",
+    marginTop: "25%",
     width: "100%",
     height: "35%",
   },

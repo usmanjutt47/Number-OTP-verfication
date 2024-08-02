@@ -8,7 +8,7 @@ import {
   Pressable,
 } from "react-native";
 
-export default function CustoomKeyboard() {
+export default function CustomKeyboard() {
   const [inputValue, setInputValue] = useState("");
   const intervalRef = useRef(null);
 

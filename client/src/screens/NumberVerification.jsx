@@ -56,7 +56,8 @@ const NumberVerification = () => {
             editable={false}
             showSoftInputOnFocus={false}
             placeholder="0092 000 000 000 000"
-            placeholderTextColor={"gray"}
+            placeholderTextColor="gray"
+            // No need for textColor as we set the color directly in the style
           />
         </View>
         <View style={styles.keyBoardContainer}>
@@ -117,6 +118,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 30,
     paddingLeft: 20,
+    color: "black", // Set the text color to red
   },
   keyBoardContainer: {
     marginTop: "15%",

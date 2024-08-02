@@ -4,7 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import SendOtpScreen from "./src/screens/SendOtpScreen";
 import VerifyOtpScreen from "./src/screens/VerifyOtpScreen";
 import { useFonts } from "expo-font";
-import CustoomKeyboard from "./components/CustoomKeyboard";
+import CustomKeyboard from "./components/CustomKeyboard";
 import NumberVerification from "./src/screens/NumberVerification";
 
 const Stack = createStackNavigator();
@@ -33,7 +33,7 @@ const App = () => {
       >
         <Stack.Screen name="SendOtp" component={SendOtpScreen} />
         <Stack.Screen name="VerifyOtp" component={VerifyOtpScreen} />
-        <Stack.Screen name="CustoomKeyboard" component={CustoomKeyboard} />
+        <Stack.Screen name="CustomKeyboard" component={CustomKeyboard} />
         <Stack.Screen
           name="NumberVerification"
           component={NumberVerification}

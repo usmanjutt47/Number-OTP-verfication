@@ -1,5 +1,12 @@
-import { View, StyleSheet, Text, TextInput, Pressable } from "react-native";
 import React, { useRef, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  Text,
+  TextInput,
+  Pressable,
+  SafeAreaView,
+} from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StatusBar } from "expo-status-bar";
 import CustomKeyboard from "../../components/CustomKeyboard";
@@ -26,7 +33,7 @@ const NumberVerification = () => {
   };
 
   return (
-    <View style={styles.mainContainer}>
+    <SafeAreaView style={styles.mainContainer}>
       <StatusBar style="auto" />
       <View style={styles.contentContainer}>
         <View style={styles.headerContainer}>
@@ -64,7 +71,7 @@ const NumberVerification = () => {
           <CustomSlider />
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

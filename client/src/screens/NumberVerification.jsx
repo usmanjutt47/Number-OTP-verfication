@@ -89,18 +89,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#CBCBCB",
+    marginTop: 20,
     paddingLeft: 10,
   },
   logoContainer: {
     alignSelf: "center",
-    marginTop: 50,
+    marginTop: "15%",
   },
   logo: {
     fontFamily: "Kanit_Bold",
     fontSize: 36,
   },
   phoneInputContainer: {
-    marginTop: 80,
+    marginTop: "35%",
   },
   input: {
     width: "100%",
@@ -111,9 +112,10 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
   },
   keyBoardContainer: {
-    marginTop: "25%",
+    marginTop: "15%",
     width: "100%",
-    height: "35%",
+    height: "30%",
+    marginBottom: "5%",
   },
   customSliderContainer: {},
 });

@@ -5,7 +5,6 @@ import SendOtpScreen from "./src/screens/SendOtpScreen";
 import VerifyOtpScreen from "./src/screens/VerifyOtpScreen";
 import { useFonts } from "expo-font";
 import CustoomKeyboard from "./components/CustoomKeyboard";
-import OnBoarding from "./src/screens/OnBoarding";
 import NumberVerification from "./src/screens/NumberVerification";
 
 const Stack = createStackNavigator();
@@ -21,7 +20,7 @@ const App = () => {
     Outfit_Regular: require("../client/assets/fonts/Outfit-Regular.ttf"),
     Outfit_Semi_Bold: require("../client/assets/fonts/Outfit-SemiBold.ttf"),
     Outfit_Thin: require("../client/assets/fonts/Outfit-SemiBold.ttf"),
-    Kanit_Bold: require("../client/assets/fonts/Kanit-Bold.ttf"),
+    // Kanit_Bold: require("../client/assets/fonts/Kanit-Bold.ttf"),
   });
   if (!loaded) {
     return null;
@@ -39,7 +38,6 @@ const App = () => {
           name="NumberVerification"
           component={NumberVerification}
         />
-        <Stack.Screen name="OnBoarding" component={OnBoarding} />
       </Stack.Navigator>
     </NavigationContainer>
   );

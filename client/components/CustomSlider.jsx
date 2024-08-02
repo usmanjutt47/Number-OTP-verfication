@@ -62,8 +62,8 @@ const CustomSlider = ({ callback = () => console.log("Swipe callback") }) => {
             justifyContent: "center",
             // Position image at the top of the slider
             height: 10, // Adjust height as needed
-            width: 80,
-            marginLeft: 200,
+            width: 70,
+            marginLeft: "70%",
             // Adjust width as needed
           }}
         />

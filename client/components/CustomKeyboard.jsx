@@ -69,6 +69,7 @@ export default function CustomKeyboard({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: "center",
   },
   buttonsContainer: {
     justifyContent: "center",
@@ -81,8 +82,8 @@ const styles = StyleSheet.create({
   button: {
     margin: 4,
     borderRadius: 50,
-    width: 82,
-    height: 82,
+    width: 72,
+    height: 72,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
@@ -96,8 +97,8 @@ const styles = StyleSheet.create({
   iconButton: {
     margin: 4,
     borderRadius: 50,
-    width: 82,
-    height: 82,
+    width: 72,
+    height: 72,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,

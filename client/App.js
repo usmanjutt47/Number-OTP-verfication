@@ -20,7 +20,7 @@ const App = () => {
     Outfit_Regular: require("../client/assets/fonts/Outfit-Regular.ttf"),
     Outfit_Semi_Bold: require("../client/assets/fonts/Outfit-SemiBold.ttf"),
     Outfit_Thin: require("../client/assets/fonts/Outfit-SemiBold.ttf"),
-    // Kanit_Bold: require("../client/assets/fonts/Kanit-Bold.ttf"),
+    Kanit_Bold: require("../client/assets/fonts/Kanit-Bold.ttf"),
   });
   if (!loaded) {
     return null;

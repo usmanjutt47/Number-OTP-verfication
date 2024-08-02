@@ -47,7 +47,7 @@ const NumberVerification = () => {
             value={inputValue}
             editable={false}
             showSoftInputOnFocus={false}
-            placeholder="000 000 000 000"
+            placeholder="0092 000 000 000 000"
             placeholderTextColor={"gray"}
           />
         </View>
@@ -102,7 +102,8 @@ const styles = StyleSheet.create({
     height: 50,
     borderWidth: 1,
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 30,
+    paddingLeft: 20,
   },
   keyBoardContainer: {
     marginTop: "40%",

@@ -123,8 +123,9 @@ const styles = StyleSheet.create({
   keyBoardContainer: {
     marginTop: "15%",
     width: "100%",
-    height: "30%",
-    marginBottom: "5%",
+    height: "35%",
+    alignSelf: "center",
+    marginBottom: "-10%",
   },
   customSliderContainer: {},
 });

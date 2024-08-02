@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     fontSize: 36,
   },
   phoneInputContainer: {
-    marginTop: "35%",
+    marginTop: "40%",
   },
   input: {
     width: "100%",

@@ -3,10 +3,12 @@ import { Animated, Dimensions, PanResponder, Text, View } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
-const { width: windowWidth } = Dimensions.get("window");
-const BUTTON_WIDTH = 50;
+const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
+const BUTTON_WIDTH = 126;
+const BUTTON_HEIGHT = 50;
 const SWIPE_THRESHOLD = 100;
-const MAX_X = windowWidth * 0.9 - BUTTON_WIDTH - 10; // Adjusted for padding and margins
+const MAX_X = windowWidth * 0.9 - BUTTON_WIDTH - 10;
+const MAX_Y = windowHeight * 0.9 - BUTTON_HEIGHT + 10;
 
 const CustomSlider = ({ callback = () => console.log("Swipe callback") }) => {
   const pan = useRef(new Animated.ValueXY()).current;
@@ -16,7 +18,10 @@ const CustomSlider = ({ callback = () => console.log("Swipe callback") }) => {
       onMoveShouldSetPanResponder: () => true,
       onPanResponderMove: (_, gestureState) => {
         // Restrict movement within bounds
-        let newX = Math.max(0, Math.min(MAX_X, gestureState.dx));
+        let newX = Math.max(
+          0,
+          Math.min(MAX_X, gestureState.dx, MAX_Y, gestureState.dy)
+        );
         pan.setValue({ x: newX, y: 0 });
       },
       onPanResponderRelease: (_, gestureState) => {
@@ -44,60 +49,62 @@ const CustomSlider = ({ callback = () => console.log("Swipe callback") }) => {
   });
 
   return (
-    <LinearGradient
-      colors={["transparent", "#ffffffa0"]}
-      start={{ x: 0.9, y: 0 }}
-      end={{ x: 0.9, y: 0 }}
-      style={{
-        marginTop: 40,
-        width: windowWidth * 0.9,
-        height: 60,
-        borderRadius: 50,
-        borderWidth: 1,
-        padding: 5,
-        justifyContent: "center",
-      }}
-    >
-      <Animated.Text
+    <View style={{ marginTop: 40, width: windowWidth * 0.9 }}>
+      <LinearGradient
+        colors={["transparent", "#075856"]}
         style={{
-          position: "absolute",
-          color: textColor, // Apply dynamic color here
-          fontSize: 16,
-          alignSelf: "center",
+          height: 60,
+          borderRadius: 50,
+          borderWidth: 1,
+          padding: 5,
+          justifyContent: "center",
         }}
       >
-        Slide Left to Right
-      </Animated.Text>
-      <Animated.View
-        style={[
-          {
-            position: "absolute",
-            left: 5,
-            transform: [{ translateX: pan.x }],
-          },
-        ]}
-        {...panResponder.panHandlers}
-      >
-        <LinearGradient
-          colors={["white", "transparent"]}
-          start={{ x: 0.99, y: 0.99 }}
-          end={{ x: 1, y: 1 }}
+        <Animated.Text
           style={{
-            width: BUTTON_WIDTH,
-            height: BUTTON_WIDTH,
-            borderRadius: 50,
-            justifyContent: "center",
+            position: "absolute",
+            top: 10, // Position text at the top of the slider
+            color: textColor, // Apply dynamic color here
+            fontSize: 16,
+            alignSelf: "center",
           }}
         >
-          <AntDesign
-            name="arrowright"
-            size={24}
-            color="green"
-            style={{ alignSelf: "center" }}
-          />
-        </LinearGradient>
-      </Animated.View>
-    </LinearGradient>
+          Slide Left to Right
+        </Animated.Text>
+        <Animated.View
+          style={[
+            {
+              position: "absolute",
+              left: 5,
+              transform: [{ translateX: pan.x }],
+            },
+          ]}
+          {...panResponder.panHandlers}
+        >
+          <LinearGradient
+            colors={["white", "transparent"]}
+            start={{ x: 0.99, y: 0.99 }}
+            end={{ x: 1, y: 1 }}
+            style={{
+              width: BUTTON_WIDTH,
+              height: BUTTON_HEIGHT,
+              borderRadius: 50,
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "Outfit_Medium",
+                fontSize: 14,
+                textAlign: "center",
+              }}
+            >
+              Send Now
+            </Text>
+          </LinearGradient>
+        </Animated.View>
+      </LinearGradient>
+    </View>
   );
 };
 

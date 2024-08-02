@@ -1,7 +1,12 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import React from "react";
+import CustomSlider from "../../components/CustomSlider";
 
 export default function OnBoarding() {
+  const handleSwipe = () => {
+    // Your custom logic for handling the swipe event
+    console.log("Slider swiped!");
+  };
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
@@ -24,6 +29,15 @@ export default function OnBoarding() {
             commonly used to form of a document or a typeface.
           </Text>
         </View>
+      </View>
+      <View
+        style={{
+          position: "absolute",
+          bottom: "5%",
+          alignSelf: "center",
+        }}
+      >
+       
       </View>
     </View>
   );

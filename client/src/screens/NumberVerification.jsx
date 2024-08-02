@@ -47,7 +47,8 @@ const NumberVerification = () => {
             value={inputValue}
             editable={false}
             showSoftInputOnFocus={false}
-            placeholder="Click the numbers"
+            placeholder="000 000 000 000"
+            placeholderTextColor={"gray"}
           />
         </View>
         <View style={styles.keyBoardContainer}>

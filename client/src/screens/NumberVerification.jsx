@@ -2,7 +2,7 @@ import { View, StyleSheet, Text, TextInput, Pressable } from "react-native";
 import React, { useRef, useState } from "react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StatusBar } from "expo-status-bar";
-import CustoomKeyboard from "../../components/CustoomKeyboard";
+import CustomKeyboard from "../../components/CustomKeyboard";
 
 const NumberVerification = () => {
   const [inputValue, setInputValue] = useState("");
@@ -29,13 +29,13 @@ const NumberVerification = () => {
       <StatusBar style="auto" />
       <View style={styles.contentContainer}>
         <View style={styles.headerContainer}>
-          <Pressable style={styles.backButton}>
-            <MaterialIcons
-              name="arrow-back-ios"
-              size={24}
-              color="black"
-              style={{ marginLeft: 10 }}
-            />
+          <Pressable
+            style={styles.backButton}
+            onPress={() => {
+              /* Add your navigation logic here */
+            }}
+          >
+            <MaterialIcons name="arrow-back-ios" size={24} color="black" />
           </Pressable>
         </View>
         <View style={styles.logoContainer}>
@@ -51,7 +51,12 @@ const NumberVerification = () => {
           />
         </View>
         <View style={styles.keyBoardContainer}>
-          <CustoomKeyboard />
+          <CustomKeyboard
+            onNumberPress={handleNumberPress}
+            onIconPress={handleIconPress}
+            startRemoving={startRemoving}
+            stopRemoving={stopRemoving}
+          />
         </View>
         <View style={styles.customSliderContainer}></View>
       </View>
@@ -88,11 +93,15 @@ const styles = StyleSheet.create({
     fontFamily: "Kanit_Bold",
     fontSize: 36,
   },
-  phoneInputContainer: {},
+  phoneInputContainer: {
+    marginTop: 20,
+  },
   input: {
     width: "100%",
-    height: 10,
+    height: 50,
     borderWidth: 1,
+    padding: 10,
+    borderRadius: 5,
   },
   keyBoardContainer: {
     marginTop: "40%",

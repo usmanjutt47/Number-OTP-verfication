@@ -28,7 +28,6 @@ const CustomSlider = ({ onSwipe }) => {
             tension: 40,
           }).start(() => {
             if (onSwipe) {
-              // Call the passed callback function
               onSwipe();
             }
 

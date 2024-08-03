@@ -1,19 +1,13 @@
 const express = require("express");
 const {
-  sendOtp,
-  resendOtp,
-  verifyOtp,
-} = require("../controllers/OTPController");
+  EmailVerificationController,
+  VerifyOtpController,
+} = require("../controllers/userContoller");
 
 const router = express.Router();
 
-// Route to send OTP
-router.post("/send-otp", sendOtp);
+router.post("/send-otp", EmailVerificationController);
 
-// Route to resend OTP
-router.post("/resend-otp", resendOtp);
-
-// Route to verify OTP
-router.post("/verify-otp", verifyOtp);
+router.post("/verify-otp", VerifyOtpController);
 
 module.exports = router;

@@ -1,12 +1,11 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import SendOtpScreen from "./src/screens/SendOtpScreen";
-import VerifyOtpScreen from "./src/screens/VerifyOtpScreen";
 import { useFonts } from "expo-font";
 import CustomKeyboard from "./components/CustomKeyboard";
-import NumberVerification from "./src/screens/NumberVerification";
 import OnBoarding from "./src/screens/OnBoarding";
+import EmailVerification from "./src/screens/EmailVerification";
+import OTPVerification from "./src/screens/OTPVerification";
 
 const Stack = createStackNavigator();
 
@@ -22,6 +21,7 @@ const App = () => {
     Outfit_Semi_Bold: require("../client/assets/fonts/Outfit-SemiBold.ttf"),
     Outfit_Thin: require("../client/assets/fonts/Outfit-SemiBold.ttf"),
     Kanit_Bold: require("../client/assets/fonts/Kanit-Bold.ttf"),
+    Sf_Pro_Display_Bold: require("../client/assets/fonts/Sf_Pro_Display_Bold.ttf"),
   });
   if (!loaded) {
     return null;
@@ -32,15 +32,11 @@ const App = () => {
         initialRouteName="OnBoarding"
         screenOptions={{ headerShown: false }}
       >
-        <Stack.Screen name="SendOtp" component={SendOtpScreen} />
-        <Stack.Screen name="VerifyOtp" component={VerifyOtpScreen} />
         <Stack.Screen name="CustoomKeyboard" component={CustomKeyboard} />
-        <Stack.Screen name="OnBoarding" component={OnBoarding} />
-        <Stack.Screen
-          name="NumberVerification"
-          component={NumberVerification}
-        />
+        <Stack.Screen name="EmailVerification" component={EmailVerification} />
+        <Stack.Screen name="OTPVerification" component={OTPVerification} />
 
+        <Stack.Screen name="OnBoarding" component={OnBoarding} />
       </Stack.Navigator>
     </NavigationContainer>
   );

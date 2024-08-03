@@ -7,8 +7,7 @@ export default function OnBoarding() {
   const navigation = useNavigation();
 
   const handleSwipe = () => {
-    // Example of navigating to a specific screen
-    navigation.navigate("NumberVerification");
+    navigation.navigate("EmailVerification");
   };
 
   return (

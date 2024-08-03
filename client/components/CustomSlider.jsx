@@ -1,48 +1,56 @@
 import React, { useRef } from "react";
 import { Animated, Dimensions, PanResponder, Text, View } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
-const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
+const { width: windowWidth } = Dimensions.get("window");
 const BUTTON_WIDTH = 126;
 const BUTTON_HEIGHT = 50;
 const SWIPE_THRESHOLD = 100;
 const MAX_X = windowWidth * 0.9 - BUTTON_WIDTH - 10;
-const MAX_Y = windowHeight * 0.9 - BUTTON_HEIGHT + 10;
 
-const CustomSlider = ({ callback = () => console.log("Swipe callback") }) => {
+const CustomSlider = ({ onSwipe }) => {
   const pan = useRef(new Animated.ValueXY()).current;
+  const navigation = useNavigation();
 
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: () => true,
       onPanResponderMove: (_, gestureState) => {
-        // Restrict movement within bounds
         let newX = Math.max(0, Math.min(MAX_X, gestureState.dx));
         pan.setValue({ x: newX, y: 0 });
       },
       onPanResponderRelease: (_, gestureState) => {
         if (gestureState.dx > SWIPE_THRESHOLD) {
-          callback();
-
           Animated.spring(pan, {
             toValue: { x: MAX_X, y: 0 },
             useNativeDriver: false,
-          }).start();
+            friction: 7,
+            tension: 40,
+          }).start(() => {
+            if (onSwipe) {
+              // Call the passed callback function
+              onSwipe();
+            }
+
+            Animated.spring(pan, {
+              toValue: { x: 0, y: 0 },
+              useNativeDriver: false,
+              friction: 7,
+              tension: 40,
+              delay: 500,
+            }).start();
+          });
         } else {
           Animated.spring(pan, {
             toValue: { x: 0, y: 0 },
             useNativeDriver: false,
+            friction: 7,
+            tension: 40,
           }).start();
         }
       },
     })
   ).current;
-
-  // Dynamically change text color based on pan.x
-  const textColor = pan.x.interpolate({
-    inputRange: [0, MAX_X],
-    outputRange: ["red", "green"],
-  });
 
   return (
     <View style={{ marginTop: 40, width: windowWidth * 0.9 }}>
@@ -50,19 +58,18 @@ const CustomSlider = ({ callback = () => console.log("Swipe callback") }) => {
         style={{
           height: 60,
           borderRadius: 50,
-          borderWidth: 1,
           padding: 5,
           justifyContent: "center",
           backgroundColor: "#075856",
         }}
       >
         <Animated.Image
-          source={require("../assets/arrows.png")} // Import your image here
+          source={require("../assets/arrows.png")}
           style={{
             justifyContent: "center",
-            height: "28%", // Adjust height as needed
-            width: "25%",
-            marginLeft: "68%",
+            height: "35%",
+            width: 66,
+            marginLeft: "70%",
           }}
         />
         <Animated.View

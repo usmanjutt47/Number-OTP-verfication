@@ -6,6 +6,7 @@ import VerifyOtpScreen from "./src/screens/VerifyOtpScreen";
 import { useFonts } from "expo-font";
 import CustomKeyboard from "./components/CustomKeyboard";
 import NumberVerification from "./src/screens/NumberVerification";
+import OnBoarding from "./src/screens/OnBoarding";
 
 const Stack = createStackNavigator();
 
@@ -28,16 +29,18 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="NumberVerification"
+        initialRouteName="OnBoarding"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="SendOtp" component={SendOtpScreen} />
         <Stack.Screen name="VerifyOtp" component={VerifyOtpScreen} />
-        <Stack.Screen name="CustomKeyboard" component={CustomKeyboard} />
+        <Stack.Screen name="CustoomKeyboard" component={CustomKeyboard} />
+        <Stack.Screen name="OnBoarding" component={OnBoarding} />
         <Stack.Screen
           name="NumberVerification"
           component={NumberVerification}
         />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

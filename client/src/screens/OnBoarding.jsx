@@ -1,12 +1,16 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import React from "react";
 import CustomSlider from "../../components/CustomSlider";
+import { useNavigation } from "@react-navigation/native";
 
 export default function OnBoarding() {
+  const navigation = useNavigation();
+
   const handleSwipe = () => {
-    // Your custom logic for handling the swipe event
-    console.log("Slider swiped!");
+    // Example of navigating to a specific screen
+    navigation.navigate("NumberVerification");
   };
+
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
@@ -37,7 +41,7 @@ export default function OnBoarding() {
           alignSelf: "center",
         }}
       >
-       
+        <CustomSlider onSwipe={handleSwipe} />
       </View>
     </View>
   );

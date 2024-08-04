@@ -20,7 +20,7 @@ const EmailVerificationController = async (req, res) => {
     authenticator.options = { digits: 4 };
     const otp = authenticator.generate(userEmail);
 
-    const otpExpiresAt = new Date(Date.now() + 60 * 1000); 
+    const otpExpiresAt = new Date(Date.now() + 60 * 1000);
 
     await userModel.findOneAndUpdate(
       { email: userEmail },
@@ -53,7 +53,7 @@ const EmailVerificationController = async (req, res) => {
             <p>Hello,</p>
             <p>Thank you for joining Our App! We’re excited to have you on board. Start exploring our range of fashion products and enjoy exclusive offers.</p>
             <p>Here is your One-Time Password (OTP) to verify your email address:</p>
-            <h2 style="font-size: 24px; color: #007bff;">${otp}</h2>
+            <h2 style="font-size: 24px; color: #075856;">${otp}</h2>
             <p>If you did not request this, please ignore this email.</p>
           </div>
         </body>
@@ -126,4 +126,86 @@ const VerifyOtpController = async (req, res) => {
   }
 };
 
-module.exports = { EmailVerificationController, VerifyOtpController };
+const ResendOTPController = async (req, res) => {
+  try {
+    const userEmail = req.body.email;
+
+    if (!validateEmail(userEmail)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid email address." });
+    }
+
+    authenticator.options = { digits: 4 };
+    const otp = authenticator.generate(userEmail);
+
+    const otpExpiresAt = new Date(Date.now() + 60 * 1000);
+
+    await userModel.findOneAndUpdate(
+      { email: userEmail },
+      { otp, otpExpiresAt },
+      { upsert: true, new: true }
+    );
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const htmlContent = `
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 20px; }
+            .container { background-color: #fff; border-radius: 8px; padding: 20px; max-width: 600px; margin: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+            h1 { color: #333; }
+            p { font-size: 16px; line-height: 1.5; }
+            .footer { font-size: 14px; color: #777; margin-top: 20px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>OTP Resent</h1>
+            <p>Hello,</p>
+            <p>Here is your new One-Time Password (OTP) to verify your email address:</p>
+            <h2 style="font-size: 24px; color: #075856;">${otp}</h2>
+            <p>If you did not request this, please ignore this email.</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    const info = await transporter.sendMail({
+      from: `"Logo" <${process.env.EMAIL_USER}>`,
+      to: userEmail,
+      subject: "Resend OTP",
+      text: `Your new OTP is ${otp}.`,
+      html: htmlContent,
+    });
+
+    console.log("OTP resent email sent: %s", info.messageId);
+
+    res.status(200).json({
+      success: true,
+      message: "A new OTP has been sent to your email.",
+    });
+  } catch (error) {
+    console.error("Error in resending OTP:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error in resending OTP.",
+      error,
+    });
+  }
+};
+const sendLetterController = async (req, res) => {};
+
+module.exports = {
+  EmailVerificationController,
+  VerifyOtpController,
+  ResendOTPController,
+  sendLetterController
+};

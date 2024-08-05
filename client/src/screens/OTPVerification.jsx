@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    width: "85%",
+    width: "95%",
     // backgroundColor: "lightblue",
     alignSelf: "center",
   },

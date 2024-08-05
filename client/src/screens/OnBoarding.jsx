@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   },
   sliderContainer: {
     position: "absolute",
-    bottom: "5%",
+    bottom: "7%",
     alignSelf: "center",
     alignItems: "center",
     width: "70%",

@@ -55,7 +55,7 @@ const CustomSlider = ({ onSwipe }) => {
   ).current;
 
   return (
-    <View style={{ marginTop: 40, width: windowWidth * 0.8 }}>
+    <View style={{ width: windowWidth * 0.8 }}>
       {/* changed here */}
       <View
         style={{

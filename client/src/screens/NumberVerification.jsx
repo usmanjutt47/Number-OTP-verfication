@@ -17,18 +17,22 @@ const NumberVerification = () => {
   const intervalRef = useRef(null);
 
   const handleNumberPress = (number) => {
+    console.log("Number pressed:", number);
     setInputValue((prevValue) => prevValue + number);
   };
 
   const handleIconPress = () => {
+    console.log("Icon pressed");
     setInputValue((prevValue) => prevValue.slice(0, -1));
   };
 
   const startRemoving = () => {
+    console.log("Start removing");
     intervalRef.current = setInterval(handleIconPress, 10);
   };
 
   const stopRemoving = () => {
+    console.log("Stop removing");
     clearInterval(intervalRef.current);
   };
 
@@ -57,7 +61,6 @@ const NumberVerification = () => {
             showSoftInputOnFocus={false}
             placeholder="0092 000 000 000 000"
             placeholderTextColor="gray"
-            // No need for textColor as we set the color directly in the style
           />
         </View>
         <View style={styles.keyBoardContainer}>
@@ -118,7 +121,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 30,
     paddingLeft: 20,
-    color: "black", // Set the text color to red
+    color: "black",
   },
   keyBoardContainer: {
     marginTop: "15%",

@@ -1,7 +1,10 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, Dimensions } from "react-native";
 import React from "react";
 import CustomSlider from "../../components/CustomSlider";
 import { useNavigation } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
+
+const { width, height } = Dimensions.get("window");
 
 export default function OnBoarding() {
   const navigation = useNavigation();
@@ -12,6 +15,7 @@ export default function OnBoarding() {
 
   return (
     <View style={styles.container}>
+      <StatusBar style="black" />
       <View style={styles.innerContainer}>
         <Image
           source={require("../../assets/images/main_img.png")}
@@ -33,13 +37,7 @@ export default function OnBoarding() {
           </Text>
         </View>
       </View>
-      <View
-        style={{
-          position: "absolute",
-          bottom: "5%",
-          alignSelf: "center",
-        }}
-      >
+      <View style={styles.sliderContainer}>
         <CustomSlider onSwipe={handleSwipe} />
       </View>
     </View>
@@ -49,11 +47,12 @@ export default function OnBoarding() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: "3%",
+    justifyContent: "center",
   },
   innerContainer: {
-    height: "100%",
-    width: "100%",
+    height: "95%",
+    width: "85%",
+    alignSelf: "center",
   },
   topSideImage: {
     height: "100%",
@@ -67,7 +66,7 @@ const styles = StyleSheet.create({
   },
   mainImage: {
     width: "100%",
-    height: "30%",
+    height: "31%",
     borderRadius: 19,
     position: "absolute",
     top: 0,
@@ -76,33 +75,40 @@ const styles = StyleSheet.create({
   },
   logoText: {
     fontFamily: "Kanit_Bold",
-    fontSize: 36,
-    padding: "5%",
+    fontSize: width * 0.09,
+    padding: width * 0.05,
   },
   textContainer: {
     width: "80%",
     justifyContent: "center",
     alignSelf: "center",
     position: "absolute",
-    top: "60%",
+    top: "61%",
   },
   mainHeading: {
     color: "#fff",
-    textAlign: "center",
     fontSize: 34,
+    height: "100%",
+    textAlign: "center",
     fontFamily: "Outfit_Bold",
   },
   punchLineContainer: {
-    width: "80%",
     justifyContent: "center",
     alignSelf: "center",
+    width: "100%",
+    top: "72%",
     position: "absolute",
-    top: "70%",
   },
   punchLineText: {
     fontSize: 16,
     fontFamily: "Outfit_Regular",
     color: "#fff",
     textAlign: "center",
+  },
+  sliderContainer: {
+    position: "absolute",
+    bottom: "5%",
+    alignSelf: "center",
+    width: "90%",
   },
 });

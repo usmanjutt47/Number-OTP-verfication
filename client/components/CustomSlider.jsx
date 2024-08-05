@@ -3,10 +3,13 @@ import { Animated, Dimensions, PanResponder, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 const { width: windowWidth } = Dimensions.get("window");
-const BUTTON_WIDTH = 126;
+const BUTTON_WIDTH = 120;
 const BUTTON_HEIGHT = 50;
 const SWIPE_THRESHOLD = 100;
-const MAX_X = windowWidth * 0.9 - BUTTON_WIDTH - 10;
+{
+  /* changed here */
+}
+const MAX_X = windowWidth * 0.8 - BUTTON_WIDTH - 10;
 
 const CustomSlider = ({ onSwipe }) => {
   const pan = useRef(new Animated.ValueXY()).current;
@@ -52,7 +55,8 @@ const CustomSlider = ({ onSwipe }) => {
   ).current;
 
   return (
-    <View style={{ marginTop: 40, width: windowWidth * 0.9 }}>
+    <View style={{ marginTop: 40, width: windowWidth * 0.8 }}>
+      {/* changed here */}
       <View
         style={{
           height: 60,
@@ -66,9 +70,9 @@ const CustomSlider = ({ onSwipe }) => {
           source={require("../assets/arrows.png")}
           style={{
             justifyContent: "center",
-            height: "35%",
-            width: 66,
-            marginLeft: "70%",
+            height: "30%",
+            width: "30%",
+            marginLeft: "50%",
           }}
         />
         <Animated.View

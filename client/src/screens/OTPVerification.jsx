@@ -1,13 +1,19 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
 
 export default function OTPVerification() {
+  const navigation = useNavigation();
+
+  const handleNavigate = () => {
+    navigation.goBack();
+  };
   return (
     <View style={styles.mainContainer}>
       <View style={styles.contentContainer}>
         <View style={styles.headerContainer}>
-          <Pressable style={styles.backArrowContainer}>
+          <Pressable onPress={handleNavigate} style={styles.backArrowContainer}>
             <Ionicons
               name="chevron-back-sharp"
               size={24}

@@ -1,6 +1,8 @@
 const userModel = require("../models/userModel");
 const { authenticator } = require("otplib");
 const nodemailer = require("nodemailer");
+const mongoose = require("mongoose");
+const Letter = require("../models/letterModel");
 
 function validateEmail(email) {
   const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -72,8 +74,7 @@ const EmailVerificationController = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message:
-        "We've sent an OTP to your email. Check your inbox and use it to verify your account!",
+      message: "OTP sent successfully",
     });
   } catch (error) {
     console.error("Error in sending welcome email:", error);
@@ -95,7 +96,7 @@ const VerifyOtpController = async (req, res) => {
         .json({ success: false, message: "Invalid email or OTP." });
     }
 
-    const user = await userModel.findOne({ email, otp });
+    let user = await userModel.findOne({ email, otp });
 
     if (!user) {
       return res.status(400).json({ success: false, message: "Invalid OTP." });
@@ -107,15 +108,22 @@ const VerifyOtpController = async (req, res) => {
         .json({ success: false, message: "OTP has expired." });
     }
 
+    // Generate and save userId if it doesn't exist
+    if (!user.userId) {
+      user.userId = user._id.toString(); // Use the _id as the userId
+    }
+
+    // Clear OTP after verification
+    user.otp = null;
+    user.otpExpiresAt = null;
+    await user.save();
+
     res.status(200).json({
       success: true,
       message: "OTP verified successfully.",
+      userId: user.userId
     });
 
-    await userModel.findOneAndUpdate(
-      { email, otp },
-      { otp: null, otpExpiresAt: null }
-    );
   } catch (error) {
     console.error("Error in verifying OTP:", error);
     res.status(500).json({
@@ -125,6 +133,8 @@ const VerifyOtpController = async (req, res) => {
     });
   }
 };
+
+
 
 const ResendOTPController = async (req, res) => {
   try {
@@ -201,11 +211,18 @@ const ResendOTPController = async (req, res) => {
     });
   }
 };
-const sendLetterController = async (req, res) => {};
+
+const createLetterController = async (req, res) => {
+  try {
+    const userId = req.cookies.userId;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 module.exports = {
   EmailVerificationController,
   VerifyOtpController,
   ResendOTPController,
-  sendLetterController
+  createLetterController,
 };

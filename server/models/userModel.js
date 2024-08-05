@@ -2,20 +2,11 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-    },
-    otp: {
-      type: String,
-      required: true,
-    },
-    otpExpiresAt: {
-      type: Date,
-      required: true,
-    },
+    email: { type: String, required: true, unique: true },
+
+    otp: { type: String, required: false, default: null },
+    otpExpiresAt: { type: Date, required: false, default: null },
+    userId: { type: String },
   },
   { timestamps: true }
 );

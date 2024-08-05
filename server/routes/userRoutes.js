@@ -3,7 +3,7 @@ const {
   EmailVerificationController,
   VerifyOtpController,
   ResendOTPController,
-  sendLetterController,
+  createLetterController,
 } = require("../controllers/userContoller");
 
 const router = express.Router();
@@ -14,6 +14,6 @@ router.post("/verify-otp", VerifyOtpController);
 
 router.post("/resend-otp", ResendOTPController);
 
-router.post("/send-letter",sendLetterController);
+router.post("/create-letter", createLetterController);
 
 module.exports = router;

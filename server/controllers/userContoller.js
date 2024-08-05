@@ -121,9 +121,8 @@ const VerifyOtpController = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "OTP verified successfully.",
-      userId: user.userId
+      userId: user.userId,
     });
-
   } catch (error) {
     console.error("Error in verifying OTP:", error);
     res.status(500).json({
@@ -133,8 +132,6 @@ const VerifyOtpController = async (req, res) => {
     });
   }
 };
-
-
 
 const ResendOTPController = async (req, res) => {
   try {
@@ -214,9 +211,52 @@ const ResendOTPController = async (req, res) => {
 
 const createLetterController = async (req, res) => {
   try {
-    const userId = req.cookies.userId;
+    const { userId, content } = req.body;
+
+    if (!userId || !content) {
+      return res
+        .status(400)
+        .json({ message: "User ID and content are required" });
+    }
+
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const newLetter = new Letter({
+      userId,
+      content,
+      createdAt: new Date(),
+    });
+
+    await newLetter.save();
+
+    res
+      .status(201)
+      .json({ message: "Letter created successfully", letter: newLetter });
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const getLetterController = async (req, res) => {
+  try {
+    // Fetch all letters from the database
+    const letters = await Letter.find().populate("userId", "email"); // Populate userId if you want to include user details
+
+    // Return the letters in the response
+    res.status(200).json({
+      success: true,
+      letters,
+    });
+  } catch (error) {
+    console.error("Error retrieving letters:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while retrieving letters.",
+    });
   }
 };
 
@@ -225,4 +265,5 @@ module.exports = {
   VerifyOtpController,
   ResendOTPController,
   createLetterController,
+  getLetterController,
 };

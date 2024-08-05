@@ -64,8 +64,8 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    width: "90%",
-    backgroundColor: "lightblue",
+    width: "85%",
+    // backgroundColor: "lightblue",
     alignSelf: "center",
   },
   headerContainer: {
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     height: 52,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F0F0F1",
+    backgroundColor: "#D9D9D9",
     borderRadius: 26,
   },
 });

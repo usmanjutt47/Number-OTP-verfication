@@ -7,11 +7,7 @@ import { useNavigation } from "@react-navigation/native";
 
 export default function EmailVerification() {
   const navigation = useNavigation();
-
   const handleNavigate = () => {
-    navigation.goBack();
-  };
-  const handleSwipe = () => {
     navigation.navigate("OTPVerification");
   };
   return (
@@ -19,7 +15,7 @@ export default function EmailVerification() {
       <StatusBar style="auto" />
       <View style={styles.contentContainer}>
         {/* header starts here */}
-        <Pressable onPress={handleNavigate} style={styles.backArrowContainer}>
+        <Pressable style={styles.backArrowContainer}>
           <Ionicons
             name="chevron-back-sharp"
             size={24}
@@ -46,7 +42,7 @@ export default function EmailVerification() {
           />
         </View>
         <View style={styles.sliderContainer}>
-          <CustomSlider onSwipe={handleSwipe} />
+          <CustomSlider onSwipe={handleNavigate} />
         </View>
       </View>
     </View>
@@ -60,7 +56,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    width: "85%",
+    width: "90%",
     alignSelf: "center",
   },
 
@@ -69,7 +65,7 @@ const styles = StyleSheet.create({
     height: 52,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#D9D9D9",
+    backgroundColor: "#F0F0F1",
     borderRadius: 26,
     marginTop: "10%",
   },

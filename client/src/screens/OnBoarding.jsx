@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     height: "95%",
-    width: "85%",
+    width: "90%",
     alignSelf: "center",
   },
   topSideImage: {
@@ -109,6 +109,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: "5%",
     alignSelf: "center",
-    width: "90%",
+    alignItems: "center",
+    width: "70%",
   },
 });

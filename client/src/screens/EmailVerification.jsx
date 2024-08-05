@@ -1,15 +1,74 @@
-import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
-import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Pressable,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
+import React, { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StatusBar } from "expo-status-bar";
-import CustomSlider from "../../components/CustomSlider";
 import { useNavigation } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
 
 export default function EmailVerification() {
   const navigation = useNavigation();
-  const handleNavigate = () => {
-    navigation.navigate("OTPVerification");
+
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handelSendOTP = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        "http://192.168.100.6:8080/api/v1/auth/send-otp",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        Toast.show({
+          type: "success",
+          text1: "Success",
+          text2: "OTP sent successfully. Please check your email.",
+          visibilityTime: 500,
+        });
+        setEmail("");
+        setTimeout(() => {
+          navigation.navigate("OTPVerification");
+        }, 500);
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: data.message || "Failed to send OTP.",
+        });
+      }
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "An error occurred while sending OTP.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
+
   return (
     <View style={styles.mainContainer}>
       <StatusBar style="auto" />
@@ -39,12 +98,45 @@ export default function EmailVerification() {
             placeholder="Enter your email"
             placeholderTextColor={"#434343"}
             keyboardType="email-address"
+            value={email}
+            onChangeText={(text) => setEmail(text)}
           />
         </View>
         <View style={styles.sliderContainer}>
-          <CustomSlider onSwipe={handleNavigate} />
+          <TouchableOpacity
+            onPress={handelSendOTP}
+            style={{
+              backgroundColor: "#075856",
+              height: 48,
+              width: "100%",
+              justifyContent: "center",
+              borderRadius: 49,
+            }}
+            disabled={loading}
+          >
+            <Text
+              style={{
+                color: "#fff",
+                fontSize: 16,
+                textAlign: "center",
+                fontFamily: "Outfit_Medium",
+              }}
+            >
+              Send Now
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator
+            size="large"
+            color="#075856"
+            style={{ marginTop: "25%" }}
+          />
+        </View>
+      )}
+      <Toast />
     </View>
   );
 }
@@ -59,7 +151,6 @@ const styles = StyleSheet.create({
     width: "90%",
     alignSelf: "center",
   },
-
   backArrowContainer: {
     width: 52,
     height: 52,
@@ -90,7 +181,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 15,
     top: 15,
-    zIndex: 1, // Ensures the icon is above the TextInput
+    zIndex: 1,
   },
   emailInput: {
     width: "100%",
@@ -98,12 +189,18 @@ const styles = StyleSheet.create({
     borderColor: "#6c6c6c",
     borderWidth: 1,
     borderRadius: 30,
-    paddingLeft: 50, // Ensure there's enough padding for the icon
+    paddingLeft: 50,
     backgroundColor: "#fff",
-    zIndex: 0, // Ensures the TextInput is below the icon
+    zIndex: 0,
   },
   sliderContainer: {
-    marginTop: "75%",
-    alignSelf: "center",
+    alignItems: "center",
+    marginTop: "90%",
+  },
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
 });

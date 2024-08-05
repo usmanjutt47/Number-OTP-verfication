@@ -1,19 +1,14 @@
 import React, { useRef } from "react";
 import { Animated, Dimensions, PanResponder, Text, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 
 const { width: windowWidth } = Dimensions.get("window");
 const BUTTON_WIDTH = 120;
 const BUTTON_HEIGHT = 50;
 const SWIPE_THRESHOLD = 100;
-{
-  /* changed here */
-}
 const MAX_X = windowWidth * 0.8 - BUTTON_WIDTH - 10;
 
 const CustomSlider = ({ onSwipe }) => {
   const pan = useRef(new Animated.ValueXY()).current;
-  const navigation = useNavigation();
 
   const panResponder = useRef(
     PanResponder.create({
@@ -56,7 +51,6 @@ const CustomSlider = ({ onSwipe }) => {
 
   return (
     <View style={{ width: windowWidth * 0.8 }}>
-      {/* changed here */}
       <View
         style={{
           height: 60,
@@ -97,7 +91,7 @@ const CustomSlider = ({ onSwipe }) => {
             <Text
               style={{
                 fontFamily: "Outfit_Medium",
-                fontSize: 14,
+                fontSize: 16,
                 textAlign: "center",
               }}
             >

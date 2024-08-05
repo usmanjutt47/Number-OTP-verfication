@@ -1,4 +1,3 @@
-// models/letterModel.js
 const mongoose = require("mongoose");
 
 const letterSchema = new mongoose.Schema({
@@ -6,11 +5,21 @@ const letterSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
-    index: true, // Add an index to optimize queries by userId
+    index: true,
   },
   content: {
     type: String,
     required: true,
+    validate: {
+      validator: function (v) {
+        const wordCount = v.split(/\s+/).length;
+        return wordCount <= 500;
+      },
+      message: (props) =>
+        `Content exceeds the 500-word limit. Current word count is ${
+          props.value.split(/\s+/).length
+        }.`,
+    },
   },
   createdAt: {
     type: Date,
@@ -22,7 +31,6 @@ const letterSchema = new mongoose.Schema({
   },
 });
 
-// Update `updatedAt` field on each save
 letterSchema.pre("save", function (next) {
   if (this.isModified()) {
     this.updatedAt = Date.now();

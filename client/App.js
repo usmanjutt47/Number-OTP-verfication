@@ -6,7 +6,6 @@ import CustomKeyboard from "./components/CustomKeyboard";
 import OnBoarding from "./src/screens/OnBoarding";
 import EmailVerification from "./src/screens/EmailVerification";
 import OTPVerification from "./src/screens/OTPVerification";
-import Test from "./Test";
 
 const Stack = createStackNavigator();
 
@@ -30,7 +29,7 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Test"
+        initialRouteName="OnBoarding"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="CustoomKeyboard" component={CustomKeyboard} />
@@ -38,7 +37,6 @@ const App = () => {
         <Stack.Screen name="OTPVerification" component={OTPVerification} />
 
         <Stack.Screen name="OnBoarding" component={OnBoarding} />
-        <Stack.Screen name="Test" component={Test} />
       </Stack.Navigator>
     </NavigationContainer>
   );

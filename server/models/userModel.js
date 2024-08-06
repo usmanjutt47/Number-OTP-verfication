@@ -2,15 +2,29 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    email: { type: String, required: true, unique: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
 
-    otp: { type: String, required: false, default: null },
-    otpExpiresAt: { type: Date, required: false, default: null },
-    userId: { type: String },
+    otp: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    otpExpiresAt: {
+      type: Date,
+      required: false,
+      default: null,
+    },
+    userId: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
 
-userSchema.index({ otpExpiresAt: 1 }, { expireAfterSeconds: 60 });
+// userSchema.index({ otpExpiresAt: 1 }, { expireAfterSeconds: 60 });
 
 module.exports = mongoose.model("User", userSchema);

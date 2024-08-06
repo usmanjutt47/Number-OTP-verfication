@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { useFonts } from "expo-font";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomKeyboard from "./components/CustomKeyboard";
 import OnBoarding from "./screens/OnBoarding";
 import EmailVerification from "./screens/EmailVerification";
@@ -11,6 +12,8 @@ import Home from "./screens/Home";
 const Stack = createStackNavigator();
 
 const App = () => {
+  const [initialRoute, setInitialRoute] = useState(null);
+
   const [loaded] = useFonts({
     Outfit_Black: require("../client/assets/fonts/Outfit-Black.ttf"),
     Outfit_Bold: require("../client/assets/fonts/Outfit-Bold.ttf"),
@@ -24,14 +27,30 @@ const App = () => {
     Kanit_Bold: require("../client/assets/fonts/Kanit-Bold.ttf"),
     Sf_Pro_Display_Bold: require("../client/assets/fonts/Sf_Pro_Display_Bold.ttf"),
   });
-  if (!loaded) {
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const userId = await AsyncStorage.getItem("userId");
+      if (userId) {
+        setInitialRoute("Home");
+      } else {
+        setInitialRoute("OnBoarding");
+      }
+    };
+
+    checkUser();
+  }, []);
+
+  if (!loaded || initialRoute === null) {
     return null;
   }
+
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="OnBoarding"
-        screenOptions={{ headerShown: false }}>
+        initialRouteName={initialRoute}
+        screenOptions={{ headerShown: false }}
+      >
         <Stack.Screen name="CustoomKeyboard" component={CustomKeyboard} />
         <Stack.Screen name="EmailVerification" component={EmailVerification} />
         <Stack.Screen name="OTPVerification" component={OTPVerification} />

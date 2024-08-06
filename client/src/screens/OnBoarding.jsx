@@ -1,45 +1,51 @@
-import { View, Text, StyleSheet, Image, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  ImageBackground,
+  Image,
+  StyleSheet,
+  Dimensions,
+} from "react-native";
 import React from "react";
+import { StatusBar } from "expo-status-bar";
 import CustomSlider from "../../components/CustomSlider";
 import { useNavigation } from "@react-navigation/native";
-import { StatusBar } from "expo-status-bar";
 
 const { width, height } = Dimensions.get("window");
 
 export default function OnBoarding() {
   const navigation = useNavigation();
-
-  const handleSwipe = () => {
-    navigation.navigate("EmailVerification");
-  };
-
   return (
     <View style={styles.container}>
-      <StatusBar style="black" />
-      <View style={styles.innerContainer}>
-        <Image
-          source={require("../../assets/images/main_img.png")}
-          style={styles.topSideImage}
-        />
-
+      <StatusBar style="auto" />
+      <ImageBackground
+        source={require("../../assets/images/main_img.png")}
+        style={styles.imageBackground}
+      >
         <Image
           source={require("../../assets/images/image.png")}
           style={styles.mainImage}
         />
         <Text style={styles.logoText}>Logo</Text>
-        <View style={styles.textContainer}>
-          <Text style={styles.mainHeading}>Modern Way Of Managing Finance</Text>
+        <View style={styles.headingContainer}>
+          <Text style={styles.mainHeading}>Modern Way Of</Text>
+          <Text style={styles.mainHeading}>Managing Finance</Text>
         </View>
         <View style={styles.punchLineContainer}>
           <Text style={styles.punchLineText}>
-            In publishing and graphic design, Lorem ipsum is a placeholder text
-            commonly used to form of a document or a typeface.
+            In publishing and graphic design, Lorem ipsum is a
           </Text>
+          <Text style={styles.punchLineText}>
+            placeholder text commonly used to form of a
+          </Text>
+          <Text style={styles.punchLineText}>document or a typeface.</Text>
         </View>
-      </View>
-      <View style={styles.sliderContainer}>
-        <CustomSlider onSwipe={handleSwipe} />
-      </View>
+        <View style={styles.sliderContainer}>
+          <CustomSlider
+            onSwipe={() => navigation.navigate("EmailVerification")}
+          />
+        </View>
+      </ImageBackground>
     </View>
   );
 }
@@ -47,69 +53,58 @@ export default function OnBoarding() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    backgroundColor: "yellow",
+    padding: "3%",
   },
-  innerContainer: {
-    height: "95%",
-    width: "90%",
-    alignSelf: "center",
-  },
-  topSideImage: {
-    height: "100%",
+  imageBackground: {
+    flex: 1,
     width: "100%",
     borderRadius: 19,
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
+    overflow: "hidden",
   },
   mainImage: {
     width: "100%",
-    height: "31%",
-    borderRadius: 19,
+    height: height * 0.33,
+    resizeMode: "cover",
     position: "absolute",
     top: 0,
-    left: 0,
-    right: 0,
   },
   logoText: {
-    fontFamily: "Kanit_Bold",
-    fontSize: width * 0.09,
-    padding: width * 0.05,
-  },
-  textContainer: {
-    width: "80%",
-    justifyContent: "center",
-    alignSelf: "center",
+    color: "#000000",
+    fontSize: 36,
     position: "absolute",
-    top: "61%",
+    top: 10,
+    left: 10,
+    fontFamily: "Kanit_Bold",
+  },
+  headingContainer: {
+    position: "absolute",
+    top: height * 0.45,
+    width: "100%",
+    alignItems: "center",
   },
   mainHeading: {
+    fontSize: width * 0.08,
     color: "#fff",
-    fontSize: 34,
-    height: "100%",
-    textAlign: "center",
     fontFamily: "Outfit_Bold",
+    textAlign: "center",
   },
   punchLineContainer: {
-    justifyContent: "center",
-    alignSelf: "center",
-    width: "100%",
-    top: "72%",
     position: "absolute",
+    top: height * 0.6,
+    width: "100%",
+    alignItems: "center",
   },
   punchLineText: {
-    fontSize: 16,
-    fontFamily: "Outfit_Regular",
+    fontSize: width * 0.04,
     color: "#fff",
+    fontFamily: "Outfit_Regular",
     textAlign: "center",
   },
   sliderContainer: {
     position: "absolute",
-    bottom: "5%",
-    alignSelf: "center",
+    bottom: height * 0.05,
+    width: "100%",
     alignItems: "center",
-    width: "70%",
   },
 });

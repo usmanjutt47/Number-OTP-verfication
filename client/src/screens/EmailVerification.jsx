@@ -23,7 +23,7 @@ export default function EmailVerification() {
     setLoading(true);
     try {
       const response = await fetch(
-        "http://192.168.100.6:8080/api/v1/auth/send-otp",
+        "http://192.168.100.175:8080/api/v1/auth/send-otp",
         {
           method: "POST",
           headers: {
@@ -48,7 +48,7 @@ export default function EmailVerification() {
         });
         setEmail("");
         setTimeout(() => {
-          navigation.navigate("OTPVerification");
+          navigation.navigate("OTPVerification", { email: email });
         }, 500);
       } else {
         Toast.show({

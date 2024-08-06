@@ -89,7 +89,6 @@ const EmailVerificationController = async (req, res) => {
 const VerifyOtpController = async (req, res) => {
   try {
     const { email, otp } = req.body;
-
     if (!validateEmail(email) || !otp) {
       return res
         .status(400)
@@ -97,7 +96,6 @@ const VerifyOtpController = async (req, res) => {
     }
 
     let user = await userModel.findOne({ email, otp });
-
     if (!user) {
       return res.status(400).json({ success: false, message: "Invalid OTP." });
     }
@@ -108,12 +106,10 @@ const VerifyOtpController = async (req, res) => {
         .json({ success: false, message: "OTP has expired." });
     }
 
-    // Generate and save userId if it doesn't exist
     if (!user.userId) {
-      user.userId = user._id.toString(); // Use the _id as the userId
+      user.userId = user._id.toString();
     }
 
-    // Clear OTP after verification
     user.otp = null;
     user.otpExpiresAt = null;
     await user.save();
@@ -243,10 +239,8 @@ const createLetterController = async (req, res) => {
 
 const getLetterController = async (req, res) => {
   try {
-    // Fetch all letters from the database
-    const letters = await Letter.find().populate("userId", "email"); // Populate userId if you want to include user details
+    const letters = await Letter.find().populate("userId", "email");
 
-    // Return the letters in the response
     res.status(200).json({
       success: true,
       letters,

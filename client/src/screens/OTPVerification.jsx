@@ -1,34 +1,41 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  Image,
   Pressable,
   TextInput,
+  Alert,
 } from "react-native";
-import CustomSlider from "../../components/CustomSlider";
+import axios from "axios";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useRoute } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
 
-export default function OTPVerification() {
+export default function OTPVerification({ navigation }) {
   const [inputValues, setInputValues] = useState(["", "", "", ""]);
+  const [otp, setOtp] = useState("");
   const inputRefs = useRef([]);
   const timerRef = useRef(null);
+  const route = useRoute();
+  const email = route.params?.email || "";
 
-  const handleNumberPress = (number) => {
-    const firstEmptyIndex = inputValues.findIndex((value) => value === "");
+  useEffect(() => {
+    // Update OTP from input values whenever they change
+    setOtp(inputValues.join(""));
+  }, [inputValues]);
 
-    if (firstEmptyIndex !== -1) {
-      setInputValues((prevValues) => {
-        const newValues = [...prevValues];
-        newValues[firstEmptyIndex] = number;
-        return newValues;
-      });
+  const handleTextChange = (text, index) => {
+    const newInputValues = [...inputValues];
+    newInputValues[index] = text;
 
-      if (firstEmptyIndex < inputRefs.current.length - 1) {
-        inputRefs.current[firstEmptyIndex + 1].focus();
-      }
+    setInputValues(newInputValues);
+
+    if (text.length === 1 && index < inputRefs.current.length - 1) {
+      inputRefs.current[index + 1].focus();
+    } else if (text.length === 0 && index > 0) {
+      inputRefs.current[index - 1].focus();
     }
   };
 
@@ -61,60 +68,89 @@ export default function OTPVerification() {
     clearInterval(timerRef.current);
   };
 
+  const formatEmail = (email) => {
+    if (!email) return "";
+    const [localPart, domainPart] = email.split("@");
+    if (!localPart || !domainPart) return "";
+    const start = localPart.slice(0, 2);
+    const end = localPart.slice(-2);
+    const masked = "*".repeat(localPart.length - 4);
+    return `${start}${masked}${end}@${domainPart}`;
+  };
+
+  const handleOtpVerification = async () => {
+    if (!otp) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "OTP is required.",
+      });
+      return;
+    }
+
+    const email = route.params?.email || "";
+    console.log("Sending OTP:", otp);
+
+    try {
+      const response = await axios.post(
+        "http://192.168.100.175:8080/api/v1/auth/verify-otp",
+        { email, otp }
+      );
+
+      if (response.data.success) {
+        Toast.show({
+          type: "success",
+          text1: "Success",
+          text2: "OTP verified successfully.",
+        });
+
+        // Navigate after 500 milliseconds
+        setTimeout(() => {
+          navigation.navigate("Home"); // Replace "Home" with your actual route name
+        }, 500);
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: response.data.message,
+        });
+      }
+    } catch (error) {
+      if (error.response) {
+        console.error("Error response:", error.response.data);
+      } else if (error.request) {
+        console.error("Error request:", error.request);
+      } else {
+        console.error("Error message:", error.message);
+      }
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "An error occurred while verifying OTP.",
+      });
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          height: "6%",
-          width: "100%",
-          flexDirection: "row",
-          marginTop: "5%",
-        }}
-      >
+      <View style={styles.header}>
         <Pressable
-          style={{
-            height: 52,
-            width: 52,
-            backgroundColor: "#d9d9d9",
-            borderRadius: 30,
-            justifyContent: "center",
-          }}
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
         >
           <Ionicons
             name="chevron-back"
             size={24}
             color="black"
-            style={{ alignSelf: "center" }}
+            style={styles.icon}
           />
         </Pressable>
-        <Text
-          style={{
-            fontFamily: "Sf_Pro_Display_Bold",
-            fontSize: 20,
-            paddingLeft: 10,
-            alignSelf: "center",
-          }}
-        >
-          Enter Otp
-        </Text>
+        <Text style={styles.headerText}>Enter OTP</Text>
       </View>
-      <View
-        style={{
-          alignSelf: "center",
-          marginTop: "30%",
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "Outfit_Medium",
-            fontSize: 32,
-            textAlign: "center",
-          }}
-        >
-          EnterYour OTP
-        </Text>
-        <Text style={{ color: "#555555", textAlign: "center" }}>
-          Code has sent to usmanjutt04747@gmail.com
+      <View style={styles.content}>
+        <Text style={styles.title}>Enter Your OTP</Text>
+        <Text style={styles.subtitle}>
+          Code has been sent to {formatEmail(email)}
         </Text>
       </View>
       <View style={styles.inputsContainer}>
@@ -126,64 +162,16 @@ export default function OTPVerification() {
             ref={(ref) => (inputRefs.current[index] = ref)}
             keyboardType="numeric"
             maxLength={1}
-            editable={false}
+            onChangeText={(text) => handleTextChange(text, index)}
           />
         ))}
       </View>
-      <View style={styles.buttonsContainer}>
-        <View style={styles.row}>
-          {[1, 2, 3, 4].map((number) => (
-            <TouchableOpacity
-              key={number}
-              style={styles.button}
-              onPress={() => handleNumberPress(number.toString())}
-            >
-              <Text style={styles.buttonText}>{number}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-        <View style={styles.row}>
-          {[5, 6, 7, 8].map((number) => (
-            <TouchableOpacity
-              key={number}
-              style={styles.button}
-              onPress={() => handleNumberPress(number.toString())}
-            >
-              <Text style={styles.buttonText}>{number}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-        <View style={styles.row}>
-          {[".", 9, 0].map((number) => (
-            <TouchableOpacity
-              key={number}
-              style={styles.button}
-              onPress={() => handleNumberPress(number.toString())}
-            >
-              <Text style={styles.buttonText}>{number}</Text>
-            </TouchableOpacity>
-          ))}
-          <Pressable
-            style={styles.iconButton}
-            onPress={handleIconPress}
-            onLongPress={handleLongPress}
-            onPressOut={handlePressOut}
-          >
-            <Image
-              source={require("../../assets/icons/cross.png")}
-              style={styles.icon}
-            />
-          </Pressable>
-        </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={handleOtpVerification} style={styles.button}>
+          <Text style={styles.buttonText}>Verify OTP</Text>
+        </TouchableOpacity>
       </View>
-      <View
-        style={{
-          alignSelf: "center",
-          marginTop: "30%",
-        }}
-      >
-        <CustomSlider />
-      </View>
+      <Toast/>
     </View>
   );
 }
@@ -193,6 +181,41 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
     padding: "5%",
+  },
+  header: {
+    height: "6%",
+    width: "100%",
+    flexDirection: "row",
+    marginTop: "5%",
+  },
+  backButton: {
+    height: 52,
+    width: 52,
+    backgroundColor: "#d9d9d9",
+    borderRadius: 30,
+    justifyContent: "center",
+  },
+  icon: {
+    alignSelf: "center",
+  },
+  headerText: {
+    fontFamily: "Sf_Pro_Display_Bold",
+    fontSize: 20,
+    paddingLeft: 10,
+    alignSelf: "center",
+  },
+  content: {
+    alignSelf: "center",
+    marginTop: "30%",
+  },
+  title: {
+    fontFamily: "Outfit_Medium",
+    fontSize: 32,
+    textAlign: "center",
+  },
+  subtitle: {
+    color: "#555555",
+    textAlign: "center",
   },
   inputsContainer: {
     flexDirection: "row",
@@ -208,43 +231,21 @@ const styles = StyleSheet.create({
     height: 80,
     fontFamily: "Outfit_Regular",
   },
-  buttonsContainer: {
-    justifyContent: "space-between",
-    width: "100%",
-    alignSelf: "center",
-    marginTop: "20%",
-    gap: 10,
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  buttonContainer: {
+    alignItems: "center",
+    marginTop: "30%",
   },
   button: {
-    borderRadius: 50,
-    width: 72,
-    height: 72,
-    alignItems: "center",
+    backgroundColor: "#075856",
+    height: 48,
+    width: "100%",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#ddd",
+    borderRadius: 49,
   },
   buttonText: {
-    fontSize: 26,
+    color: "#fff",
+    fontSize: 16,
     textAlign: "center",
-    fontFamily: "Outfit_Regular",
-  },
-  iconButton: {
-    borderRadius: 50,
-    width: 72,
-    height: 72,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-  icon: {
-    height: 24,
-    width: 24,
-    resizeMode: "contain",
+    fontFamily: "Outfit_Medium",
   },
 });

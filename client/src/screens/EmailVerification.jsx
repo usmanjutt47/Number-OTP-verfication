@@ -6,12 +6,15 @@ import {
   Pressable,
   TouchableOpacity,
   ActivityIndicator,
+  Dimensions,
 } from "react-native";
 import React, { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
+
+const { height, width } = Dimensions.get("window");
 
 export default function EmailVerification() {
   const navigation = useNavigation();
@@ -73,7 +76,6 @@ export default function EmailVerification() {
     <View style={styles.mainContainer}>
       <StatusBar style="auto" />
       <View style={styles.contentContainer}>
-        {/* header starts here */}
         <Pressable style={styles.backArrowContainer}>
           <Ionicons
             name="chevron-back-sharp"
@@ -102,30 +104,15 @@ export default function EmailVerification() {
             onChangeText={(text) => setEmail(text)}
           />
         </View>
-        <View style={styles.sliderContainer}>
-          <TouchableOpacity
-            onPress={handelSendOTP}
-            style={{
-              backgroundColor: "#075856",
-              height: 48,
-              width: "100%",
-              justifyContent: "center",
-              borderRadius: 49,
-            }}
-            disabled={loading}
-          >
-            <Text
-              style={{
-                color: "#fff",
-                fontSize: 16,
-                textAlign: "center",
-                fontFamily: "Outfit_Medium",
-              }}
-            >
-              Send Now
-            </Text>
-          </TouchableOpacity>
-        </View>
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          onPress={handelSendOTP}
+          style={styles.sendButton}
+          disabled={loading}
+        >
+          <Text style={styles.sendButtonText}>Send Now</Text>
+        </TouchableOpacity>
       </View>
       {loading && (
         <View style={styles.loadingContainer}>
@@ -150,52 +137,73 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "90%",
     alignSelf: "center",
+    justifyContent: "center",
   },
   backArrowContainer: {
-    width: 52,
-    height: 52,
+    position: "absolute",
+    top: width * 0.08,
+    left: width * 0.02,
+    width: width * 0.1,
+    height: width * 0.1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#F0F0F1",
-    borderRadius: 26,
-    marginTop: "10%",
+    borderRadius: width * 0.05,
   },
   logo: {
     fontFamily: "Kanit_Bold",
-    fontSize: 48,
+    fontSize: width * 0.12,
+    marginBottom: height * 0.03,
     alignSelf: "center",
-    marginTop: "30%",
   },
   emailLable: {
-    marginTop: "30%",
-    marginBottom: "2%",
     fontFamily: "Outfit_Medium",
-    fontSize: 18,
+    fontSize: width * 0.05,
+    marginBottom: height * 0.01,
+    marginLeft: width * 0.03,
+    alignSelf: "flex-start",
   },
   emailInputContainer: {
     position: "relative",
-    height: 58,
-    justifyContent: "center",
+    height: height * 0.08,
+    marginBottom: height * 0.03,
   },
   mailIcon: {
     position: "absolute",
-    left: 15,
-    top: 15,
+    left: width * 0.04,
+    top: "50%",
+    transform: [{ translateY: -12 }],
     zIndex: 1,
   },
   emailInput: {
     width: "100%",
-    height: 58,
+    height: "100%",
     borderColor: "#6c6c6c",
     borderWidth: 1,
-    borderRadius: 30,
-    paddingLeft: 50,
+    borderRadius: width * 0.09,
+    paddingLeft: width * 0.12,
+    paddingRight: width * 0.05,
     backgroundColor: "#fff",
     zIndex: 0,
   },
-  sliderContainer: {
-    alignItems: "center",
-    marginTop: "90%",
+  buttonContainer: {
+    justifyContent: "flex-end",
+    width: "100%",
+    paddingHorizontal: width * 0.05,
+    paddingBottom: height * 0.05,
+  },
+  sendButton: {
+    backgroundColor: "#075856",
+    height: height * 0.07,
+    width: "100%",
+    justifyContent: "center",
+    borderRadius: width * 0.1,
+  },
+  sendButtonText: {
+    color: "#fff",
+    fontSize: width * 0.04,
+    textAlign: "center",
+    fontFamily: "Outfit_Medium",
   },
   loadingContainer: {
     ...StyleSheet.absoluteFillObject,

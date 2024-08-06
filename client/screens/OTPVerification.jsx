@@ -23,9 +23,55 @@ export default function OTPVerification({ navigation }) {
   const timerRef = useRef(null);
   const route = useRoute();
   const email = route.params?.email || "";
+  const [countdown, setCountdown] = useState(60);
+  const [isResendEnabled, setIsResendEnabled] = useState(false);
 
   useEffect(() => {
-    // Update OTP from input values whenever they change
+    const timer = setInterval(() => {
+      setCountdown((prevCountdown) => {
+        if (prevCountdown <= 1) {
+          clearInterval(timer);
+          setIsResendEnabled(true);
+          return 0;
+        }
+        return prevCountdown - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleResendOtp = async () => {
+    setCountdown(60);
+    setIsResendEnabled(false);
+    try {
+      const response = await axios.post(
+        "http://192.168.100.175:8080/api/v1/auth/resend-otp",
+        { email }
+      );
+      if (response.data.success) {
+        Toast.show({
+          type: "success",
+          text1: "OTP Resent",
+          text2: "A new OTP has been sent to your email.",
+        });
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: response.data.message,
+        });
+      }
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "An error occurred while resending OTP.",
+      });
+    }
+  };
+
+  useEffect(() => {
     setOtp(inputValues.join(""));
   }, [inputValues]);
 
@@ -91,7 +137,6 @@ export default function OTPVerification({ navigation }) {
       return;
     }
 
-    const email = route.params?.email || "";
     console.log("Sending OTP:", otp);
 
     try {
@@ -167,6 +212,16 @@ export default function OTPVerification({ navigation }) {
             onChangeText={(text) => handleTextChange(text, index)}
           />
         ))}
+      </View>
+      <View style={styles.resendContainer}>
+        <Text>Resend code in </Text>
+        <Text style={styles.countdownText}>{countdown} </Text>
+        <Text>s</Text>
+        {isResendEnabled && (
+          <TouchableOpacity onPress={handleResendOtp}>
+            <Text style={styles.resendText}> Resend Code</Text>
+          </TouchableOpacity>
+        )}
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={handleOtpVerification} style={styles.button}>
@@ -255,5 +310,16 @@ const styles = StyleSheet.create({
     fontSize: width * 0.04,
     textAlign: "center",
     fontFamily: "Outfit_Medium",
+  },
+  resendContainer: {
+    flexDirection: "row",
+    alignSelf: "center",
+    marginTop: 20,
+  },
+  countdownText: {
+    color: "#246BFD",
+  },
+  resendText: {
+    color: "#246BFD",
   },
 });

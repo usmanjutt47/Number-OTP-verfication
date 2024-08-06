@@ -31,12 +31,10 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator
         initialRouteName="OnBoarding"
-        screenOptions={{ headerShown: false }}
-      >
+        screenOptions={{ headerShown: false }}>
         <Stack.Screen name="CustoomKeyboard" component={CustomKeyboard} />
         <Stack.Screen name="EmailVerification" component={EmailVerification} />
         <Stack.Screen name="OTPVerification" component={OTPVerification} />
-
         <Stack.Screen name="OnBoarding" component={OnBoarding} />
         <Stack.Screen name="Home" component={Home} />
       </Stack.Navigator>

@@ -76,14 +76,19 @@ export default function EmailVerification() {
     <View style={styles.mainContainer}>
       <StatusBar style="auto" />
       <View style={styles.contentContainer}>
-        <Pressable style={styles.backArrowContainer}>
-          <Ionicons
-            name="chevron-back-sharp"
-            size={24}
-            color="black"
-            style={{ alignSelf: "center" }}
-          />
-        </Pressable>
+        <View style={styles.header}>
+          <Pressable
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons
+              name="chevron-back"
+              size={24}
+              color="black"
+              style={styles.icon}
+            />
+          </Pressable>
+        </View>
 
         <Text style={styles.logo}>Logo</Text>
 
@@ -132,6 +137,23 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    position: "absolute",
+    top: height * 0.06,
+  },
+  backButton: {
+    height: 52,
+    width: 52,
+    backgroundColor: "#d9d9d9",
+    borderRadius: 26,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  icon: {
+    alignSelf: "center",
   },
   contentContainer: {
     flex: 1,

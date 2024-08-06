@@ -7,11 +7,14 @@ import {
   Pressable,
   TextInput,
   Alert,
+  Dimensions,
 } from "react-native";
 import axios from "axios";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRoute } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
+
+const { height, width } = Dimensions.get("window");
 
 export default function OTPVerification({ navigation }) {
   const [inputValues, setInputValues] = useState(["", "", "", ""]);
@@ -104,10 +107,9 @@ export default function OTPVerification({ navigation }) {
           text2: "OTP verified successfully.",
         });
 
-        // Navigate after 500 milliseconds
         setTimeout(() => {
-          navigation.navigate("Home"); // Replace "Home" with your actual route name
-        }, 500);
+          navigation.navigate("Home");
+        }, 100);
       } else {
         Toast.show({
           type: "error",
@@ -171,80 +173,86 @@ export default function OTPVerification({ navigation }) {
           <Text style={styles.buttonText}>Verify OTP</Text>
         </TouchableOpacity>
       </View>
-      <Toast/>
+      <Toast />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: "100%",
-    width: "100%",
-    padding: "5%",
+    flex: 1,
+    padding: width * 0.05,
+    backgroundColor: "#fff",
   },
   header: {
-    height: "6%",
-    width: "100%",
     flexDirection: "row",
-    marginTop: "5%",
+    alignItems: "center",
+    marginVertical: height * 0.03,
   },
   backButton: {
     height: 52,
     width: 52,
     backgroundColor: "#d9d9d9",
-    borderRadius: 30,
+    borderRadius: 26,
     justifyContent: "center",
+    alignItems: "center",
   },
   icon: {
     alignSelf: "center",
   },
   headerText: {
     fontFamily: "Sf_Pro_Display_Bold",
-    fontSize: 20,
-    paddingLeft: 10,
+    fontSize: width * 0.05,
+    paddingLeft: width * 0.03,
     alignSelf: "center",
   },
   content: {
-    alignSelf: "center",
-    marginTop: "30%",
+    alignItems: "center",
+    marginTop: height * 0.05,
   },
   title: {
     fontFamily: "Outfit_Medium",
-    fontSize: 32,
+    fontSize: width * 0.08,
     textAlign: "center",
   },
   subtitle: {
     color: "#555555",
     textAlign: "center",
+    marginTop: height * 0.01,
   },
   inputsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: "10%",
+    marginVertical: height * 0.05,
   },
   input: {
     backgroundColor: "#D9D9D9",
-    borderRadius: 19,
-    fontSize: 24,
+    borderRadius: 12,
+    fontSize: width * 0.1,
     textAlign: "center",
-    width: 77,
-    height: 80,
+    width: width * 0.2,
+    height: height * 0.1,
     fontFamily: "Outfit_Regular",
   },
   buttonContainer: {
     alignItems: "center",
-    marginTop: "30%",
+    marginTop: height * 0.05,
+    paddingHorizontal: width * 0.05,
+    paddingBottom: height * 0.05,
+    position: "absolute",
+    bottom: height * 0.01,
   },
   button: {
     backgroundColor: "#075856",
-    height: 48,
-    width: "100%",
+    height: height * 0.07,
+    width: width * 0.9,
     justifyContent: "center",
-    borderRadius: 49,
+    borderRadius: 24,
+    bottom: height * 0.01,
   },
   buttonText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: width * 0.04,
     textAlign: "center",
     fontFamily: "Outfit_Medium",
   },

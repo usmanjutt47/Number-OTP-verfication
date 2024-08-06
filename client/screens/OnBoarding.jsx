@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React from "react";
 import { StatusBar } from "expo-status-bar";
-import CustomSlider from "../../components/CustomSlider";
+import CustomSlider from "../components/CustomSlider";
 import { useNavigation } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
@@ -19,11 +19,11 @@ export default function OnBoarding() {
     <View style={styles.container}>
       <StatusBar style="auto" />
       <ImageBackground
-        source={require("../../assets/images/main_img.png")}
+        source={require("../assets/images/main_img.png")}
         style={styles.imageBackground}
       >
         <Image
-          source={require("../../assets/images/image.png")}
+          source={require("../assets/images/image.png")}
           style={styles.mainImage}
         />
         <Text style={styles.logoText}>Logo</Text>
@@ -53,7 +53,6 @@ export default function OnBoarding() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "yellow",
     padding: "3%",
   },
   imageBackground: {

@@ -3,11 +3,10 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { useFonts } from "expo-font";
 import CustomKeyboard from "./components/CustomKeyboard";
-import OnBoarding from "./src/screens/OnBoarding";
-import EmailVerification from "./src/screens/EmailVerification";
-import OTPVerification from "./src/screens/OTPVerification";
-import Home from "./src/screens/Home";
-import Test from "./Test";
+import OnBoarding from "./screens/OnBoarding";
+import EmailVerification from "./screens/EmailVerification";
+import OTPVerification from "./screens/OTPVerification";
+import Home from "./screens/Home";
 
 const Stack = createStackNavigator();
 
@@ -31,7 +30,7 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Test"
+        initialRouteName="OnBoarding"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="CustoomKeyboard" component={CustomKeyboard} />
@@ -40,7 +39,6 @@ const App = () => {
 
         <Stack.Screen name="OnBoarding" component={OnBoarding} />
         <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Test" component={Test} />
       </Stack.Navigator>
     </NavigationContainer>
   );

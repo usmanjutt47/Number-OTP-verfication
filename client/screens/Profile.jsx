@@ -1,4 +1,12 @@
-import { View, Text, StyleSheet, Image, Animated, Easing } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Animated,
+  Easing,
+  Pressable,
+} from "react-native";
 import React, { useRef, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import CustomTopNav from "../components/CustomTopNav";
@@ -46,6 +54,27 @@ export default function Profile() {
             />
           </View>
         </View>
+        <View style={styles.headingsContainer}>
+          <Text style={styles.heading}>You currently have no posts</Text>
+          <Text style={styles.subHeading}>
+            Click the button and fill in the information to create a post
+          </Text>
+        </View>
+        <Pressable
+          style={{
+            marginTop: "10%",
+            backgroundColor: "#075856",
+            height: 52,
+            width: 212,
+            alignSelf: "center",
+            alignItems: "center",
+            justifyContent: "center",
+
+            borderRadius: 30,
+          }}
+        >
+          <Text style={{ color: "#fff" }}>Create a post</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -59,10 +88,9 @@ const styles = StyleSheet.create({
     width: "90%",
     height: "100%",
     alignSelf: "center",
-    // backgroundColor: "lightblue",
   },
   imageWrapper: {
-    marginTop: "45%",
+    marginTop: "50%",
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
@@ -72,7 +100,7 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     borderRadius: 100,
-    backgroundColor: "#E9E9E9", // Adjust the color and opacity as needed
+    backgroundColor: "#E9E9E9",
   },
   imageContainer: {
     width: 146.1,
@@ -85,6 +113,23 @@ const styles = StyleSheet.create({
   image: {
     width: 56.07,
     height: 56.46,
-    borderRadius: 100, // Makes the image round
+    borderRadius: 100,
+  },
+  headingsContainer: {
+    marginTop: "15%", // Adjust this value to move the container down
+    alignItems: "center",
+    width: "80%",
+    alignSelf: "center",
+  },
+  heading: {
+    fontWeight: "bold",
+    fontSize: 20,
+    textAlign: "center",
+  },
+  subHeading: {
+    marginTop: "3%",
+    fontSize: 12,
+    alignSelf: "center",
+    textAlign: "center",
   },
 });

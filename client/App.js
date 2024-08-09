@@ -32,6 +32,9 @@ const App = () => {
     const checkUser = async () => {
       const userId = await AsyncStorage.getItem("userId");
       if (userId) {
+        {
+          /* home added as initial rout */
+        }
         setInitialRoute("Home");
       } else {
         setInitialRoute("OnBoarding");

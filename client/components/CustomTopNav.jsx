@@ -1,28 +1,49 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import React from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import Feather from "@expo/vector-icons/Feather";
 
 export default function CustomTopNav() {
   return (
     <View style={styles.container}>
       <Pressable style={styles.logo}>
-        <Text>Logo</Text>
+        <Text style={{ color: "white" }}>Logo</Text>
       </Pressable>
 
-      <Pressable style={styles.star}>
-        <Text>Star</Text>
+      <Pressable
+        style={({ pressed }) => [
+          styles.star,
+          pressed && { backgroundColor: "rgba(137, 137, 137, 0.38)" },
+        ]}
+      >
+        <AntDesign name="staro" size={24} color="black" />
       </Pressable>
 
-      <Pressable style={styles.feed}>
-        <Text>Feed</Text>
+      <Pressable
+        style={({ pressed }) => [
+          styles.inbox,
+          pressed && { backgroundColor: "rgba(137, 137, 137, 0.38)" },
+        ]}
+      >
+        <AntDesign name="inbox" size={24} color="black" />
       </Pressable>
 
-      <Pressable style={styles.updates}>
-        <Text>Updates</Text>
+      <Pressable
+        style={({ pressed }) => [
+          styles.sent,
+          pressed && { backgroundColor: "rgba(137, 137, 137, 0.38)" },
+        ]}
+      >
+        <Feather name="send" size={24} color="black" />
       </Pressable>
 
-      <Pressable style={styles.dropDown}>
-        <Text>Drop Down</Text>
+      <Pressable
+        style={({ pressed }) => [
+          styles.dropDown,
+          pressed && { backgroundColor: "rgba(137, 137, 137, 0.38)" },
+        ]}
+      >
+        <AntDesign name="down" size={24} color="black" />
       </Pressable>
     </View>
   );
@@ -30,24 +51,33 @@ export default function CustomTopNav() {
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: "10%",
     flexDirection: "row",
-    backgroundColor: "blue",
     justifyContent: "space-between",
-    padding: 10,
+    alignItems: "center",
   },
   logo: {
-    // Add any styles for the logo here
+    width: 53,
+    height: 53,
+    borderRadius: 30,
+    backgroundColor: "black",
+    justifyContent: "center",
+    alignItems: "center",
   },
   star: {
-    // Add any styles for the star here
+    padding: 10,
+    borderRadius: 30,
   },
-  feed: {
-    // Add any styles for the feed here
+  inbox: {
+    padding: 10,
+    borderRadius: 30,
   },
-  updates: {
-    // Add any styles for the updates here
+  sent: {
+    padding: 10,
+    borderRadius: 30,
   },
   dropDown: {
-    // Add any styles for the dropDown here
+    padding: 10,
+    borderRadius: 30,
   },
 });

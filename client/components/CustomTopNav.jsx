@@ -1,27 +1,53 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import React from "react";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 export default function CustomTopNav() {
   return (
-    <View style={styles.mainContainer}>
-      <View style={styles.navContainer}>
-        <View style={styles.logoContainer}></View>
-        <View style={styles.starContainer}></View>
-        <View style={styles.feedContainer}></View>
-        <View style={styles.updatesContainer}></View>
-        <View style={styles.dropDownContainer}></View>
-      </View>
+    <View style={styles.container}>
+      <Pressable style={styles.logo}>
+        <Text>Logo</Text>
+      </Pressable>
+
+      <Pressable style={styles.star}>
+        <Text>Star</Text>
+      </Pressable>
+
+      <Pressable style={styles.feed}>
+        <Text>Feed</Text>
+      </Pressable>
+
+      <Pressable style={styles.updates}>
+        <Text>Updates</Text>
+      </Pressable>
+
+      <Pressable style={styles.dropDown}>
+        <Text>Drop Down</Text>
+      </Pressable>
     </View>
   );
 }
+
 const styles = StyleSheet.create({
-  mainContainer: {},
-  navContainer: {
+  container: {
+    flexDirection: "row",
     backgroundColor: "blue",
+    justifyContent: "space-between",
+    padding: 10,
   },
-  logoContainer: {},
-  starContainer: {},
-  feedContainer: {},
-  updatesContainer: {},
-  dropDownContainer: {},
+  logo: {
+    // Add any styles for the logo here
+  },
+  star: {
+    // Add any styles for the star here
+  },
+  feed: {
+    // Add any styles for the feed here
+  },
+  updates: {
+    // Add any styles for the updates here
+  },
+  dropDown: {
+    // Add any styles for the dropDown here
+  },
 });

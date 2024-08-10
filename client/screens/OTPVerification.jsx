@@ -13,6 +13,7 @@ import axios from "axios";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRoute } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { height, width } = Dimensions.get("window");
 
@@ -141,7 +142,7 @@ export default function OTPVerification({ navigation }) {
 
     try {
       const response = await axios.post(
-        "http://192.168.100.175:8080/api/v1/auth/verify-otp",
+        "http://192.168.10.10:8080/api/v1/auth/verify-otp",
         { email, otp }
       );
 
@@ -151,6 +152,13 @@ export default function OTPVerification({ navigation }) {
           text1: "Success",
           text2: "OTP verified successfully.",
         });
+
+        // Assuming userId is returned in the response after successful verification
+        const userId = response.data.userId;
+
+        // Store userId in AsyncStorage
+        await AsyncStorage.setItem("userId", userId);
+        console.log("User ID saved:", userId);
 
         setTimeout(() => {
           navigation.navigate("Home");

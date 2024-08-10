@@ -28,13 +28,20 @@ const App = () => {
     Sf_Pro_Display_Bold: require("../client/assets/fonts/Sf_Pro_Display_Bold.ttf"),
   });
 
+  const handleLogin = async () => {
+    const userId = "some_unique_user_id";
+    await AsyncStorage.setItem("userId", userId);
+    console.log("User ID saved:", userId);
+
+    const savedUserId = await AsyncStorage.getItem("userId");
+    console.log("Saved User ID:", savedUserId);
+  };
+
   useEffect(() => {
     const checkUser = async () => {
       const userId = await AsyncStorage.getItem("userId");
+      console.log("User ID from AsyncStorage:", userId);
       if (userId) {
-        {
-          /* home added as initial rout */
-        }
         setInitialRoute("Home");
       } else {
         setInitialRoute("OnBoarding");
@@ -54,7 +61,7 @@ const App = () => {
         initialRouteName={initialRoute}
         screenOptions={{ headerShown: false }}
       >
-        <Stack.Screen name="CustoomKeyboard" component={CustomKeyboard} />
+        <Stack.Screen name="CustomKeyboard" component={CustomKeyboard} />
         <Stack.Screen name="EmailVerification" component={EmailVerification} />
         <Stack.Screen name="OTPVerification" component={OTPVerification} />
         <Stack.Screen name="OnBoarding" component={OnBoarding} />

@@ -14,6 +14,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRoute } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { StatusBar } from "expo-status-bar";
 
 const { height, width } = Dimensions.get("window");
 
@@ -47,7 +48,7 @@ export default function OTPVerification({ navigation }) {
     setIsResendEnabled(false);
     try {
       const response = await axios.post(
-        "http://192.168.100.175:8080/api/v1/auth/resend-otp",
+        "http://192.168.100.140:8080/api/v1/auth/resend-otp",
         { email }
       );
       if (response.data.success) {
@@ -142,7 +143,7 @@ export default function OTPVerification({ navigation }) {
 
     try {
       const response = await axios.post(
-        "http://192.168.10.10:8080/api/v1/auth/verify-otp",
+        "http://192.168.100.140:8080/api/v1/auth/verify-otp",
         { email, otp }
       );
 
@@ -153,10 +154,7 @@ export default function OTPVerification({ navigation }) {
           text2: "OTP verified successfully.",
         });
 
-        // Assuming userId is returned in the response after successful verification
         const userId = response.data.userId;
-
-        // Store userId in AsyncStorage
         await AsyncStorage.setItem("userId", userId);
         console.log("User ID saved:", userId);
 
@@ -188,6 +186,7 @@ export default function OTPVerification({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <StatusBar style="auto" /> {/* StatusBar added here */}
       <View style={styles.header}>
         <Pressable
           style={styles.backButton}
@@ -293,41 +292,33 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     fontSize: width * 0.1,
     textAlign: "center",
-    width: width * 0.2,
-    height: height * 0.1,
-    fontFamily: "Outfit_Regular",
-  },
-  buttonContainer: {
-    alignItems: "center",
-    marginTop: height * 0.05,
-    paddingHorizontal: width * 0.05,
-    paddingBottom: height * 0.05,
-    position: "absolute",
-    bottom: height * 0.01,
-  },
-  button: {
-    backgroundColor: "#075856",
-    height: height * 0.07,
-    width: width * 0.9,
-    justifyContent: "center",
-    borderRadius: 24,
-    bottom: height * 0.01,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: width * 0.04,
-    textAlign: "center",
-    fontFamily: "Outfit_Medium",
+    width: 52,
+    height: 52,
   },
   resendContainer: {
     flexDirection: "row",
-    alignSelf: "center",
-    marginTop: 20,
+    justifyContent: "center",
+    marginVertical: height * 0.02,
   },
   countdownText: {
-    color: "#246BFD",
+    color: "#555555",
   },
   resendText: {
-    color: "#246BFD",
+    color: "#007AFF",
+  },
+  buttonContainer: {
+    marginTop: height * 0.05,
+    alignItems: "center",
+  },
+  button: {
+    backgroundColor: "#007AFF",
+    borderRadius: 8,
+    width: "100%",
+    paddingVertical: height * 0.02,
+  },
+  buttonText: {
+    color: "#fff",
+    textAlign: "center",
+    fontSize: width * 0.04,
   },
 });

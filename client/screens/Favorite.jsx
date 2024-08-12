@@ -1,74 +1,32 @@
+import { View, Text, StyleSheet } from "react-native";
 import React from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import CustomTopNav from "../components/CustomTopNav";
+import { StatusBar } from "expo-status-bar";
 
-const posts = [
-  {
-    id: "1",
-    name: "Elon",
-    time: "2 mins ago",
-    content: "Just launched a new rocket!",
-  },
-  {
-    id: "2",
-    name: "Ronaldo",
-    time: "5 mins ago",
-    content: "Scored a hat-trick!",
-  },
-  {
-    id: "3",
-    name: "Camila",
-    time: "10 mins ago",
-    content: "New song release!",
-  },
-];
-
-const FavoriteScreen = () => {
+export default function Favorite() {
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={posts}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item, index }) => (
-          <View style={[styles.card, { zIndex: posts.length - index }]}>
-            <Text style={styles.name}>{item.name}</Text>
-            <Text style={styles.time}>{item.time}</Text>
-            <Text style={styles.content}>{item.content}</Text>
-          </View>
-        )}
-      />
+    <View style={styles.mainContainer}>
+      <StatusBar style="auto" />
+
+      <View style={styles.navContainer}>
+        <CustomTopNav />
+      </View>
+      <Text style={styles.text}>Favorite</Text>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: {
+  mainContainer: {
     flex: 1,
-    backgroundColor: "#fff",
-    padding: 20,
+    paddingHorizontal: 16, // Added for padding on the sides
   },
-  card: {
-    backgroundColor: "#f9f9f9",
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: -40, // Overlapping effect
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
+  navContainer: {
+    marginTop: "10%",
   },
-  name: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  time: {
-    fontSize: 12,
-    color: "#666",
-  },
-  content: {
-    fontSize: 16,
-    marginTop: 10,
+  text: {
+    fontSize: 18, // Adjust this size based on design requirements
+    textAlign: "center", // Center the text
+    marginTop: 20, // Added for some space below the top nav
   },
 });
-
-export default FavoriteScreen;

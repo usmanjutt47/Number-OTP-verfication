@@ -1,29 +1,37 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import React from "react";
+import { useNavigation } from "@react-navigation/native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 
 export default function CustomTopNav() {
+  const navigation = useNavigation(); // Initialize navigation
+
   return (
     <View style={styles.container}>
-      <Pressable style={styles.logo}>
+      <Pressable
+        style={styles.logo}
+        onPress={() => navigation.navigate("Home")} // Navigate to Home screen
+      >
         <Text style={{ color: "white" }}>Logo</Text>
       </Pressable>
 
       <Pressable
         style={({ pressed }) => [
-          styles.star,
+          styles.favorite,
           pressed && { backgroundColor: "rgba(137, 137, 137, 0.38)" },
         ]}
+        onPress={() => navigation.navigate("Favorite")} // Navigate to Favorite screen
       >
         <AntDesign name="staro" size={24} color="black" />
       </Pressable>
 
       <Pressable
         style={({ pressed }) => [
-          styles.inbox,
+          styles.allChats,
           pressed && { backgroundColor: "rgba(137, 137, 137, 0.38)" },
         ]}
+        onPress={() => navigation.navigate("AllChats")} // Navigate to AllChats screen
       >
         <AntDesign name="inbox" size={24} color="black" />
       </Pressable>
@@ -33,6 +41,7 @@ export default function CustomTopNav() {
           styles.sent,
           pressed && { backgroundColor: "rgba(137, 137, 137, 0.38)" },
         ]}
+        onPress={() => navigation.navigate("Profile")} // Navigate to Profile screen
       >
         <Feather name="send" size={24} color="black" />
       </Pressable>
@@ -63,11 +72,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  star: {
+  favorite: {
     padding: 10,
     borderRadius: 30,
   },
-  inbox: {
+  allChats: {
     padding: 10,
     borderRadius: 30,
   },

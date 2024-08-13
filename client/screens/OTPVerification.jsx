@@ -47,7 +47,7 @@ export default function OTPVerification({ navigation }) {
     setIsResendEnabled(false);
     try {
       const response = await axios.post(
-        "http://192.168.100.175:8080/api/v1/auth/resend-otp",
+        "http://192.168.100.140:8080/api/v1/auth/resend-otp",
         { email }
       );
       if (response.data.success) {
@@ -142,7 +142,7 @@ export default function OTPVerification({ navigation }) {
 
     try {
       const response = await axios.post(
-        "http://192.168.10.10:8080/api/v1/auth/verify-otp",
+        "http://192.168.100.140:8080/api/v1/auth/verify-otp",
         { email, otp }
       );
 

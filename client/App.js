@@ -8,10 +8,6 @@ import OnBoarding from "./screens/OnBoarding";
 import EmailVerification from "./screens/EmailVerification";
 import OTPVerification from "./screens/OTPVerification";
 import Home from "./screens/Home";
-import Profile from "./screens/Profile";
-import Favorite from "./screens/Favorite";
-import AllChats from "./screens/AllChats";
-import CustomTopNav from "./components/CustomTopNav";
 
 const Stack = createStackNavigator();
 
@@ -44,10 +40,8 @@ const App = () => {
   useEffect(() => {
     const checkUser = async () => {
       const userId = await AsyncStorage.getItem("userId");
+      console.log("User ID from AsyncStorage:", userId);
       if (userId) {
-        {
-          /* home added as initial rout */
-        }
         setInitialRoute("Home");
       } else {
         setInitialRoute("OnBoarding");
@@ -72,10 +66,6 @@ const App = () => {
         <Stack.Screen name="OTPVerification" component={OTPVerification} />
         <Stack.Screen name="OnBoarding" component={OnBoarding} />
         <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Profile" component={Profile} />
-        <Stack.Screen name="Favorite" component={Favorite} />
-        <Stack.Screen name="AllChats" component={AllChats} />
-        <Stack.Screen name="CustomTopNav" component={CustomTopNav} />
       </Stack.Navigator>
     </NavigationContainer>
   );

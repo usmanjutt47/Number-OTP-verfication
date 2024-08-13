@@ -4,10 +4,16 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { useFonts } from "expo-font";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomKeyboard from "./components/CustomKeyboard";
+import CustomTopNav from "./components/CustomTopNav";
+
 import OnBoarding from "./screens/OnBoarding";
 import EmailVerification from "./screens/EmailVerification";
 import OTPVerification from "./screens/OTPVerification";
 import Home from "./screens/Home";
+import Favorite from "./screens/Favorite";
+import AllChats from "./screens/AllChats";
+import Profile from "./screens/Profile";
+import WriteLetter from "./screens/WriteLetter";
 
 const Stack = createStackNavigator();
 
@@ -26,6 +32,7 @@ const App = () => {
     Outfit_Thin: require("../client/assets/fonts/Outfit-SemiBold.ttf"),
     Kanit_Bold: require("../client/assets/fonts/Kanit-Bold.ttf"),
     Sf_Pro_Display_Bold: require("../client/assets/fonts/Sf_Pro_Display_Bold.ttf"),
+    Inter_Bold: require("../client/assets/fonts/Inter_24pt-Bold.ttf"),
   });
 
   const handleLogin = async () => {
@@ -62,10 +69,16 @@ const App = () => {
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="CustomKeyboard" component={CustomKeyboard} />
+        <Stack.Screen name="CustomTopNav" component={CustomTopNav} />
+
+        <Stack.Screen name="OnBoarding" component={OnBoarding} />
         <Stack.Screen name="EmailVerification" component={EmailVerification} />
         <Stack.Screen name="OTPVerification" component={OTPVerification} />
-        <Stack.Screen name="OnBoarding" component={OnBoarding} />
         <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="Favorite" component={Favorite} />
+        <Stack.Screen name="AllChats" component={AllChats} />
+        <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen name="WriteLetter" component={WriteLetter} />
       </Stack.Navigator>
     </NavigationContainer>
   );

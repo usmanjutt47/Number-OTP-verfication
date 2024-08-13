@@ -10,9 +10,11 @@ import {
 import React, { useRef, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import CustomTopNav from "../components/CustomTopNav";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Profile() {
   const scaleValue = useRef(new Animated.Value(1)).current;
+  const navigation = useNavigation();
 
   useEffect(() => {
     const scaleAnimation = Animated.loop(
@@ -72,6 +74,7 @@ export default function Profile() {
 
             borderRadius: 30,
           }}
+          onPress={() => navigation.navigate("WriteLetter")} // Navigate to AllChats screen
         >
           <Text style={{ color: "#fff" }}>Create a post</Text>
         </Pressable>

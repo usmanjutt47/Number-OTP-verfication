@@ -65,12 +65,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   textInput: {
+    fontFamily: "Outfit_Regular",
     marginTop: "5%",
     fontSize: 18,
-    fontFamily: "Outfit_Regular",
-    paddingHorizontal: 10,
     paddingRight: 20,
-    borderRadius: 10,
+    width: "70%",
+    textAlign: "justify",
   },
   sendButton: {
     backgroundColor: "#075856",

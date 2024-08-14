@@ -6,23 +6,53 @@ import {
   Image,
   Animated,
   Pressable,
+  ActivityIndicator,
+  StyleSheet,
 } from "react-native";
-import React from "react";
-
-const data = [
-  require("../assets/images/white.png"),
-  require("../assets/images/white.png"),
-  require("../assets/images/white.png"),
-  require("../assets/images/white.png"),
-  require("../assets/images/white.png"),
-];
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.9;
 const ITEM_HEIGHT = ITEM_WIDTH * 0.8;
 
 export default function CustomImageCarousel() {
+  const [letters, setLetters] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const scrollX = new Animated.Value(0);
+
+  useEffect(() => {
+    const fetchLetters = async () => {
+      try {
+        const response = await axios.get(
+          "http://192.168.100.6:8080/api/v1/auth/letters"
+        );
+        if (response.data.success) {
+          setLetters(response.data.letters);
+        } else {
+          setError("Failed to fetch letters.");
+        }
+      } catch (error) {
+        setError("An error occurred while fetching letters.");
+        console.log("Fetched letters:", response.data.letters);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLetters();
+  }, []);
+
+  if (loading) {
+    return (
+      <ActivityIndicator size="large" color="#0000ff" style={styles.centered} />
+    );
+  }
+
+  if (error) {
+    return <Text style={styles.centered}>{error}</Text>;
+  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -34,8 +64,8 @@ export default function CustomImageCarousel() {
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
           { useNativeDriver: true }
         )}
-        data={data}
-        keyExtractor={(item, index) => index.toString()}
+        data={letters}
+        keyExtractor={(item) => item._id}
         renderItem={({ item, index }) => {
           const inputRange = [
             (index - 1) * width,
@@ -73,10 +103,11 @@ export default function CustomImageCarousel() {
                 }}
               >
                 <Animated.Image
-                  source={item}
+                  source={{ uri: item.content }}
                   style={{
                     width: ITEM_WIDTH,
                     height: ITEM_HEIGHT,
+                    backgroundColor: "#fff",
                     transform: [{ translateY: translateY }, { scale: scale }],
                   }}
                 />
@@ -165,8 +196,7 @@ export default function CustomImageCarousel() {
                       <Text
                         style={{ fontSize: 27, fontFamily: "Outfit_Medium" }}
                       >
-                        The 2024 Bugatti Mistral roadster is more than a
-                        roofless Chiron, as we learned from...
+                        {item.content}
                       </Text>
                     </Animated.View>
                   </View>
@@ -179,3 +209,11 @@ export default function CustomImageCarousel() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});

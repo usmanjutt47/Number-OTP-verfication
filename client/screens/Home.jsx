@@ -1,15 +1,27 @@
-import { View, Text, StyleSheet } from "react-native";
-import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  ActivityIndicator,
+  FlatList,
+} from "react-native";
+import React, { useEffect, useState } from "react";
 import CustomTopNav from "../components/CustomTopNav";
 import { StatusBar } from "expo-status-bar";
+import CustomImageCrousel from "../components/CustomImageCrousel";
+import axios from "axios";
+
+const { width, height } = Dimensions.get("window");
 
 export default function Home() {
   return (
     <View style={styles.mainContainer}>
       <StatusBar style="auto" />
-      <View>
+      <View style={{ padding: "5%" }}>
         <CustomTopNav />
       </View>
+      <CustomImageCrousel />
     </View>
   );
 }
@@ -18,7 +30,6 @@ const styles = StyleSheet.create({
   mainContainer: {
     height: "100%",
     width: "100%",
-    backgroundColor: "red",
-    padding: "5%",
+    backgroundColor: "#bcbaba",
   },
 });

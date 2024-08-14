@@ -194,7 +194,14 @@ export default function CustomImageCarousel() {
                       }}
                     >
                       <Text
-                        style={{ fontSize: 27, fontFamily: "Outfit_Medium" }}
+                        style={{
+                          fontSize: 27,
+                          fontFamily: "Outfit_Medium",
+                          // Adjust these styles as needed
+                          color: "#000",
+                        }}
+                        numberOfLines={5} // Maximum number of lines before truncation
+                        ellipsizeMode="tail" // Adds ellipsis at the end of the text if it overflows
                       >
                         {item.content}
                       </Text>

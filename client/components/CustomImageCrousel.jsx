@@ -1,3 +1,4 @@
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -5,12 +6,13 @@ import {
   FlatList,
   Image,
   Animated,
-  Pressable,
   ActivityIndicator,
   StyleSheet,
+  Pressable,
+  TouchableOpacity,
 } from "react-native";
-import React, { useEffect, useState } from "react";
 import axios from "axios";
+import BottomSheet from "@gorhom/bottom-sheet";
 
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.9;
@@ -20,7 +22,9 @@ export default function CustomImageCarousel() {
   const [letters, setLetters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
   const scrollX = new Animated.Value(0);
+  const bottomSheetRef = useRef(null);
 
   useEffect(() => {
     const fetchLetters = async () => {
@@ -54,6 +58,11 @@ export default function CustomImageCarousel() {
     return <Text style={styles.centered}>{error}</Text>;
   }
 
+  const handleOpenBottomSheet = (item) => {
+    setSelectedItem(item);
+    bottomSheetRef.current?.expand();
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <Animated.FlatList
@@ -84,7 +93,8 @@ export default function CustomImageCarousel() {
           });
 
           return (
-            <View
+            <Pressable
+              onPress={() => handleOpenBottomSheet(item)}
               style={{
                 width: width,
                 alignItems: "center",
@@ -197,11 +207,10 @@ export default function CustomImageCarousel() {
                         style={{
                           fontSize: 27,
                           fontFamily: "Outfit_Medium",
-                          // Adjust these styles as needed
                           color: "#000",
                         }}
-                        numberOfLines={5} // Maximum number of lines before truncation
-                        ellipsizeMode="tail" // Adds ellipsis at the end of the text if it overflows
+                        numberOfLines={5}
+                        ellipsizeMode="tail"
                       >
                         {item.content}
                       </Text>
@@ -209,10 +218,57 @@ export default function CustomImageCarousel() {
                   </View>
                 </Animated.View>
               </Animated.View>
-            </View>
+            </Pressable>
           );
         }}
       />
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1} // Closed state initially
+        snapPoints={["25%", "50%", "100%"]}
+        enablePanDownToClose
+      >
+        <View style={styles.bottomSheetContent}>
+          {selectedItem && (
+            <>
+              <Text
+                style={{
+                  color: "#000",
+                  fontSize: 24,
+                  fontFamily: "Inter_Bold",
+                }}
+              >
+                Anonymous
+              </Text>
+              <Text style={styles.bottomSheetContentText}>
+                {selectedItem.content}
+              </Text>
+              <TouchableOpacity
+                style={{
+                  height: 62,
+                  width: "100%",
+                  backgroundColor: "#075856",
+                  alignSelf: "center",
+                  justifyContent: "center",
+                  borderRadius: 44,
+                  marginTop: height * 0.3,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontFamily: "Outfit_Medium",
+                    textAlign: "center",
+                    color: "#fff",
+                  }}
+                >
+                  Reply Now
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </BottomSheet>
     </View>
   );
 }
@@ -222,5 +278,20 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  bottomSheetContent: {
+    flex: 1,
+    padding: "5%",
+  },
+  bottomSheetTitle: {
+    fontSize: 24,
+    fontFamily: "Outfit_Medium",
+  },
+  bottomSheetContentText: {
+    fontSize: 24,
+    fontFamily: "Outfit_Regular",
+    color: "#000",
+    marginTop: "1%",
+    width: "40%",
   },
 });

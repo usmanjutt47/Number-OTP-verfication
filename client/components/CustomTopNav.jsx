@@ -1,58 +1,52 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import React from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 
 export default function CustomTopNav() {
-  const navigation = useNavigation(); // Initialize navigation
+  const navigation = useNavigation();
+  const route = useRoute();
+  const activeScreen = route.name; 
+
+  const handlePress = (screen) => {
+    navigation.navigate(screen); 
+  };
 
   return (
     <View style={styles.container}>
-      <Pressable
-        style={styles.logo}
-        onPress={() => navigation.navigate("Home")} // Navigate to Home screen
-      >
+      <Pressable style={[styles.logo]} onPress={() => handlePress("Home")}>
         <Text style={{ color: "white" }}>Logo</Text>
       </Pressable>
 
       <Pressable
-        style={({ pressed }) => [
+        style={[
           styles.favorite,
-          pressed && { backgroundColor: "rgba(137, 137, 137, 0.38)" },
+          activeScreen === "Favorite" && styles.activeButton, 
         ]}
-        onPress={() => navigation.navigate("Favorite")} // Navigate to Favorite screen
+        onPress={() => handlePress("Favorite")}
       >
         <AntDesign name="staro" size={24} color="black" />
       </Pressable>
 
       <Pressable
-        style={({ pressed }) => [
+        style={[
           styles.allChats,
-          pressed && { backgroundColor: "rgba(137, 137, 137, 0.38)" },
+          activeScreen === "AllChats" && styles.activeButton,
         ]}
-        onPress={() => navigation.navigate("AllChats")} // Navigate to AllChats screen
+        onPress={() => handlePress("AllChats")}
       >
         <AntDesign name="inbox" size={24} color="black" />
       </Pressable>
 
       <Pressable
-        style={({ pressed }) => [
+        style={[
           styles.sent,
-          pressed && { backgroundColor: "rgba(137, 137, 137, 0.38)" },
+          activeScreen === "Profile" && styles.activeButton, 
         ]}
-        onPress={() => navigation.navigate("Profile")} // Navigate to Profile screen
+        onPress={() => handlePress("Profile")}
       >
         <Feather name="send" size={24} color="black" />
-      </Pressable>
-
-      <Pressable
-        style={({ pressed }) => [
-          styles.dropDown,
-          pressed && { backgroundColor: "rgba(137, 137, 137, 0.38)" },
-        ]}
-      >
-        <AntDesign name="down" size={24} color="black" />
       </Pressable>
     </View>
   );
@@ -63,6 +57,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    padding: 10,
   },
   logo: {
     width: 53,
@@ -84,8 +79,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 30,
   },
-  dropDown: {
-    padding: 10,
-    borderRadius: 30,
+  activeButton: {
+    backgroundColor: "#e0e0e0",
   },
 });

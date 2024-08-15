@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
   planHeader: {
     width: "90%",
     height: "20%",
+    marginTop: "3%",
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "center",

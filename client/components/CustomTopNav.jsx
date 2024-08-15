@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#e0e0e0",
   },
   activeButton: {
-    backgroundColor: "#898989",
+    backgroundColor: "#E0E0E0",
   },
   inactiveButton: {
     backgroundColor: "black", // Ensure Home stays black

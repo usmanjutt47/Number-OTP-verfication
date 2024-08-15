@@ -67,6 +67,15 @@ export default function CustomTopNav() {
       >
         <Feather name="send" size={responsiveIconSize(24)} color="black" />
       </Pressable>
+      <Pressable
+        style={[
+          styles.seePlan,
+          activeScreen === "Profile" && styles.activeButton,
+        ]}
+        onPress={() => handlePress("SelectPlan")}
+      >
+        <Feather name="dollar-sign" size={24} color="orange" />
+      </Pressable>
     </View>
   );
 }
@@ -106,11 +115,15 @@ const styles = StyleSheet.create({
     padding: responsivePadding(10),
     borderRadius: responsiveWidth(30),
   },
+  seePlan: {
+    padding: responsivePadding(10),
+    borderRadius: responsiveWidth(30),
+  },
   activeButton: {
     backgroundColor: "#e0e0e0",
   },
   activeButton: {
-    backgroundColor: "green",
+    backgroundColor: "#898989",
   },
   inactiveButton: {
     backgroundColor: "black", // Ensure Home stays black

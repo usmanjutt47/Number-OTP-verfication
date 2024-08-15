@@ -3,6 +3,7 @@ const { authenticator } = require("otplib");
 const nodemailer = require("nodemailer");
 const mongoose = require("mongoose");
 const Letter = require("../models/letterModel");
+const Reply = require("../models/Reply");
 
 function validateEmail(email) {
   const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -253,6 +254,64 @@ const getLetterController = async (req, res) => {
     });
   }
 };
+const replyLetterController = async (req, res) => {
+  try {
+    const { userId, content } = req.body;
+
+    if (!userId || !content) {
+      return res
+        .status(400)
+        .json({ message: "userId and content are required" });
+    }
+
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const newLetter = new Letter({
+      userId: userId,
+      content: content,
+    });
+
+    await newLetter.save();
+
+    const newReply = new Reply({
+      letterId: newLetter.userId,
+      userId,
+      content,
+    });
+
+    await newReply.save();
+
+    res.status(201).json({
+      message: "Reply and letter created successfully",
+      reply: newReply,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to create reply", error: error.message });
+  }
+};
+
+const getRepliesController = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const replies = await Reply.find({ userId }).populate("letterId");
+    if (!replies || replies.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No replies found for this user" });
+    }
+
+    res.status(200).json(replies);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 module.exports = {
   EmailVerificationController,
@@ -260,4 +319,6 @@ module.exports = {
   ResendOTPController,
   createLetterController,
   getLetterController,
+  replyLetterController,
+  getRepliesController,
 };

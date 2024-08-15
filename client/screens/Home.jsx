@@ -5,6 +5,7 @@ import {
   Dimensions,
   ActivityIndicator,
   FlatList,
+  TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import CustomTopNav from "../components/CustomTopNav";

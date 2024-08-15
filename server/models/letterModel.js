@@ -21,6 +21,10 @@ const letterSchema = new mongoose.Schema({
         }.`,
     },
   },
+  reply: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Letter",
+  },
   createdAt: {
     type: Date,
     default: Date.now,

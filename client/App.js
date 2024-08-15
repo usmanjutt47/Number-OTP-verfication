@@ -14,6 +14,7 @@ import Favorite from "./screens/Favorite";
 import AllChats from "./screens/AllChats";
 import Profile from "./screens/Profile";
 import WriteLetter from "./screens/WriteLetter";
+import SelectPlan from "./screens/SelectPlan";
 
 const Stack = createStackNavigator();
 
@@ -79,6 +80,7 @@ const App = () => {
         <Stack.Screen name="AllChats" component={AllChats} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="WriteLetter" component={WriteLetter} />
+        <Stack.Screen name="SelectPlan" component={SelectPlan} />
       </Stack.Navigator>
     </NavigationContainer>
   );

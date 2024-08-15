@@ -1,93 +1,72 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 
+const { width, height } = Dimensions.get("window");
+
+const responsiveFontSize = (size) => {
+  return (size * width) / 375;
+};
+
+const responsiveIconSize = (size) => {
+  return (size * width) / 375;
+};
+
+const responsiveWidth = (size) => {
+  return (size * width) / 375;
+};
+
+const responsiveHeight = (size) => {
+  return (size * height) / 812;
+};
+
+const responsivePadding = (size) => {
+  return (size * width) / 375;
+};
+
 export default function CustomTopNav() {
   const navigation = useNavigation();
-  const route = useRoute(); // Get the current route
-  const [activeButton, setActiveButton] = useState(route.name); // Initialize with current route
+  const route = useRoute();
+  const activeScreen = route.name;
 
-  useEffect(() => {
-    // Update the active button when the route changes
-    setActiveButton(route.name);
-  }, [route.name]);
-
-  const handlePress = (buttonName, screen) => {
-    setActiveButton(buttonName);
+  const handlePress = (screen) => {
     navigation.navigate(screen);
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.buttonContainer}>
-        <Pressable
-          style={[
-            styles.logo,
-            activeButton === "Home" && styles.inactiveButton, // Home should not be green
-          ]}
-          onPress={() => handlePress("Home", "Home")}
-        >
-          <Text style={styles.logoText}>Logo</Text>
-        </Pressable>
-      </View>
+      <Pressable style={[styles.logo]} onPress={() => handlePress("Home")}>
+        <Text style={[styles.logoText]}>Logo</Text>
+      </Pressable>
 
-      <View style={styles.buttonContainer}>
-        <Pressable
-          style={[
-            styles.favorite,
-            activeButton === "Favorite" && styles.activeButton, // Favorite should be green when active
-          ]}
-          onPress={() => handlePress("Favorite", "Favorite")}
-        >
-          <AntDesign
-            name="staro"
-            size={24}
-            color={activeButton === "Favorite" ? "green" : "black"}
-          />
-        </Pressable>
-      </View>
+      <Pressable
+        style={[
+          styles.favorite,
+          activeScreen === "Favorite" && styles.activeButton,
+        ]}
+        onPress={() => handlePress("Favorite")}
+      >
+        <AntDesign name="staro" size={responsiveIconSize(24)} color="black" />
+      </Pressable>
 
-      <View style={styles.buttonContainer}>
-        <Pressable
-          style={[
-            styles.allChats,
-            activeButton === "AllChats" && styles.activeButton, // AllChats should be green when active
-          ]}
-          onPress={() => handlePress("AllChats", "AllChats")}
-        >
-          <AntDesign
-            name="inbox"
-            size={24}
-            color={activeButton === "AllChats" ? "green" : "black"}
-          />
-        </Pressable>
-      </View>
+      <Pressable
+        style={[
+          styles.allChats,
+          activeScreen === "AllChats" && styles.activeButton,
+        ]}
+        onPress={() => handlePress("AllChats")}
+      >
+        <AntDesign name="inbox" size={responsiveIconSize(24)} color="black" />
+      </Pressable>
 
-      <View style={styles.buttonContainer}>
-        <Pressable
-          style={[
-            styles.sent,
-            activeButton === "Profile" && styles.activeButton,
-          ]}
-          onPress={() => handlePress("Profile", "Profile")}
-        >
-          <Feather name="send" size={24} color="black" />
-        </Pressable>
-      </View>
-
-      <View style={styles.buttonContainer}>
-        <Pressable
-          style={[
-            styles.dropDown,
-            activeButton === "DropDown" && styles.activeButton,
-          ]}
-          onPress={() => setActiveButton("DropDown")}
-        >
-          <AntDesign name="down" size={24} color="black" />
-        </Pressable>
-      </View>
+      <Pressable
+        style={[styles.sent, activeScreen === "Profile" && styles.activeButton]}
+        onPress={() => handlePress("Profile")}
+      >
+        <Feather name="send" size={responsiveIconSize(24)} color="black" />
+      </Pressable>
     </View>
   );
 }
@@ -97,37 +76,38 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    padding: responsivePadding(10),
   },
   buttonContainer: {
     justifyContent: "center",
     alignItems: "center",
   },
   logo: {
-    width: 53,
-    height: 53,
-    borderRadius: 30,
+    width: responsiveWidth(53),
+    height: responsiveHeight(53),
+    borderRadius: responsiveWidth(30),
     backgroundColor: "black",
     justifyContent: "center",
     alignItems: "center",
   },
   logoText: {
     color: "white",
+    fontSize: responsiveFontSize(16),
   },
   favorite: {
-    padding: 10,
-    borderRadius: 30,
+    padding: responsivePadding(10),
+    borderRadius: responsiveWidth(30),
   },
   allChats: {
-    padding: 10,
-    borderRadius: 30,
+    padding: responsivePadding(10),
+    borderRadius: responsiveWidth(30),
   },
   sent: {
-    padding: 10,
-    borderRadius: 30,
+    padding: responsivePadding(10),
+    borderRadius: responsiveWidth(30),
   },
-  dropDown: {
-    padding: 10,
-    borderRadius: 30,
+  activeButton: {
+    backgroundColor: "#e0e0e0",
   },
   activeButton: {
     backgroundColor: "green",

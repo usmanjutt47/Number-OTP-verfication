@@ -5,18 +5,19 @@ const {
   ResendOTPController,
   createLetterController,
   getLetterController,
+  replyLetterController,
+  getRepliesController,
 } = require("../controllers/userContoller");
 
 const router = express.Router();
 
+// Existing routes
 router.post("/send-otp", EmailVerificationController);
-
 router.post("/verify-otp", VerifyOtpController);
-
 router.post("/resend-otp", ResendOTPController);
-
 router.post("/create-letter", createLetterController);
-
 router.get("/letters", getLetterController);
+router.post("/reply", replyLetterController);
+router.get("/replies/:userId", getRepliesController);
 
 module.exports = router;

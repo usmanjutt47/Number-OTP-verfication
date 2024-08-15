@@ -36,7 +36,7 @@ export default function CustomImageCarousel() {
     const fetchLetters = async () => {
       try {
         const response = await axios.get(
-          "http://192.168.100.6:8080/api/v1/auth/letters"
+          "http://192.168.100.140:8080/api/v1/auth/letters"
         );
         if (response.data.success) {
           setLetters(response.data.letters);

@@ -4,6 +4,20 @@ import { StatusBar } from "expo-status-bar";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 
+// Centralized styles for common properties
+const fontStyles = {
+  regular: "Outfit_Regular",
+  medium: "Outfit_Medium",
+  bold: "Outfit_Bold",
+};
+
+const colors = {
+  primary: "#075856",
+  lightGray: "#E0E0E0",
+  darkGray: "#8B8E97",
+  headerColor: "#404D97",
+};
+
 const SelectPlan = () => {
   const navigation = useNavigation();
   return (
@@ -14,12 +28,16 @@ const SelectPlan = () => {
           <Pressable
             style={styles.backButton}
             onPress={() => navigation.goBack()}
+            accessible={true}
+            accessibilityLabel="Go back"
           >
             <Ionicons name="chevron-back" size={24} color="black" />
           </Pressable>
           <Text style={styles.heading}>Select Plan</Text>
         </View>
         {/* header ends here */}
+
+        {/* basic plan starts here */}
         <View style={styles.basicPlanCard}>
           <View style={styles.planHeader}>
             <Image
@@ -27,7 +45,7 @@ const SelectPlan = () => {
               style={styles.planIcon}
             />
             <Text style={styles.planHeading}>Basic Plan</Text>
-            <Text style={styles.planPrice}>$10 </Text>
+            <Text style={styles.planPrice}>$10</Text>
             <Text style={styles.planDuration}>/weekly</Text>
           </View>
           {/* plan header ended */}
@@ -45,17 +63,28 @@ const SelectPlan = () => {
                 source={require("./../assets/icons/featureStar.png")}
                 style={styles.rowsIcon}
               />
-              <Text style={styles.lightText}>Get Started With</Text>
-              <Text style={styles.darkText}>messaging</Text>
+              <Text style={styles.lightText}>Flexible</Text>
+              <Text style={styles.darkText}>team meeting</Text>
             </View>
             <View style={styles.row}>
               <Image
                 source={require("./../assets/icons/featureStar.png")}
                 style={styles.rowsIcon}
               />
-              <Text style={styles.lightText}>Get Started With</Text>
-              <Text style={styles.darkText}>messaging</Text>
+              <Text style={styles.lightText}>Support</Text>
+              <Text style={styles.darkText}>chat</Text>
             </View>
+          </View>
+          {/* feature box ended */}
+          <View style={styles.buyButtonContainer}>
+            <Pressable
+              style={styles.buyButton}
+              accessible={true}
+              accessibilityLabel="Buy Basic Plan"
+            >
+              <Text style={styles.buyButtonText}>Buy Plan</Text>
+              <Ionicons name="arrow-forward" size={24} color={colors.primary} />
+            </Pressable>
           </View>
         </View>
       </View>
@@ -79,21 +108,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   backButton: {
-    width: 52.21,
-    height: 52.21,
+    width: 52,
+    height: 52,
     borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#E0E0E0",
+    backgroundColor: colors.lightGray,
   },
   heading: {
-    fontFamily: "Outfit_Bold",
+    fontFamily: fontStyles.bold,
     fontSize: 20,
     marginLeft: "5%",
   },
   basicPlanCard: {
     width: "100%",
-    height: "20%",
+    height: "25%",
     marginTop: "10%",
     borderRadius: 24,
     backgroundColor: "#FFF",
@@ -111,46 +140,67 @@ const styles = StyleSheet.create({
     height: 18,
   },
   planHeading: {
-    fontFamily: "Outfit_Medium",
+    fontFamily: fontStyles.medium,
     fontSize: 18,
     marginLeft: "3%",
   },
   planPrice: {
-    fontFamily: "Outfit_Medium",
+    fontFamily: fontStyles.medium,
     fontSize: 16,
-    marginLeft: "40%",
-    color: "#404D97",
+    marginLeft: "auto",
+    marginRight: 4,
+    color: colors.headerColor,
   },
   planDuration: {
-    color: "#8B8E97",
-    fontFamily: "Outfit_Regular",
+    color: colors.darkGray,
+    fontFamily: fontStyles.regular,
     fontSize: 16,
   },
   featuresBox: {
-    width: "60%",
-    height: "40%",
-    marginTop: "3%",
-    marginLeft: "15%",
+    width: "85%",
+    alignSelf: "center",
+    marginTop: "5%",
+    marginLeft: "10%",
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: "2%",
+    marginVertical: "1%",
   },
   rowsIcon: {
     width: 12,
     height: 12,
   },
   lightText: {
-    color: "#8B8E97",
-    fontFamily: "Outfit_Regular",
+    color: colors.darkGray,
+    fontFamily: fontStyles.regular,
     fontSize: 12,
     marginLeft: 5,
   },
   darkText: {
-    fontFamily: "Outfit_Regular",
+    fontFamily: fontStyles.regular,
     fontSize: 12,
     marginLeft: 5,
+  },
+  buyButtonContainer: {
+    alignItems: "flex-end",
+    marginRight: "5%",
+    marginTop: "5%",
+  },
+  buyButton: {
+    width: 96,
+    height: 41,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    flexDirection: "row",
+  },
+  buyButtonText: {
+    color: colors.primary,
+    fontFamily: fontStyles.regular,
+    fontSize: 12,
   },
 });
 

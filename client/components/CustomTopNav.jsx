@@ -101,10 +101,9 @@ const styles = StyleSheet.create({
     // backgroundColor: "blue",
     justifyContent: "space-between",
     width: "80%",
-    
+
     zIndex: 10, // Ensures it is behind the logo
     paddingLeft: responsiveWidth(53 + 10), // Add padding to account for the logo's width + some spacing
-
   },
   favorite: {
     height: responsiveHeight(53),

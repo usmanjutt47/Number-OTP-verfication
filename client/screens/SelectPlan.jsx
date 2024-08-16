@@ -14,7 +14,9 @@ const SelectPlan = () => {
   const handlePlanPress = (plan) => {
     setActivePlan(plan);
   };
-
+  {
+    /* cards components are called here */
+  }
   return (
     <View style={styles.mainContainer}>
       <StatusBar style="auto" />

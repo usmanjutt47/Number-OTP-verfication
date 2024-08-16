@@ -2,10 +2,12 @@ import { View, Text, StyleSheet, Pressable, Image } from "react-native";
 import React, { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-const BasicPlan = ({ isButtonPressed, handleButtonPress }) => {
-  {
-    /* all colors are here */
-  }
+const BasicPlan = () => {
+  const [isButtonPressed, setIsButtonPressed] = useState(false);
+
+  const handleButtonPress = () => {
+    setIsButtonPressed(!isButtonPressed);
+  };
 
   const colors = {
     primary: "#075856",
@@ -15,6 +17,7 @@ const BasicPlan = ({ isButtonPressed, handleButtonPress }) => {
 
   return (
     <Pressable
+      onPress={handleButtonPress}
       style={[
         styles.basicPlanCard,
         {

@@ -213,6 +213,7 @@ const ReplyCard = ({ reply }) => {
 export default function Profile() {
   const [replies, setReplies] = useState([]);
   const [error, setError] = useState(null);
+  const navigation = useNavigation();
 
   const fetchReplies = async () => {
     try {
@@ -268,6 +269,7 @@ export default function Profile() {
         contentContainerStyle={styles.contentContainer}
       />
       <TouchableOpacity
+        onPress={() => navigation.navigate("WriteLetter")}
         style={{
           position: "absolute",
           bottom: responsiveHeight(20),
@@ -298,8 +300,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     alignSelf: "center",
-    // padding: responsivePadding,
-    backgroundColor:'#fff'
+    backgroundColor: "#fff",
   },
   contentContainer: {
     paddingBottom: responsiveHeight(20),

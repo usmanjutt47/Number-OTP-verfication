@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   logo: {
     width: responsiveWidth(53),
     height: responsiveHeight(53),
-    borderRadius: responsiveWidth(30),
+    borderRadius: responsiveWidth(100),
     backgroundColor: "black",
     justifyContent: "center",
     alignItems: "center",

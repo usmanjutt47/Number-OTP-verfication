@@ -15,6 +15,7 @@ import AllChats from "./screens/AllChats";
 import Profile from "./screens/Profile";
 import WriteLetter from "./screens/WriteLetter";
 import SelectPlan from "./screens/SelectPlan";
+import AddCard from "./screens/AddCard";
 
 const Stack = createStackNavigator();
 
@@ -81,6 +82,7 @@ const App = () => {
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="WriteLetter" component={WriteLetter} />
         <Stack.Screen name="SelectPlan" component={SelectPlan} />
+        <Stack.Screen name="AddCard" component={AddCard} />
       </Stack.Navigator>
     </NavigationContainer>
   );

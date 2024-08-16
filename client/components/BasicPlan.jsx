@@ -3,6 +3,10 @@ import React, { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 const BasicPlan = ({ isButtonPressed, handleButtonPress }) => {
+  {
+    /* all colors are here */
+  }
+
   const colors = {
     primary: "#075856",
     darkGray: "#8B8E97",

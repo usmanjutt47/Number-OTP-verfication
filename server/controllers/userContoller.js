@@ -315,10 +315,20 @@ const getRepliesController = async (req, res) => {
 
 const getUsersController = async (req, res) => {
   try {
-    const users = await userModel.find();
-    res.status(200).json(users);
+    const { email } = req.params; // Email is extracted from URL parameters
+
+    if (!email) {
+      return res.status(400).json({ error: "Email parameter is required" });
+    }
+
+    const user = await userModel.findOne({ email });
+    if (user) {
+      res.status(200).json(user);
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch users" });
+    res.status(500).json({ error: "Failed to fetch user" });
   }
 };
 

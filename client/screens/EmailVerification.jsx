@@ -26,7 +26,7 @@ export default function EmailVerification() {
     setLoading(true);
     try {
       const response = await fetch(
-        "http://192.168.100.140:8080/api/v1/auth/send-otp",
+        "http://192.168.10.9:8080/api/v1/auth/send-otp",
         {
           method: "POST",
           headers: {

@@ -4,8 +4,6 @@ import {
   Text,
   StyleSheet,
   Image,
-  Animated,
-  Easing,
   Dimensions,
   TouchableOpacity,
   FlatList,
@@ -15,7 +13,6 @@ import { StatusBar } from "expo-status-bar";
 import CustomTopNav from "../components/CustomTopNav";
 import { useNavigation } from "@react-navigation/native";
 import { Entypo } from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -58,7 +55,6 @@ const ReplyCard = ({ reply }) => {
           backgroundColor: "#F5F5F5",
           borderRadius: 26.22,
           alignSelf: "center",
-          // marginTop: responsiveHeight(20),
         }}
       >
         <View
@@ -260,14 +256,20 @@ export default function Profile() {
       >
         <CustomTopNav />
       </View>
-      <FlatList
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        data={replies}
-        keyExtractor={(item) => item._id.toString()}
-        renderItem={({ item }) => <ReplyCard reply={item} />}
-        contentContainerStyle={styles.contentContainer}
-      />
+      {replies.length === 0 ? (
+        <View style={styles.noRepliesContainer}>
+          <Text style={styles.noRepliesText}>No replies available</Text>
+        </View>
+      ) : (
+        <FlatList
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          data={replies}
+          keyExtractor={(item) => item._id.toString()}
+          renderItem={({ item }) => <ReplyCard reply={item} />}
+          contentContainerStyle={styles.contentContainer}
+        />
+      )}
       <TouchableOpacity
         onPress={() => navigation.navigate("WriteLetter")}
         style={{
@@ -310,5 +312,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: responsivePadding(10),
     marginBottom: responsiveHeight(10),
+  },
+  noRepliesContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  noRepliesText: {
+    fontSize: responsiveFontSize(18),
+    color: "#C9C9C9",
+    fontFamily: "Outfit_Medium",
   },
 });

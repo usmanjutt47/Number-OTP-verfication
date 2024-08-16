@@ -9,14 +9,12 @@ import PremiumPlan from "./../components/PremiumPlan";
 
 const SelectPlan = () => {
   const navigation = useNavigation();
-  const [activePlan, setActivePlan] = useState(null); // Track the active plan
+  const [activePlan, setActivePlan] = useState(null);
 
   const handlePlanPress = (plan) => {
     setActivePlan(plan);
   };
-  {
-    /* cards components are called here */
-  }
+
   return (
     <View style={styles.mainContainer}>
       <StatusBar style="auto" />

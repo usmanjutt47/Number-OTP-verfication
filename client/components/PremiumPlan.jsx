@@ -2,7 +2,13 @@ import { View, Text, StyleSheet, Pressable, Image } from "react-native";
 import React, { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-const PremiumPlan = ({ isButtonPressed, handleButtonPress }) => {
+const PremiumPlan = () => {
+  const [isButtonPressed, setIsButtonPressed] = useState(false);
+
+  const handleButtonPress = () => {
+    setIsButtonPressed(!isButtonPressed);
+  };
+
   const colors = {
     primary: "#075856",
     darkGray: "#8B8E97",
@@ -18,11 +24,11 @@ const PremiumPlan = ({ isButtonPressed, handleButtonPress }) => {
           borderWidth: 2,
         },
       ]}
+      onPress={handleButtonPress}
       accessible={true}
       accessibilityLabel="Premium Plan Card"
     >
       <View style={styles.planHeader}>
-        {/* color fixed here */}
         <Image
           source={require("./../assets/icons/blur-icon.png")}
           style={[
@@ -30,7 +36,7 @@ const PremiumPlan = ({ isButtonPressed, handleButtonPress }) => {
             { tintColor: isButtonPressed ? colors.primary : "#404D97" },
           ]}
         />
-        <Text style={styles.planHeading}>PremiumPlan</Text>
+        <Text style={styles.planHeading}>Premium Plan</Text>
         <Text
           style={[
             styles.planPrice,
@@ -43,7 +49,6 @@ const PremiumPlan = ({ isButtonPressed, handleButtonPress }) => {
         </Text>
         <Text style={styles.planDuration}>/Yearly</Text>
       </View>
-      {/* Plan header ended */}
       <View style={styles.featuresBox}>
         <View style={styles.row}>
           <Image
@@ -70,7 +75,6 @@ const PremiumPlan = ({ isButtonPressed, handleButtonPress }) => {
           <Text style={styles.darkText}>chat</Text>
         </View>
       </View>
-      {/* Features box ended */}
       <View style={styles.buyButtonContainer}>
         <Pressable
           style={[

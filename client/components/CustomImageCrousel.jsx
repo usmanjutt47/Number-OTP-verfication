@@ -73,7 +73,7 @@ export default function CustomImageCarousel() {
           setError("Failed to fetch letters.");
         }
       } catch (error) {
-        console.log("Error occurred:", error);
+        // console.log("Error occurred:", error);
         setError("An error occurred while fetching letters.");
       } finally {
         setLoading(false);
@@ -101,7 +101,7 @@ export default function CustomImageCarousel() {
   const handleReply = async () => {
     try {
       const userId = await AsyncStorage.getItem("userId");
-      console.log("User ID from AsyncStorage:", userId);
+      // console.log("User ID from AsyncStorage:", userId);
 
       if (!userId) {
         ToastAndroid.show("User ID not found", ToastAndroid.SHORT);
@@ -109,7 +109,7 @@ export default function CustomImageCarousel() {
         return;
       }
 
-      console.log("Content to be sent:", replyContent);
+      // console.log("Content to be sent:", replyContent);
 
       if (!replyContent.trim()) {
         ToastAndroid.show("Content cannot be empty", ToastAndroid.SHORT);
@@ -132,10 +132,10 @@ export default function CustomImageCarousel() {
       );
 
       const rawResponse = await response.text();
-      console.log("Raw response:", rawResponse);
+      // console.log("Raw response:", rawResponse);
 
       const result = JSON.parse(rawResponse);
-      console.log("Parsed result:", result);
+      // console.log("Parsed result:", result);
 
       if (response.ok) {
         ToastAndroid.show("Reply sent successfully", ToastAndroid.SHORT);

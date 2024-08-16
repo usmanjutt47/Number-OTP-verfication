@@ -41,41 +41,37 @@ export default function CustomTopNav() {
         <Text style={[styles.logoText]}>Logo</Text>
       </Pressable>
 
-      <Pressable
-        style={[
-          styles.favorite,
-          activeScreen === "Favorite" && styles.activeButton,
-        ]}
-        onPress={() => handlePress("Favorite")}
-      >
-        <AntDesign name="staro" size={responsiveIconSize(24)} color="black" />
-      </Pressable>
+      <View style={styles.blueContainer}>
+        <Pressable
+          style={[
+            styles.favorite,
+            activeScreen === "Favorite" && styles.activeButton,
+          ]}
+          onPress={() => handlePress("Favorite")}
+        >
+          <AntDesign name="staro" size={responsiveIconSize(24)} color="black" />
+        </Pressable>
 
-      <Pressable
-        style={[
-          styles.allChats,
-          activeScreen === "AllChats" && styles.activeButton,
-        ]}
-        onPress={() => handlePress("AllChats")}
-      >
-        <AntDesign name="inbox" size={responsiveIconSize(24)} color="black" />
-      </Pressable>
+        <Pressable
+          style={[
+            styles.allChats,
+            activeScreen === "AllChats" && styles.activeButton,
+          ]}
+          onPress={() => handlePress("AllChats")}
+        >
+          <AntDesign name="inbox" size={responsiveIconSize(24)} color="black" />
+        </Pressable>
 
-      <Pressable
-        style={[styles.sent, activeScreen === "Profile" && styles.activeButton]}
-        onPress={() => handlePress("Profile")}
-      >
-        <Feather name="send" size={responsiveIconSize(24)} color="black" />
-      </Pressable>
-      <Pressable
-        style={[
-          styles.seePlan,
-          activeScreen === "Profile" && styles.activeButton,
-        ]}
-        onPress={() => handlePress("SelectPlan")}
-      >
-        <Feather name="dollar-sign" size={24} color="orange" />
-      </Pressable>
+        <Pressable
+          style={[
+            styles.sent,
+            activeScreen === "Profile" && styles.activeButton,
+          ]}
+          onPress={() => handlePress("Profile")}
+        >
+          <Feather name="send" size={responsiveIconSize(24)} color="black" />
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -83,13 +79,8 @@ export default function CustomTopNav() {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
     padding: responsivePadding(10),
-  },
-  buttonContainer: {
-    justifyContent: "center",
-    alignItems: "center",
   },
   logo: {
     width: responsiveWidth(53),
@@ -98,34 +89,45 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
     justifyContent: "center",
     alignItems: "center",
+    // position: "absolute", // Position the logo absolutely
+    zIndex: 20, // Ensure it appears above the blue container
   },
   logoText: {
     color: "white",
     fontSize: responsiveFontSize(16),
   },
+  blueContainer: {
+    flexDirection: "row",
+    // backgroundColor: "blue",
+    justifyContent: "space-between",
+    width: "80%",
+    
+    zIndex: 10, // Ensures it is behind the logo
+    paddingLeft: responsiveWidth(53 + 10), // Add padding to account for the logo's width + some spacing
+
+  },
   favorite: {
-    padding: responsivePadding(10),
+    height: responsiveHeight(53),
+    width: responsiveWidth(53),
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: responsiveWidth(30),
   },
   allChats: {
-    padding: responsivePadding(10),
+    height: responsiveHeight(53),
+    width: responsiveWidth(53),
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: responsiveWidth(30),
   },
   sent: {
-    padding: responsivePadding(10),
-    borderRadius: responsiveWidth(30),
-  },
-  seePlan: {
-    padding: responsivePadding(10),
+    height: responsiveHeight(53),
+    width: responsiveWidth(53),
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: responsiveWidth(30),
   },
   activeButton: {
     backgroundColor: "#e0e0e0",
-  },
-  activeButton: {
-    backgroundColor: "#E0E0E0",
-  },
-  inactiveButton: {
-    backgroundColor: "black", // Ensure Home stays black
   },
 });

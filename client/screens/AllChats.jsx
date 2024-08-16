@@ -1,7 +1,15 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Dimensions } from "react-native";
 import React from "react";
 import CustomTopNav from "../components/CustomTopNav";
 import { StatusBar } from "expo-status-bar";
+
+const { width, height } = Dimensions.get("window");
+
+const responsiveFontSize = (size) => (size * width) / 375;
+const responsiveIconSize = (size) => (size * width) / 375;
+const responsiveWidth = (size) => (size * width) / 375;
+const responsiveHeight = (size) => (size * height) / 812;
+const responsivePadding = (size) => (size * width) / 375;
 
 export default function AllChats() {
   return (
@@ -18,11 +26,14 @@ export default function AllChats() {
 
 const styles = StyleSheet.create({
   mainContainer: {
-    flex: 1,
-    paddingHorizontal: 16, // Added for padding on the sides
+    width: "100%",
+    height: "100%",
+    alignSelf: "center",
   },
   navContainer: {
-    marginTop: "10%",
+    // width: "96%",
+    alignSelf: "center",
+    marginTop: responsiveHeight(20),
   },
   text: {
     fontSize: 38, // Adjust this size based on design requirements

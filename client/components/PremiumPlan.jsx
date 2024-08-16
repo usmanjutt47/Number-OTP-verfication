@@ -22,6 +22,7 @@ const PremiumPlan = ({ isButtonPressed, handleButtonPress }) => {
       accessibilityLabel="Premium Plan Card"
     >
       <View style={styles.planHeader}>
+        {/* color fixed here */}
         <Image
           source={require("./../assets/icons/blur-icon.png")}
           style={[

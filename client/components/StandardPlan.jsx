@@ -2,10 +2,13 @@ import { View, Text, StyleSheet, Pressable, Image } from "react-native";
 import React, { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-const StandardPlan = ({ isButtonPressed, handleButtonPress }) => {
-  {
-    /* colors are here */
-  }
+const StandardPlan = () => {
+  const [isButtonPressed, setIsButtonPressed] = useState(false);
+
+  const handleButtonPress = () => {
+    setIsButtonPressed(!isButtonPressed);
+  };
+
   const colors = {
     primary: "#075856",
     darkGray: "#8B8E97",
@@ -21,6 +24,7 @@ const StandardPlan = ({ isButtonPressed, handleButtonPress }) => {
           borderWidth: 2,
         },
       ]}
+      onPress={handleButtonPress}
       accessible={true}
       accessibilityLabel="Standard Plan Card"
     >
@@ -45,7 +49,6 @@ const StandardPlan = ({ isButtonPressed, handleButtonPress }) => {
         </Text>
         <Text style={styles.planDuration}>/monthly</Text>
       </View>
-      {/* Plan header ended */}
       <View style={styles.featuresBox}>
         <View style={styles.row}>
           <Image
@@ -72,7 +75,6 @@ const StandardPlan = ({ isButtonPressed, handleButtonPress }) => {
           <Text style={styles.darkText}>chat</Text>
         </View>
       </View>
-      {/* Features box ended */}
       <View style={styles.buyButtonContainer}>
         <Pressable
           style={[

@@ -65,11 +65,7 @@ export default function CustomImageCarousel() {
     const fetchLetters = async () => {
       try {
         const response = await axios.get(
-<<<<<<< Updated upstream
           "http://192.168.100.140:8080/api/v1/auth/letters"
-=======
-          "http://192.168.100.175:8080/api/v1/auth/letters"
->>>>>>> Stashed changes
         );
         if (response.data.success) {
           setLetters(response.data.letters);
@@ -122,7 +118,7 @@ export default function CustomImageCarousel() {
       }
 
       const response = await fetch(
-        "http://192.168.100.175:8080/api/v1/auth/reply",
+        "http://192.168.100.140:8080/api/v1/auth/reply",
         {
           method: "POST",
           headers: {

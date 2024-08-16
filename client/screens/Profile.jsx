@@ -7,13 +7,16 @@ import {
   Dimensions,
   TouchableOpacity,
   FlatList,
+  Animated,
+  Easing,
+  Pressable,
   ToastAndroid,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import CustomTopNav from "../components/CustomTopNav";
 import { useNavigation } from "@react-navigation/native";
 import { Entypo } from "@expo/vector-icons";
-import axios from "axios";
+import { BlurView } from "expo-blur";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
@@ -210,6 +213,8 @@ export default function Profile() {
   const [replies, setReplies] = useState([]);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
+  const scaleValue = useRef(new Animated.Value(1)).current;
+  const [showPressable, setShowPressable] = useState(false);
 
   const fetchReplies = async () => {
     try {
@@ -244,83 +249,160 @@ export default function Profile() {
     fetchReplies();
   }, []);
 
+  useEffect(() => {
+    const scaleAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleValue, {
+          toValue: 1.2,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleValue, {
+          toValue: 1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    scaleAnimation.start();
+
+    return () => scaleAnimation.stop();
+  }, [scaleValue]);
+
+  const handlePress = () => {
+    setShowPressable(true);
+    setTimeout(() => {
+      setShowPressable(false);
+    }, 2000);
+  };
+
   return (
     <View style={styles.mainContainer}>
       <StatusBar style="auto" />
-      <View
-        style={{
-          width: "96%",
-          alignSelf: "center",
-          marginTop: responsiveHeight(20),
-        }}
-      >
-        <CustomTopNav />
-      </View>
-      {replies.length === 0 ? (
-        <View style={styles.noRepliesContainer}>
-          <Text style={styles.noRepliesText}>No replies available</Text>
+      <View style={styles.contentContainer}>
+        <View style={{ marginTop: responsiveHeight(20) }}>
+          <CustomTopNav />
         </View>
-      ) : (
-        <FlatList
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          data={replies}
-          keyExtractor={(item) => item._id.toString()}
-          renderItem={({ item }) => <ReplyCard reply={item} />}
-          contentContainerStyle={styles.contentContainer}
-        />
-      )}
-      <TouchableOpacity
-        onPress={() => navigation.navigate("WriteLetter")}
-        style={{
-          position: "absolute",
-          bottom: responsiveHeight(20),
-          right: responsiveWidth(20),
-          height: responsiveHeight(62),
-          width: responsiveWidth(62),
-          backgroundColor: "#054746",
-          justifyContent: "center",
-          alignItems: "center",
-          borderRadius: 31,
-        }}
-      >
-        <Image
-          source={require("../assets/icons/add.png")}
-          style={{
-            height: responsiveIconSize(20),
-            width: responsiveIconSize(20),
-            alignSelf: "center",
-          }}
-        />
-      </TouchableOpacity>
+        {replies.length === 0 ? (
+          <View style={styles.noRepliesContainer}>
+            <Animated.View
+              style={[styles.circle, { transform: [{ scale: scaleValue }] }]}
+            />
+            <View style={styles.imageContainer}>
+              <Image
+                source={require("../assets/icons/NoPost.png")}
+                style={styles.image}
+              />
+            </View>
+            <View style={styles.headingsContainer}>
+              <Text style={styles.heading}>You currently have no replies</Text>
+              <Text style={styles.subHeading}>
+                Click the button and fill in the information to create a post
+              </Text>
+            </View>
+            <Pressable
+              style={styles.createPostButton}
+              onPress={() => navigation.navigate("WriteLetter")}
+            >
+              <Text style={styles.createPostButtonText}>Create a post</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <FlatList
+            data={replies}
+            renderItem={({ item }) => <ReplyCard reply={item} />}
+            keyExtractor={(item) => item._id}
+            contentContainerStyle={styles.flatListContainer}
+          />
+        )}
+        {showPressable && (
+          <Pressable style={styles.pressable} onPress={() => handlePress()}>
+            <Entypo name="plus" size={40} color="white" />
+          </Pressable>
+        )}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   mainContainer: {
-    width: "100%",
-    height: "100%",
-    alignSelf: "center",
-    backgroundColor: "#fff",
+    flex: 1,
+    backgroundColor: "#F5F5F5",
+    alignItems: "center",
   },
   contentContainer: {
-    paddingBottom: responsiveHeight(20),
-  },
-  card: {
-    backgroundColor: "#FFF",
-    borderRadius: 10,
-    padding: responsivePadding(10),
-    marginBottom: responsiveHeight(10),
+    flex: 1,
+    width: width,
+    padding: responsivePadding(20),
   },
   noRepliesContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
-  noRepliesText: {
+  circle: {
+    width: responsiveWidth(100),
+    height: responsiveWidth(100),
+    borderRadius: responsiveWidth(50),
+    backgroundColor: "#E0E0E0",
+    position: "absolute",
+    top: -responsiveWidth(50),
+    left: width / 2 - responsiveWidth(50),
+  },
+  imageContainer: {
+    height: responsiveHeight(240),
+    width: responsiveWidth(240),
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: responsiveHeight(20),
+  },
+  image: {
+    height: "100%",
+    width: "100%",
+    resizeMode: "contain",
+  },
+  headingsContainer: {
+    alignItems: "center",
+    marginBottom: responsiveHeight(20),
+  },
+  heading: {
+    fontSize: responsiveFontSize(24),
+    fontFamily: "Outfit_Bold",
+    color: "#000",
+  },
+  subHeading: {
     fontSize: responsiveFontSize(18),
-    color: "#C9C9C9",
-    fontFamily: "Outfit_Medium",
+    fontFamily: "Outfit_Regular",
+    color: "#999",
+  },
+  createPostButton: {
+    backgroundColor: "#075856",
+    borderRadius: 8,
+    padding: responsivePadding(15),
+    justifyContent: "center",
+    alignItems: "center",
+    width: responsiveWidth(220),
+  },
+  createPostButtonText: {
+    color: "#fff",
+    fontSize: responsiveFontSize(18),
+    fontFamily: "Outfit_Bold",
+  },
+  flatListContainer: {
+    paddingBottom: responsiveHeight(20),
+  },
+  pressable: {
+    position: "absolute",
+    bottom: responsiveHeight(20),
+    right: responsiveWidth(20),
+    backgroundColor: "#075856",
+    borderRadius: 50,
+    width: responsiveWidth(60),
+    height: responsiveWidth(60),
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

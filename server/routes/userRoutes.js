@@ -19,7 +19,7 @@ router.post("/resend-otp", ResendOTPController);
 router.post("/create-letter", createLetterController);
 router.get("/letters", getLetterController);
 router.post("/reply", replyLetterController);
-router.get("/replies/:userId", getRepliesController);
+router.get("/replies", getRepliesController);
 router.get("/users/:email", getUsersController);
 
 module.exports = router;

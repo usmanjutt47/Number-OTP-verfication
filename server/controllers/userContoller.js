@@ -343,14 +343,23 @@ const replyLetterController = async (req, res) => {
 };
 
 const getRepliesController = async (req, res) => {
-  const { userId } = req.params;
+  const { letterId } = req.query;
+  const loggedInUserId = req.userId;
 
   try {
-    const replies = await Reply.find({ userId }).populate("letterId");
+    if (!letterId) {
+      return res.status(400).json({ message: "Letter ID is required" });
+    }
+
+    const replies = await Reply.find({
+      letterId,
+      userId: { $ne: loggedInUserId },
+    }).populate("letterId");
+
     if (!replies || replies.length === 0) {
       return res
         .status(404)
-        .json({ message: "No replies found for this user" });
+        .json({ message: "No replies found for this letter" });
     }
 
     res.status(200).json(replies);

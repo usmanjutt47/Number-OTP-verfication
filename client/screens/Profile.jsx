@@ -217,7 +217,7 @@ export default function Profile() {
   const scaleValue = useRef(new Animated.Value(1)).current;
   const [showPressable, setShowPressable] = useState(false);
 
-  const fetchReplies = async () => {
+  const fetchReplies = async (letterId) => {
     try {
       const userId = await AsyncStorage.getItem("userId");
       if (!userId) {
@@ -225,7 +225,7 @@ export default function Profile() {
       }
 
       const response = await fetch(
-        `http://192.168.10.9:8080/api/v1/auth/replies/${userId}`,
+        `http://192.168.10.9:8080/api/v1/auth/replies?letterId=${letterId}`, // Pass letterId as a query parameter
         {
           method: "GET",
           headers: {
@@ -241,13 +241,14 @@ export default function Profile() {
       const data = await response.json();
       setReplies(data);
     } catch (error) {
-      // console.error("Fetch error:", error);
-      // ToastAndroid.show("Failed to fetch replies", ToastAndroid.SHORT);
+      console.error("Fetch error:", error);
+      ToastAndroid.show("Failed to fetch replies", ToastAndroid.SHORT);
     }
   };
 
   useEffect(() => {
-    fetchReplies();
+    const letterId = "66c058bb25c04a9f881e4639"; // Replace this with the actual letterId you want to use
+    fetchReplies(letterId);
   }, []);
 
   useEffect(() => {

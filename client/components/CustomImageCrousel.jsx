@@ -18,8 +18,9 @@ import axios from "axios";
 import BottomSheet from "@gorhom/bottom-sheet";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
+import { responsiveScreenHeight } from "react-native-responsive-dimensions";
 
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.9;
@@ -59,6 +60,45 @@ export default function CustomImageCarousel() {
   const bottomSheetRef = useRef(null);
   const replyBottomSheetRef = useRef(null);
   const [content, setContent] = useState("");
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  const handleFavoriteClick = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+
+      if (!userId) {
+        console.error("User ID not found.");
+        return;
+      }
+
+      const data = {
+        userId,
+        letterId: selectedItem._id,
+      };
+
+      console.log("Sending request with data:", data);
+
+      const response = await axios.post(
+        "http://192.168.100.6:8080/api/v1/auth/addToFavorite",
+        data
+      );
+
+      if (response.data.success) {
+        setIsFavorite(true);
+        // console.log("Letter added to favorites successfully.");
+      } else {
+        console.error(
+          "Failed to add letter to favorites. Server response:",
+          response.data
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Error occurred while adding to favorites:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  };
 
   useEffect(() => {
     const fetchLetters = async () => {
@@ -305,7 +345,43 @@ export default function CustomImageCarousel() {
         <ScrollView contentContainerStyle={styles.bottomSheetContent}>
           {selectedItem && (
             <>
-              <Text style={styles.bottomSheetTitle}>Anonymous</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={styles.bottomSheetTitle}>Anonymous</Text>
+                <Pressable
+                  onPress={handleFavoriteClick}
+                  style={{
+                    height: responsiveHeight(53),
+                    width: responsiveWidth(53),
+                    backgroundColor: "#FFF8E4",
+                    borderRadius: 50,
+                    justifyContent: "center",
+                  }}
+                >
+                  {isFavorite ? (
+                    <Image
+                      source={require("../assets/icons/star.png")}
+                      style={{
+                        height: responsiveHeight(20),
+                        width: responsiveWidth(20),
+                        alignSelf: "center",
+                      }}
+                    />
+                  ) : (
+                    <AntDesign
+                      name="staro"
+                      size={25}
+                      color="#FFCD26"
+                      style={{ alignSelf: "center" }}
+                    />
+                  )}
+                </Pressable>
+              </View>
               <Text style={styles.bottomSheetContentText}>
                 {selectedItem.content}
               </Text>

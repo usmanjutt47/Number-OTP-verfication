@@ -4,6 +4,7 @@ const nodemailer = require("nodemailer");
 const mongoose = require("mongoose");
 const Letter = require("../models/letterModel");
 const Reply = require("../models/Reply");
+const Favorite = require("../models/Favorite");
 
 function validateEmail(email) {
   const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -388,8 +389,101 @@ const getUsersController = async (req, res) => {
   }
 };
 
-const addToFavoriteController = async (req, res) => {};
-const getFavoritesController = async (req, res) => {};
+const addToFavoriteController = async (req, res) => {
+  const { userId, letterId } = req.body;
+
+  try {
+    // Validate input
+    if (!userId || !letterId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID and Letter ID are required.",
+      });
+    }
+
+    // Check if letter exists
+    const letter = await Letter.findById(letterId);
+    if (!letter) {
+      return res.status(404).json({
+        success: false,
+        message: "Letter not found.",
+      });
+    }
+
+    // Find the user
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    // Check if the letter is already in favorites
+    const existingFavorite = await Favorite.findOne({ userId, letterId });
+    if (existingFavorite) {
+      return res.status(400).json({
+        success: false,
+        message: "Letter is already in favorites.",
+      });
+    }
+
+    // Add letter to favorites
+    const newFavorite = new Favorite({ userId, letterId });
+    await newFavorite.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Letter added to favorites.",
+    });
+  } catch (error) {
+    console.error("Error adding letter to favorites:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error.",
+    });
+  }
+};
+
+const getFavoritesController = async (req, res) => {
+  const { userId } = req.query; // Get userId from query parameters
+
+  try {
+    // Validate input
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required.",
+      });
+    }
+
+    // Find all favorite letters for the user
+    const favorites = await Favorite.find({ userId });
+
+    // If no favorites found
+    if (favorites.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No favorite letters found for this user.",
+      });
+    }
+
+    // Retrieve letter details
+    const letterIds = favorites.map((fav) => fav.letterId);
+    const letters = await Letter.find({ _id: { $in: letterIds } });
+
+    res.status(200).json({
+      success: true,
+      favorites: letters, // Send the detailed letter objects
+    });
+  } catch (error) {
+    console.error("Error fetching favorite letters:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error.",
+    });
+  }
+};
 
 module.exports = {
   EmailVerificationController,

@@ -24,7 +24,14 @@ const userSchema = new mongoose.Schema(
     },
     userId: {
       type: String,
+      unique: true,
     },
+    favorites: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Letter",
+      },
+    ], // Array of Letter IDs
   },
   { timestamps: true }
 );

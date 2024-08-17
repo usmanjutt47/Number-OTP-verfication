@@ -247,7 +247,7 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    const letterId = "66c058bb25c04a9f881e4639"; // Replace this with the actual letterId you want to use
+    const letterId = "66c058bb25c04a9f881e4639"; 
     fetchReplies(letterId);
   }, []);
 

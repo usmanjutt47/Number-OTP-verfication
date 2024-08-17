@@ -9,6 +9,7 @@ import {
 import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
 
 const mockChats = [
   {
@@ -84,6 +85,7 @@ const mockChats = [
 ];
 
 const AllChats = () => {
+  const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
 
   // Filter chats based on the search query
@@ -115,7 +117,12 @@ const AllChats = () => {
       <StatusBar style="auto" />
       <View style={styles.contentContainer}>
         <View style={styles.header}>
-          <Pressable style={styles.backButton}>
+          <Pressable
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+            accessible={true}
+            accessibilityLabel="Go back"
+          >
             <Ionicons name="chevron-back" size={24} color="black" />
           </Pressable>
           <Text style={styles.heading}>All Chats</Text>

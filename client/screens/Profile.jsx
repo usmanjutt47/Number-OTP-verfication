@@ -247,7 +247,7 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    const letterId = "66c058bb25c04a9f881e4639"; 
+    const letterId = "66c058bb25c04a9f881e4639";
     fetchReplies(letterId);
   }, []);
 
@@ -274,10 +274,7 @@ export default function Profile() {
   }, [scaleValue]);
 
   const handlePress = () => {
-    setShowPressable(true);
-    setTimeout(() => {
-      setShowPressable(false);
-    }, 2000);
+    navigation.navigate("WriteLetter");
   };
 
   return (
@@ -291,17 +288,21 @@ export default function Profile() {
           <NoReply />
         ) : (
           <FlatList
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
             data={replies}
             renderItem={({ item }) => <ReplyCard reply={item} />}
             keyExtractor={(item) => item._id}
             contentContainerStyle={styles.flatListContainer}
           />
         )}
-        {showPressable && (
-          <Pressable style={styles.pressable} onPress={() => handlePress()}>
-            <Entypo name="plus" size={40} color="white" />
-          </Pressable>
-        )}
+
+        <Pressable
+          style={styles.pressable}
+          onPress={() => handlePress()}
+        >
+          <Entypo name="plus" size={40} color="white" />
+        </Pressable>
       </View>
     </View>
   );

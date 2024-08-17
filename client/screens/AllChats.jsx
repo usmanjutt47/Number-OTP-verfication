@@ -5,11 +5,10 @@ import { StatusBar } from "expo-status-bar";
 
 const { width, height } = Dimensions.get("window");
 
-const responsiveFontSize = (size) => (size * width) / 375;
-const responsiveIconSize = (size) => (size * width) / 375;
-const responsiveWidth = (size) => (size * width) / 375;
-const responsiveHeight = (size) => (size * height) / 812;
-const responsivePadding = (size) => (size * width) / 375;
+const responsiveSize = (size, dimension = "width") => {
+  const factor = dimension === "width" ? width : height;
+  return (size * factor) / 375;
+};
 
 export default function AllChats() {
   return (
@@ -26,18 +25,17 @@ export default function AllChats() {
 
 const styles = StyleSheet.create({
   mainContainer: {
-    width: "100%",
-    height: "100%",
-    alignSelf: "center",
+    flex: 1,
+    alignItems: "center",
+    backgroundColor: "#f0f0f0", // Added a background color for better visibility
   },
   navContainer: {
-    // width: "96%",
-    alignSelf: "center",
-    marginTop: responsiveHeight(20),
+    width: "96%", // Ensuring the nav container has some margin from the edges
+    marginTop: responsiveSize(20, "height"),
   },
   text: {
-    fontSize: 38, // Adjust this size based on design requirements
-    textAlign: "center", // Center the text
-    marginTop: 20, // Added for some space below the top nav
+    fontSize: responsiveSize(38),
+    textAlign: "center",
+    marginTop: responsiveSize(20, "height"), // Consistent spacing below the nav
   },
 });

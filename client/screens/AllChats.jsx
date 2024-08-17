@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,7 +7,6 @@ import {
   TextInput,
   FlatList,
 } from "react-native";
-import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
@@ -94,7 +94,10 @@ const AllChats = () => {
   );
 
   const renderItem = ({ item }) => (
-    <View style={styles.chatContainer}>
+    <Pressable
+      style={styles.chatContainer}
+      onPress={() => navigation.navigate("ChatDetail", { chatName: item.name })}
+    >
       <View style={styles.chatDetails}>
         <View style={styles.chatContent}>
           <Text style={styles.chatName}>{item.name}</Text>
@@ -109,7 +112,7 @@ const AllChats = () => {
           )}
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 
   return (

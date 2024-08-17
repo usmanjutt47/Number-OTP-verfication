@@ -18,7 +18,6 @@ import axios from "axios";
 import BottomSheet from "@gorhom/bottom-sheet";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
 
@@ -64,16 +63,25 @@ export default function CustomImageCarousel() {
   useEffect(() => {
     const fetchLetters = async () => {
       try {
+        const userId = await AsyncStorage.getItem("userId");
+
+        if (!userId) {
+          setError("User ID not found.");
+          setLoading(false);
+          return;
+        }
+
         const response = await axios.get(
-          "http://192.168.10.9:8080/api/v1/auth/letters"
+          ` http://192.168.10.9:8080/api/v1/auth/letters?userId=${userId}`
         );
+
         if (response.data.success) {
           setLetters(response.data.letters);
         } else {
           setError("Failed to fetch letters.");
         }
       } catch (error) {
-        // console.log("Error occurred:", error);
+        console.error("Error occurred:", error);
         setError("An error occurred while fetching letters.");
       } finally {
         setLoading(false);
@@ -97,23 +105,22 @@ export default function CustomImageCarousel() {
     setSelectedItem(item);
     bottomSheetRef.current?.expand();
   };
-
   const handleReply = async () => {
     try {
       const userId = await AsyncStorage.getItem("userId");
-      // console.log("User ID from AsyncStorage:", userId);
 
       if (!userId) {
         ToastAndroid.show("User ID not found", ToastAndroid.SHORT);
-        console.error("User ID not found");
         return;
       }
 
-      // console.log("Content to be sent:", replyContent);
-
       if (!replyContent.trim()) {
         ToastAndroid.show("Content cannot be empty", ToastAndroid.SHORT);
-        console.error("Content is empty");
+        return;
+      }
+
+      if (!selectedItem || !selectedItem._id) {
+        ToastAndroid.show("No item selected", ToastAndroid.SHORT);
         return;
       }
 
@@ -127,29 +134,34 @@ export default function CustomImageCarousel() {
           body: JSON.stringify({
             userId: userId,
             content: replyContent,
+            letterId: selectedItem._id,
           }),
         }
       );
 
       const rawResponse = await response.text();
-      // console.log("Raw response:", rawResponse);
-
       const result = JSON.parse(rawResponse);
-      // console.log("Parsed result:", result);
 
       if (response.ok) {
         ToastAndroid.show("Reply sent successfully", ToastAndroid.SHORT);
         setReplyContent("");
+        setLetters((prevLetters) =>
+          prevLetters.map((letter) =>
+            letter._id === selectedItem._id
+              ? { ...letter, replied: true }
+              : letter
+          )
+        );
+        bottomSheetRef.current?.close();
       } else {
         ToastAndroid.show(`Error: ${result.message}`, ToastAndroid.SHORT);
-        console.error(`Server Error: ${result.message}`);
       }
     } catch (error) {
       ToastAndroid.show(
         `Failed to send reply: ${error.message}`,
         ToastAndroid.SHORT
       );
-      console.error("Failed to send reply:", error);
+      console.log(`Failed to send reply: ${error.message}`);
     }
   };
 

@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema(
       required: false,
       default: null,
     },
+    lettersCreatedToday: {
+      type: Number,
+      default: 0,
+    },
     userId: {
       type: String,
     },

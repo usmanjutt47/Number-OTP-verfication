@@ -18,6 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Entypo } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import NoReply from "../components/NoReply";
 
 const { width, height } = Dimensions.get("window");
 
@@ -240,8 +241,8 @@ export default function Profile() {
       const data = await response.json();
       setReplies(data);
     } catch (error) {
-      console.error("Fetch error:", error);
-      ToastAndroid.show("Failed to fetch replies", ToastAndroid.SHORT);
+      // console.error("Fetch error:", error);
+      // ToastAndroid.show("Failed to fetch replies", ToastAndroid.SHORT);
     }
   };
 
@@ -286,29 +287,7 @@ export default function Profile() {
           <CustomTopNav />
         </View>
         {replies.length === 0 ? (
-          <View style={styles.noRepliesContainer}>
-            <Animated.View
-              style={[styles.circle, { transform: [{ scale: scaleValue }] }]}
-            />
-            <View style={styles.imageContainer}>
-              <Image
-                source={require("../assets/icons/NoPost.png")}
-                style={styles.image}
-              />
-            </View>
-            <View style={styles.headingsContainer}>
-              <Text style={styles.heading}>You currently have no replies</Text>
-              <Text style={styles.subHeading}>
-                Click the button and fill in the information to create a post
-              </Text>
-            </View>
-            <Pressable
-              style={styles.createPostButton}
-              onPress={() => navigation.navigate("WriteLetter")}
-            >
-              <Text style={styles.createPostButtonText}>Create a post</Text>
-            </Pressable>
-          </View>
+          <NoReply />
         ) : (
           <FlatList
             data={replies}

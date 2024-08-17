@@ -142,7 +142,7 @@ export default function OTPVerification({ navigation }) {
 
     try {
       const response = await axios.post(
-        "http://192.168.10.9:8080/api/v1/auth/verify-otp",
+        "http://192.168.100.6:8080/api/v1/auth/verify-otp",
         { email, otp }
       );
 
@@ -157,9 +157,10 @@ export default function OTPVerification({ navigation }) {
         const userId = response.data.userId;
 
         // Store userId in AsyncStorage
-        // await AsyncStorage.setItem("userId", userId);
-        // console.log("User ID saved:", userId);
+        await AsyncStorage.setItem("userId", userId);
+        console.log("User ID saved:", userId);
 
+        // Navigate to Home screen after storing userId
         setTimeout(() => {
           navigation.navigate("Home");
         }, 100);

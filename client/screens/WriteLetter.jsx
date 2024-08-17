@@ -1,8 +1,81 @@
-import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function WriteLetter() {
+  const [content, setContent] = useState("");
+  const [userId, setUserId] = useState(null);
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    // Fetch userId from AsyncStorage when the component mounts
+    const fetchUserId = async () => {
+      try {
+        const storedUserId = await AsyncStorage.getItem("userId");
+        console.log("Letter created userId ", storedUserId);
+        if (storedUserId) {
+          setUserId(storedUserId);
+        }
+      } catch (error) {
+        console.error("Error fetching userId:", error);
+      }
+    };
+
+    fetchUserId();
+  }, []);
+
+  const handleSendLetter = async () => {
+    if (!userId) {
+      Alert.alert("Error", "User not logged in.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "http://192.168.10.9:8080/api/v1/auth/create-letter",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId,
+            content,
+          }),
+        }
+      );
+
+      const result = await response.json();
+      console.log("Response JSON:", result);
+
+      if (response.status === 201) {
+        Alert.alert("Success", "Letter created successfully.");
+        setContent(""); // Clear the content field
+      } else if (response.status === 403) {
+        Alert.alert("Limit Reached", result.message, [
+          {
+            text: "OK",
+            onPress: () => navigation.navigate("SelectPlan"),
+          },
+        ]);
+      } else {
+        Alert.alert("Error", result.message || "An error occurred.");
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+      Alert.alert("Error", `An error occurred: ${error.message}`);
+    }
+  };
+
   return (
     <View style={styles.mainContainer}>
       <View style={styles.contentContainer}>
@@ -15,15 +88,16 @@ export default function WriteLetter() {
           />
           <Text style={styles.heading}>Write Letter</Text>
         </View>
-        {/* Text input with multiline support */}
         <TextInput
           style={styles.textInput}
           placeholder="Type here . . ."
           placeholderTextColor="#999"
           multiline={true}
           textAlignVertical="top"
+          value={content}
+          onChangeText={(text) => setContent(text)}
         />
-        <Pressable style={styles.sendButton}>
+        <TouchableOpacity style={styles.sendButton} onPress={handleSendLetter}>
           <Text
             style={{
               color: "#fff",
@@ -33,7 +107,7 @@ export default function WriteLetter() {
           >
             Send Now
           </Text>
-        </Pressable>
+        </TouchableOpacity>
       </View>
     </View>
   );

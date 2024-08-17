@@ -216,22 +216,55 @@ const createLetterController = async (req, res) => {
         .json({ message: "User ID and content are required" });
     }
 
-    const user = await userModel.findById(userId);
+    // Find user by ID
+    let user = await userModel.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
+    const now = new Date();
+    const hoursSinceLastLetter =
+      (now - user.lastLetterCreatedAt) / (1000 * 60 * 60); // Difference in hours
+
+    if (hoursSinceLastLetter >= 24) {
+      // Reset the counter and timestamp after 24 hours
+      user.lettersCreatedToday = 0;
+      user.lastLetterCreatedAt = now;
+    }
+
+    if (user.lettersCreatedToday >= 2) {
+      return res.status(403).json({
+        message: `You can only create 2 letters per day. Please wait until the next day to create a new letter.`,
+      });
+    }
+
+    // Create the letter
     const newLetter = new Letter({
       userId,
       content,
-      createdAt: new Date(),
+      createdAt: now,
     });
 
+    // Save the letter
     await newLetter.save();
 
-    res
-      .status(201)
-      .json({ message: "Letter created successfully", letter: newLetter });
+    // Update the user's letter creation count and timestamp
+    user.lettersCreatedToday += 1;
+    user.lastLetterCreatedAt = now;
+    await user.save();
+
+    // Respond with the newly created letter and its letterId
+    res.status(201).json({
+      message: "Letter created successfully",
+      letterId: newLetter._id.toString(), // Ensure letterId is a string
+      letter: {
+        _id: newLetter._id.toString(),
+        userId: newLetter.userId,
+        content: newLetter.content,
+        createdAt: newLetter.createdAt,
+        updatedAt: newLetter.updatedAt,
+      },
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -240,8 +273,18 @@ const createLetterController = async (req, res) => {
 
 const getLetterController = async (req, res) => {
   try {
-    const letters = await Letter.find().populate("userId", "email");
+    const userId = req.query.userId;
 
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required to fetch letters.",
+      });
+    }
+    const letters = await Letter.find({ userId: { $ne: userId } }).populate(
+      "userId",
+      "email"
+    );
     res.status(200).json({
       success: true,
       letters,
@@ -254,38 +297,42 @@ const getLetterController = async (req, res) => {
     });
   }
 };
+
 const replyLetterController = async (req, res) => {
   try {
-    const { userId, content } = req.body;
+    const { userId, content, letterId } = req.body;
 
-    if (!userId || !content) {
+    // Validate that all required fields are present
+    if (!userId || !content || !letterId) {
       return res
         .status(400)
-        .json({ message: "userId and content are required" });
+        .json({ message: "userId, content, and letterId are required" });
     }
 
+    // Verify that the user exists
     const user = await userModel.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const newLetter = new Letter({
-      userId: userId,
-      content: content,
-    });
+    // Verify that the letter exists
+    const letter = await Letter.findById(letterId);
+    if (!letter) {
+      return res.status(404).json({ message: "Letter not found" });
+    }
 
-    await newLetter.save();
-
+    // Create the reply associated with the specific letter
     const newReply = new Reply({
-      letterId: newLetter.userId,
+      letterId, // Store the letterId in the reply
       userId,
       content,
     });
 
     await newReply.save();
 
+    // Return the created reply and associated letterId
     res.status(201).json({
-      message: "Reply and letter created successfully",
+      message: "Reply created successfully",
       reply: newReply,
     });
   } catch (error) {

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -31,23 +31,29 @@ const SelectPlan = () => {
           <Text style={styles.heading}>Select Plan</Text>
         </View>
 
-        {/* Basic Plan Component */}
-        <BasicPlan
-          isButtonPressed={activePlan === "Basic"}
-          handleButtonPress={() => handlePlanPress("Basic")}
-        />
+        {/* ScrollView to make the plan components scrollable */}
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false} // Optionally hide the scrollbar
+        >
+          {/* Basic Plan Component */}
+          <BasicPlan
+            isButtonPressed={activePlan === "Basic"}
+            handleButtonPress={() => handlePlanPress("Basic")}
+          />
 
-        {/* Standard Plan Component */}
-        <StandardPlan
-          isButtonPressed={activePlan === "Standard"}
-          handleButtonPress={() => handlePlanPress("Standard")}
-        />
+          {/* Standard Plan Component */}
+          <StandardPlan
+            isButtonPressed={activePlan === "Standard"}
+            handleButtonPress={() => handlePlanPress("Standard")}
+          />
 
-        {/* Premium Plan Component */}
-        <PremiumPlan
-          isButtonPressed={activePlan === "Premium"}
-          handleButtonPress={() => handlePlanPress("Premium")}
-        />
+          {/* Premium Plan Component */}
+          <PremiumPlan
+            isButtonPressed={activePlan === "Premium"}
+            handleButtonPress={() => handlePlanPress("Premium")}
+          />
+        </ScrollView>
       </View>
     </View>
   );
@@ -80,6 +86,10 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit_Bold",
     fontSize: 20,
     marginLeft: "5%",
+  },
+  scrollContainer: {
+    flexGrow: 1, // Ensure ScrollView takes full available height
+    justifyContent: "center", // Center the content vertically
   },
 });
 

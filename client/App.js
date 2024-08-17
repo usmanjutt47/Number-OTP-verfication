@@ -50,7 +50,7 @@ const App = () => {
       const userId = await AsyncStorage.getItem("userId");
       console.log("User ID from AsyncStorage:", userId);
       if (userId) {
-        setInitialRoute("Home");
+        setInitialRoute("AllChats");
       } else {
         setInitialRoute("OnBoarding");
       }

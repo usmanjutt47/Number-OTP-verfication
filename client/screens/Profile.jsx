@@ -225,7 +225,7 @@ export default function Profile() {
       }
 
       const response = await fetch(
-        `http://192.168.10.9:8080/api/v1/auth/replies?letterId=${letterId}`, // Pass letterId as a query parameter
+        `http://192.168.100.6:8080/api/v1/auth/replies?letterId=${letterId}`, // Pass letterId as a query parameter
         {
           method: "GET",
           headers: {
@@ -297,10 +297,7 @@ export default function Profile() {
           />
         )}
 
-        <Pressable
-          style={styles.pressable}
-          onPress={() => handlePress()}
-        >
+        <Pressable style={styles.pressable} onPress={() => handlePress()}>
           <Entypo name="plus" size={40} color="white" />
         </Pressable>
       </View>

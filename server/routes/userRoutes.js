@@ -8,6 +8,8 @@ const {
   replyLetterController,
   getRepliesController,
   getUsersController,
+  addToFavoriteController,
+  getFavoritesController,
 } = require("../controllers/userContoller");
 
 const router = express.Router();
@@ -21,5 +23,7 @@ router.get("/letters", getLetterController);
 router.post("/reply", replyLetterController);
 router.get("/replies", getRepliesController);
 router.get("/users/:email", getUsersController);
+router.post("addToFavorite", addToFavoriteController);
+router.get("/getFavorites", getFavoritesController);
 
 module.exports = router;

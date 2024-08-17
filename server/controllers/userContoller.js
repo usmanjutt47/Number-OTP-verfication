@@ -388,6 +388,9 @@ const getUsersController = async (req, res) => {
   }
 };
 
+const addToFavoriteController = async (req, res) => {};
+const getFavoritesController = async (req, res) => {};
+
 module.exports = {
   EmailVerificationController,
   VerifyOtpController,
@@ -397,4 +400,6 @@ module.exports = {
   replyLetterController,
   getRepliesController,
   getUsersController,
+  addToFavoriteController,
+  getFavoritesController,
 };

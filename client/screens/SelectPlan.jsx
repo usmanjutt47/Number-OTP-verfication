@@ -3,14 +3,27 @@ import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
-import BasicPlan from "./../components/BasicPlan";
-import StandardPlan from "./../components/StandardPlan";
-import PremiumPlan from "./../components/PremiumPlan";
+
+import PlanCard from "./../components/PlanCard";
 
 const SelectPlan = () => {
   const navigation = useNavigation();
   const [activePlan, setActivePlan] = useState(null);
-
+  const featuresB = [
+    { lightText: "Get Started With", darkText: "messaging" },
+    { lightText: "Flexible", darkText: "team meeting" },
+    { lightText: "Support", darkText: "chat" },
+  ];
+  const featuresP = [
+    { lightText: "All features in", darkText: "StartUp" },
+    { lightText: "Growth", darkText: "Oriented" },
+    { lightText: "Support", darkText: "chat" },
+  ];
+  const featuresS = [
+    { lightText: "All features in", darkText: "Basic Plan" },
+    { lightText: "Priority", darkText: "support" },
+    { lightText: "Advanced", darkText: "analytics" },
+  ];
   const handlePlanPress = (plan) => {
     setActivePlan(plan);
   };
@@ -31,29 +44,37 @@ const SelectPlan = () => {
           <Text style={styles.heading}>Select Plan</Text>
         </View>
 
-        {/* ScrollView to make the plan components scrollable */}
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          showsVerticalScrollIndicator={false} // Optionally hide the scrollbar
-        >
-          {/* Basic Plan Component */}
-          <BasicPlan
-            isButtonPressed={activePlan === "Basic"}
-            handleButtonPress={() => handlePlanPress("Basic")}
-          />
+        {/* Basic Plan Component */}
+        <PlanCard
+      planName="Basic Plan"
+      price="$10"
+      duration="/weekly"
+      features={featuresB}
+      iconSource={require("./../assets/icons/blur-icon.png")}
+      isButtonPressed={activePlan === "Basic"}
+      handleButtonPress={() => handlePlanPress("Basic")}
+/>
+        {/* Standard Plan Component */}
+        <PlanCard
+      planName="Standard Plan"
+      price="$20"
+      duration="/monthly"
+      features={featuresS}
+      iconSource={require("./../assets/icons/blur-icon.png")}
+      isButtonPressed={activePlan === "Standard"}
+      handleButtonPress={() => handlePlanPress("Standard")}
+    />
 
-          {/* Standard Plan Component */}
-          <StandardPlan
-            isButtonPressed={activePlan === "Standard"}
-            handleButtonPress={() => handlePlanPress("Standard")}
-          />
-
-          {/* Premium Plan Component */}
-          <PremiumPlan
-            isButtonPressed={activePlan === "Premium"}
-            handleButtonPress={() => handlePlanPress("Premium")}
-          />
-        </ScrollView>
+        {/* Premium Plan Component */}
+        <PlanCard
+      planName="Premium Plan"
+      price="$35"
+      duration="/Yearly"
+      features={featuresP}
+      iconSource={require("./../assets/icons/blur-icon.png")}
+      isButtonPressed={activePlan === "Premium"}
+      handleButtonPress={() => handlePlanPress("Premium")}
+    />
       </View>
     </View>
   );

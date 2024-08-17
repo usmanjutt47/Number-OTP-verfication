@@ -72,7 +72,7 @@ export default function CustomImageCarousel() {
         }
 
         const response = await axios.get(
-          ` http://192.168.10.9:8080/api/v1/auth/letters?userId=${userId}`
+          ` http://192.168.100.175:8080/api/v1/auth/letters?userId=${userId}`
         );
 
         if (response.data.success) {

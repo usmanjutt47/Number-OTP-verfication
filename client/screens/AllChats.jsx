@@ -41,7 +41,7 @@ const AllChats = () => {
       Alert.alert("Error", err.message);
     } finally {
       setLoading(false);
-      setRefreshing(false); 
+      setRefreshing(false);
     }
   }, []);
 
@@ -59,7 +59,18 @@ const AllChats = () => {
   const renderItem = ({ item }) => (
     <Pressable
       style={styles.chatContainer}
-      onPress={() => navigation.navigate("ChatDetail", { chatId: item._id })}
+      onPress={() =>
+        navigation.navigate("ChatDetail", {
+          chatId: item._id,
+          chatContent: item.content,
+          senderName: "Anonymous",
+          timestamp: new Date(item.createdAt).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          }),
+        })
+      }
     >
       <View style={styles.chatDetails}>
         <View style={styles.chatContent}>
@@ -144,7 +155,7 @@ const AllChats = () => {
           style={styles.chatList}
           showsVerticalScrollIndicator={false}
           onRefresh={onRefresh}
-          refreshing={refreshing} 
+          refreshing={refreshing}
         />
       </View>
     </View>
@@ -196,7 +207,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: "Outfit_Regular",
     fontSize: 16,
-    left: 15, 
+    left: 15,
   },
   searchIcon: {
     position: "absolute",

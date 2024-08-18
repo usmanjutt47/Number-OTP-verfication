@@ -6,51 +6,32 @@ import {
   FlatList,
   TextInput,
   TouchableOpacity,
+  Image,
+  Pressable,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 
-const mockMessages = [
-  { id: "1", text: "Hey, how are you?", sender: "Adam", timestamp: "10:30 AM" },
-  { id: "2", text: "I am good, thanks!", sender: "You", timestamp: "10:32 AM" },
-  {
-    id: "3",
-    text: "Can you give me an article on 10 lines about React Native?",
-    sender: "Adam",
-    timestamp: "10:35 AM",
-  },
-  {
-    id: "4",
-    text: "Yes Sure! here it is",
-    sender: "You",
-    timestamp: "10:40 AM",
-  },
-  {
-    id: "5",
-    text: `React Native is a framework for building mobile applications using JavaScript and React.
-It allows developers to create apps for both iOS and Android from a single codebase.
-The framework uses native components and bridges JavaScript and native code for optimal performance.
-React Native enables hot reloading, allowing developers to see changes instantly without restarting the app.
-It offers a rich set of pre-built components like View, Text, and Button for rapid development.
-State management is often handled using hooks or libraries like Redux or Context API.
-Navigation can be implemented using libraries like React Navigation or React Native Navigation.
-Styling in React Native is similar to CSS but uses a JavaScript style object syntax.
-React Native supports integration with native modules, enabling access to device-specific features.
-The community and ecosystem around React Native provide extensive third-party libraries and tools to enhance development.`,
-    sender: "You",
-    timestamp: "10:45 AM",
-  },
-  // Add more messages here
-];
-
 const ChatDetail = () => {
   const route = useRoute();
-  const { chatName } = route.params; // Get chatName from route params
+  const { chatId, chatContent, senderName, timestamp } = route.params;
+
+  const messages = [
+    {
+      id: chatId,
+      text: chatContent,
+      sender: senderName,
+      timestamp: timestamp,
+    },
+  ];
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>{chatName}</Text>
+      <View>
+        <Pressable></Pressable>
+        <Text style={styles.heading}>Chat Details</Text>
+      </View>
       <FlatList
-        data={mockMessages}
+        data={messages}
         renderItem={({ item }) => (
           <View
             style={[
@@ -84,15 +65,45 @@ const ChatDetail = () => {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.messageList}
       />
-      <View style={styles.inputContainer}>
-        <TextInput style={styles.input} placeholder="Type a message" />
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: "#fff",
+          position: "absolute",
+          bottom: 20,
+          width: "100%",
+          alignSelf: "center",
+        }}
+      >
+        <TextInput
+          style={{
+            flex: 1,
+            borderRadius: 28,
+            backgroundColor: "#FEFEFE",
+            elevation: 1,
+            height: 55,
+            paddingLeft: 10,
+          }}
+          placeholder="Type a message"
+        />
         <TouchableOpacity
-          style={styles.sendButton}
-          onPress={() => {
-            /* Handle send message */
+          style={{
+            position: "absolute",
+            right: 15, // Adjust this value to position the image
+            height: 24,
+            width: 24,
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
-          <Text style={styles.sendButtonText}>Send</Text>
+          <Image
+            source={require("../assets/icons/send.png")} // Replace with your image path
+            style={{
+              width: 24,
+              height: 24,
+            }}
+          />
         </TouchableOpacity>
       </View>
     </View>
@@ -114,57 +125,67 @@ const styles = StyleSheet.create({
   messageContainer: {
     padding: 10,
     borderRadius: 20,
-    borderBottomRightRadius: 0,
-    marginBottom: 10, // Increased margin for better separation
+    borderBottomLeftRadius: 0,
+    marginBottom: 10,
     maxWidth: "80%",
     alignSelf: "flex-start",
-    paddingTop: 15, // Added padding at the top to ensure sender's name is visible
+    paddingTop: 15,
+    elevation: 3,
+    backgroundColor: "#FEFEFE",
+    marginLeft: 5,
+    flexDirection: "column", // Ensure the timestamp is below the text
   },
   messageYou: {
     backgroundColor: "#075856",
     alignSelf: "flex-end",
   },
   messageOther: {
-    backgroundColor: "#f1f1f1",
+    elevation: 2,
+    backgroundColor: "#FEFEFE",
   },
   messageSender: {
-    fontWeight: "bold",
+    fontFamily: "Outfit_Bold",
     marginBottom: 5,
+    color: "#075856",
   },
   messageSenderYou: {
-    color: "#fff", // Sender's name color for "You"
+    color: "#fff",
   },
   messageSenderOther: {
-    color: "#000", // Sender's name color for other senders
+    color: "#075856",
+    fontSize: 16,
+    fontFamily: "Outfit_Bold",
   },
   messageText: {
     fontSize: 16,
   },
   messageTextYou: {
-    color: "#fff", // Sender's text color for "You"
+    color: "#fff",
   },
   messageTextOther: {
-    color: "#000", // Text color for other senders
+    color: "#000",
+    fontSize: 16,
+    fontFamily: "Outfit_Regular",
   },
   messageTimestamp: {
     fontSize: 12,
     color: "#888",
     marginTop: 5,
+    alignSelf: "flex-end", // Ensure it aligns well in message container
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    borderTopWidth: 1,
-    borderTopColor: "#ddd",
-    padding: 10,
+    width: "100%",
+    height: "7%",
   },
   input: {
     flex: 1,
-    borderColor: "#ddd",
-    borderWidth: 1,
-    borderRadius: 20,
-    padding: 10,
-    marginRight: 10,
+    borderRadius: 28,
+    backgroundColor: "#FEFEFE",
+    elevation: 1,
+    height: 55,
+    paddingLeft: 10,
   },
   sendButton: {
     backgroundColor: "#075856",
@@ -177,6 +198,51 @@ const styles = StyleSheet.create({
   },
   messageList: {
     flexGrow: 1,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderTopWidth: 1,
+    borderTopColor: "#ddd",
+    padding: 10,
+    position: "absolute",
+    bottom: 60, // Adjust based on your timestamp container's height
+    width: "100%",
+    backgroundColor: "#fff",
+  },
+  input: {
+    flex: 1,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    borderRadius: 20,
+    padding: 10,
+    marginRight: 10,
+  },
+  imageButton: {
+    padding: 5,
+    marginRight: 10,
+  },
+  image: {
+    width: 24,
+    height: 24,
+  },
+  sendButton: {
+    backgroundColor: "#075856",
+    padding: 10,
+    borderRadius: 20,
+  },
+  sendButtonText: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  timestampContainer: {
+    alignItems: "center",
+    paddingVertical: 10,
+    backgroundColor: "#fff",
+  },
+  timestampText: {
+    fontSize: 12,
+    color: "#888",
   },
 });
 

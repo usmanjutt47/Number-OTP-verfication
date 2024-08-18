@@ -16,6 +16,7 @@ import Profile from "./screens/Profile";
 import WriteLetter from "./screens/WriteLetter";
 import SelectPlan from "./screens/SelectPlan";
 import { StripeProvider } from "@stripe/stripe-react-native";
+import ChatDetail from "./components/ChatDetail";
 
 const Stack = createStackNavigator();
 
@@ -89,6 +90,7 @@ const App = () => {
           <Stack.Screen name="Profile" component={Profile} />
           <Stack.Screen name="WriteLetter" component={WriteLetter} />
           <Stack.Screen name="SelectPlan" component={SelectPlan} />
+          <Stack.Screen name="ChatDetail" component={ChatDetail} />
         </Stack.Navigator>
       </NavigationContainer>
     </StripeProvider>

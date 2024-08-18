@@ -15,6 +15,7 @@ import AllChats from "./screens/AllChats";
 import Profile from "./screens/Profile";
 import WriteLetter from "./screens/WriteLetter";
 import SelectPlan from "./screens/SelectPlan";
+import { StripeProvider } from "@stripe/stripe-react-native";
 
 const Stack = createStackNavigator();
 
@@ -50,7 +51,7 @@ const App = () => {
       const userId = await AsyncStorage.getItem("userId");
       console.log("User ID from AsyncStorage:", userId);
       if (userId) {
-        setInitialRoute("Home");
+        setInitialRoute("SelectPlan");
       } else {
         setInitialRoute("OnBoarding");
       }
@@ -63,26 +64,34 @@ const App = () => {
     return null;
   }
 
-  return (
-    <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName={initialRoute}
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="CustomKeyboard" component={CustomKeyboard} />
-        <Stack.Screen name="CustomTopNav" component={CustomTopNav} />
+  const PUBLISH_KEY =
+    "pk_test_51PnyvfDw0HZ2rXEfHszzvJJfoiyLWKUpejcAP2xOWWkwj3e6eflY3zWFN8OK69FS9NLQPaoz2P1XcZ1XK3OVO79K00Avrtb4N6";
 
-        <Stack.Screen name="OnBoarding" component={OnBoarding} />
-        <Stack.Screen name="EmailVerification" component={EmailVerification} />
-        <Stack.Screen name="OTPVerification" component={OTPVerification} />
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Favorite" component={Favorite} />
-        <Stack.Screen name="AllChats" component={AllChats} />
-        <Stack.Screen name="Profile" component={Profile} />
-        <Stack.Screen name="WriteLetter" component={WriteLetter} />
-        <Stack.Screen name="SelectPlan" component={SelectPlan} />
-      </Stack.Navigator>
-    </NavigationContainer>
+  return (
+    <StripeProvider publishableKey={PUBLISH_KEY}>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName={initialRoute}
+          screenOptions={{ headerShown: false }}
+        >
+          <Stack.Screen name="CustomKeyboard" component={CustomKeyboard} />
+          <Stack.Screen name="CustomTopNav" component={CustomTopNav} />
+
+          <Stack.Screen name="OnBoarding" component={OnBoarding} />
+          <Stack.Screen
+            name="EmailVerification"
+            component={EmailVerification}
+          />
+          <Stack.Screen name="OTPVerification" component={OTPVerification} />
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="Favorite" component={Favorite} />
+          <Stack.Screen name="AllChats" component={AllChats} />
+          <Stack.Screen name="Profile" component={Profile} />
+          <Stack.Screen name="WriteLetter" component={WriteLetter} />
+          <Stack.Screen name="SelectPlan" component={SelectPlan} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </StripeProvider>
   );
 };
 

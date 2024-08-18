@@ -5,6 +5,9 @@ const mongoose = require("mongoose");
 const Letter = require("../models/letterModel");
 const Reply = require("../models/Reply");
 const Favorite = require("../models/Favorite");
+const stripe = require("stripe")(
+  "sk_test_51PnyvfDw0HZ2rXEfHv77jdjoTrcCffI0rSZ3IdcG17gHvdB5t9H2M7yfMpysIIdRRS7zbpkThI90XVVFSjiBtEgY00UoTlPOS9"
+);
 
 function validateEmail(email) {
   const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -485,6 +488,20 @@ const getFavoritesController = async (req, res) => {
   }
 };
 
+const paymentsController = async (req, res) => {
+  try {
+    const { amount } = req.body; // Ensure you receive amount or any other necessary data
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount, // Ensure amount is correctly processed
+      currency: "usd",
+      automatic_payment_methods: { enabled: true },
+    });
+    res.json({ clientSecret: paymentIntent.client_secret }); // Ensure clientSecret is returned correctly
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+};
+
 module.exports = {
   EmailVerificationController,
   VerifyOtpController,
@@ -496,4 +513,5 @@ module.exports = {
   getUsersController,
   addToFavoriteController,
   getFavoritesController,
+  paymentsController,
 };

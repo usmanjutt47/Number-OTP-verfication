@@ -10,6 +10,7 @@ const {
   getUsersController,
   addToFavoriteController,
   getFavoritesController,
+  paymentsController,
 } = require("../controllers/userContoller");
 
 const router = express.Router();
@@ -25,5 +26,6 @@ router.get("/replies", getRepliesController);
 router.get("/users/:email", getUsersController);
 router.post("/addToFavorite", addToFavoriteController);
 router.get("/getFavorites", getFavoritesController);
+router.post("/payments", paymentsController);
 
 module.exports = router;

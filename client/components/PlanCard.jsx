@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, Pressable, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
@@ -19,7 +26,7 @@ const PlanCard = ({
 
   return (
     <Pressable
-      onPress={handleButtonPress}
+      onPress={() => handleButtonPress(planName, price)}
       style={[
         styles.planCard,
         {
@@ -64,14 +71,14 @@ const PlanCard = ({
         ))}
       </View>
       <View style={styles.buyButtonContainer}>
-        <Pressable
+        <TouchableOpacity
           style={[
             styles.buyButton,
             {
               backgroundColor: isButtonPressed ? colors.primary : "transparent",
             },
           ]}
-          onPress={handleButtonPress}
+          onPress={() => handleButtonPress(planName, price)}
           accessible={true}
           accessibilityLabel={`Buy ${planName} Plan`}
         >
@@ -88,7 +95,7 @@ const PlanCard = ({
             size={24}
             color={isButtonPressed ? "#FFF" : colors.primary}
           />
-        </Pressable>
+        </TouchableOpacity>
       </View>
     </Pressable>
   );

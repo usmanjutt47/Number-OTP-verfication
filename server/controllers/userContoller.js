@@ -488,30 +488,42 @@ const getFavoritesController = async (req, res) => {
 const paymentsController = async (req, res) => {
   try {
     const { amount, userId, subscriptionPlan } = req.body;
+
+    // Create a PaymentIntent with Stripe
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency: "usd",
       automatic_payment_methods: { enabled: true },
     });
 
+    // Find the user in the database
     const user = await userModel.findOne({ userId });
     if (!user) return res.status(404).json({ error: "User not found" });
 
+    // Calculate the expiration date based on the selected plan
     const expirationDate = new Date();
-    if (subscriptionPlan === "weekly")
+    if (subscriptionPlan === "weekly") {
       expirationDate.setDate(expirationDate.getDate() + 7);
-    if (subscriptionPlan === "monthly")
+    } else if (subscriptionPlan === "monthly") {
       expirationDate.setMonth(expirationDate.getMonth() + 1);
-    if (subscriptionPlan === "yearly")
+    } else if (subscriptionPlan === "yearly") {
       expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+    }
 
+    // Update the user's subscription details and set hasPlan to true
     await userModel.findOneAndUpdate(
       { userId },
-      { subscriptionPlan, subscriptionExpires: expirationDate }
+      {
+        subscriptionPlan,
+        subscriptionExpires: expirationDate,
+        hasPlan: true, // Set hasPlan to true
+      }
     );
 
+    // Return the client secret to complete the payment process
     res.json({ clientSecret: paymentIntent.client_secret });
   } catch (error) {
+    console.error("Payment processing error:", error); // Log the error
     res.status(500).json({ error: error.message });
   }
 };
@@ -567,6 +579,26 @@ const getUserPlanController = async (req, res) => {
   }
 };
 
+const getLettersOfSubscribedUsers = async (req, res) => {
+  try {
+    const subscribedUsers = await userModel
+      .find({ hasPlan: true })
+      .select("userId");
+
+    if (subscribedUsers.length === 0) {
+      return res.status(404).json({ error: "No subscribed users found" });
+    }
+
+    const userIds = subscribedUsers.map((user) => user.userId);
+
+    const replies = await Reply.find({ userId: { $in: userIds } });
+
+    res.json({ success: true, replies });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   EmailVerificationController,
   VerifyOtpController,
@@ -581,4 +613,5 @@ module.exports = {
   paymentsController,
   updateSubscriptionController,
   getUserPlanController,
+  getLettersOfSubscribedUsers,
 };

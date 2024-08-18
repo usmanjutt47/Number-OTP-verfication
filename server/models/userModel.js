@@ -48,15 +48,37 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-userSchema.methods.updateHasPlan = function () {
-  if (
-    this.subscriptionPlan !== "none" &&
-    this.subscriptionExpires > Date.now()
-  ) {
+// Method to update the subscription plan
+userSchema.methods.updateSubscription = function (plan) {
+  let duration;
+
+  switch (plan) {
+    case "weekly":
+      duration = 7; // 7 days
+      break;
+    case "monthly":
+      duration = 30; // 30 days
+      break;
+    case "yearly":
+      duration = 365; // 365 days
+      break;
+    default:
+      duration = 0;
+      break;
+  }
+
+  if (duration > 0) {
+    this.subscriptionPlan = plan;
+    this.subscriptionExpires = new Date(
+      Date.now() + duration * 24 * 60 * 60 * 1000
+    );
     this.hasPlan = true;
   } else {
+    this.subscriptionPlan = "none";
+    this.subscriptionExpires = null;
     this.hasPlan = false;
   }
+
   return this.save();
 };
 

@@ -13,6 +13,7 @@ const {
   paymentsController,
   updateSubscriptionController,
   getUserPlanController,
+  getLettersOfSubscribedUsers,
 } = require("../controllers/userContoller");
 
 const router = express.Router();
@@ -31,5 +32,6 @@ router.get("/getFavorites", getFavoritesController);
 router.post("/payments", paymentsController);
 router.post("/updateSubscription", updateSubscriptionController);
 router.get("/user-plan", getUserPlanController);
+router.get("/letters-of-subscribed-users", getLettersOfSubscribedUsers);
 
 module.exports = router;

@@ -14,6 +14,7 @@ const SelectPlan = () => {
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [activePlan, setActivePlan] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [hasPlan, setHasPlan] = useState(false);
 
   const featuresB = [
     { lightText: "Get Started With", darkText: "messaging" },
@@ -47,7 +48,7 @@ const SelectPlan = () => {
 
     try {
       setLoading(true);
-      const userId = await getUserId(); 
+      const userId = await getUserId();
       if (!userId) {
         throw new Error("User ID not found. Please log in again.");
       }
@@ -85,13 +86,19 @@ const SelectPlan = () => {
       const { error: presentError } = await presentPaymentSheet();
 
       if (presentError) {
-        console.error("Payment error:", presentError);
+        logError(presentError);
         Alert.alert("Payment failed", presentError.message);
       } else {
+        // Payment is successful, update the hasPlan state
         Alert.alert("Payment successful", "Thank you for your purchase!");
+
+        // Optionally, you could update local state or trigger other actions
+        setHasPlan(true); // Assuming you have this in your state
+
+        // Optionally navigate to another screen or update the UI
       }
     } catch (error) {
-      console.error("Error initializing payment:", error);
+      logError(error);
       Alert.alert(
         "Error",
         error.message || "An error occurred. Please try again."
@@ -99,6 +106,20 @@ const SelectPlan = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const logError = (error) => {
+    console.error("Error:", error.message);
+    if (error.response) {
+      console.error("Response data:", error.response.data);
+      console.error("Response status:", error.response.status);
+      console.error("Response headers:", error.response.headers);
+    } else if (error.request) {
+      console.error("Request data:", error.request);
+    } else {
+      console.error("Error details:", error);
+    }
+    console.error("Error stack:", error.stack);
   };
 
   return (

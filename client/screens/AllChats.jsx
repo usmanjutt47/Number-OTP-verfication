@@ -3,97 +3,106 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
-  ActivityIndicator,
   Pressable,
   TextInput,
+  FlatList,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
-import Entypo from "@expo/vector-icons/Entypo";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 
 const AllChats = () => {
-  const [replies, setReplies] = useState([]);
+  const navigation = useNavigation();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  const navigation = useNavigation();
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const fetchReplies = async (letterId) => {
+  const fetchChats = useCallback(async () => {
+    setLoading(true);
     try {
-      const userId = await AsyncStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID is not available");
-      }
-
       const response = await fetch(
-        `http://192.168.100.6:8080/api/v1/auth/replies?letterId=${letterId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        "http://192.168.100.6:8080/api/v1/auth/letters-of-subscribed-users"
       );
-
       if (!response.ok) {
-        throw new Error(`Network response was not ok: ${response.statusText}`);
+        throw new Error("Network response was not ok");
       }
-
       const data = await response.json();
-      setReplies(data);
-    } catch (error) {
-      console.error("Failed to fetch replies:", error.message);
-      setError("Failed to fetch replies");
+      if (data.success) {
+        setChats(data.replies);
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (err) {
+      setError(err.message);
+      Alert.alert("Error", err.message);
     } finally {
       setLoading(false);
-      setRefreshing(false);
-    }
-  };
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    const letterId = "66c058bb25c04a9f881e4639";
-    if (letterId) {
-      await fetchReplies(letterId);
+      setRefreshing(false); 
     }
   }, []);
 
   useEffect(() => {
-    const letterId = "66c058bb25c04a9f881e4639";
-    if (letterId) {
-      fetchReplies(letterId);
-    }
-  }, []);
+    fetchChats();
+  }, [fetchChats]);
 
-  const renderReplyItem = ({ item }) => (
-    <View style={styles.replyContainer}>
-      <Text style={{ fontSize: 16, fontFamily: "Outfit_Medium" }}>
-        Anonymous
-      </Text>
-      <Text style={styles.replyContent}>{item.content}</Text>
-      {/* <Text style={styles.replyDate}>
-        {new Date(item.createdAt).toLocaleDateString()}
-      </Text> */}
-    </View>
+  const filteredChats = chats.filter(
+    (chat) =>
+      chat.content &&
+      typeof chat.content === "string" &&
+      chat.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (loading && !refreshing) {
+  const renderItem = ({ item }) => (
+    <Pressable
+      style={styles.chatContainer}
+      onPress={() => navigation.navigate("ChatDetail", { chatId: item._id })}
+    >
+      <View style={styles.chatDetails}>
+        <View style={styles.chatContent}>
+          <Text
+            style={{
+              fontSize: 16,
+              fontFamily: "Outfit_Medium",
+              marginTop: 5,
+              marginBottom: 5,
+            }}
+          >
+            Anonymous
+          </Text>
+          <Text
+            style={styles.chatMessage}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {item.content}
+          </Text>
+        </View>
+        <View style={styles.chatRightSection}>
+          <Text style={styles.chatTime}>
+            {new Date(item.createdAt).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            })}
+          </Text>
+        </View>
+      </View>
+    </Pressable>
+  );
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchChats();
+  };
+
+  if (loading) {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.container}>
-        <Text>{error}</Text>
       </View>
     );
   }
@@ -102,74 +111,40 @@ const AllChats = () => {
     <View style={styles.container}>
       <StatusBar style="auto" />
       <View style={styles.contentContainer}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
+        <View style={styles.header}>
           <Pressable
-            style={{
-              height: 52,
-              width: 52,
-              backgroundColor: "#e0e0e0",
-              justifyContent: "center",
-              borderRadius: 30,
-            }}
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+            accessible={true}
+            accessibilityLabel="Go back"
           >
-            <Entypo
-              name="chevron-left"
-              size={24}
-              color="black"
-              style={{ alignSelf: "center" }}
-            />
+            <Ionicons name="chevron-back" size={24} color="black" />
           </Pressable>
-          <Text
-            style={{
-              fontSize: 20,
-              marginLeft: 10,
-              fontFamily: "Outfit_Bold",
-            }}
-          >
-            All chat
-          </Text>
+          <Text style={styles.heading}>All Chats</Text>
         </View>
-
-        <View style={{ position: "relative", width: "100%" }}>
+        <View style={styles.searchContainer}>
           <TextInput
+            style={styles.searchInput}
             placeholder="Search message..."
             placeholderTextColor="#AAAAB4"
-            style={{
-              height: 52,
-              paddingRight: 40,
-              paddingLeft: "5%",
-              borderRadius: 30,
-              marginTop: "5%",
-              borderWidth: 1,
-              borderColor: "#D6D6D6",
-            }}
+            onChangeText={(text) => setSearchQuery(text)}
+            value={searchQuery}
           />
-
-          <AntDesign
-            name="search1"
+          <Ionicons
+            name="search-outline"
             size={24}
-            color="#BDBDC4"
-            style={{
-              position: "absolute",
-              right: "5%",
-              top: "60%",
-              transform: [{ translateY: -12 }],
-            }}
+            color="black"
+            style={styles.searchIcon}
           />
         </View>
-
         <FlatList
-          data={replies}
-          renderItem={renderReplyItem}
+          data={filteredChats}
+          renderItem={renderItem}
           keyExtractor={(item) => item._id}
-          style={styles.repliesList}
+          style={styles.chatList}
+          showsVerticalScrollIndicator={false}
           onRefresh={onRefresh}
-          refreshing={refreshing}
+          refreshing={refreshing} 
         />
       </View>
     </View>
@@ -178,36 +153,88 @@ const AllChats = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
+    flex: 1,
+    alignItems: "center",
     height: "100%",
-    width: "100%",
-    paddingLeft: "5%",
-    paddingRight: "5%",
-    paddingTop: "5%",
-    alignSelf: "center",
+    backgroundColor: "#fff",
   },
   contentContainer: {
+    width: "90%",
+    height: "100%",
+  },
+  header: {
+    flexDirection: "row",
+    marginTop: "10%",
+    alignItems: "center",
+  },
+  backButton: {
+    width: 52,
+    height: 52,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#E0E0E0",
+  },
+  heading: {
+    fontFamily: "Outfit_Bold",
+    fontSize: 20,
+    marginLeft: "5%",
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 25,
+    paddingHorizontal: 10,
+    borderColor: "#D6D6D6",
+    borderWidth: 1,
+    marginTop: 20,
+    position: "relative",
+  },
+  searchInput: {
+    height: 52,
     flex: 1,
-    padding: 10,
+    fontFamily: "Outfit_Regular",
+    fontSize: 16,
+    left: 15, 
   },
-  repliesTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
+  searchIcon: {
+    position: "absolute",
+    right: 20,
+    color: "#AAAAB4",
   },
-  replyContainer: {
+  chatList: {
+    marginTop: 20,
+  },
+  chatContainer: {
     backgroundColor: "#F9F9F9",
     height: 63,
     borderRadius: 15,
-    marginBottom: 5,
+    marginBottom: 10,
   },
-  replyContent: {
-    fontSize: 16,
+  chatDetails: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginLeft: 10,
   },
-  replyDate: {
+  chatContent: {
+    flex: 1,
+  },
+  chatRightSection: {
+    alignItems: "flex-end",
+    justifyContent: "center",
+  },
+  chatMessage: {
+    fontFamily: "Outfit_Regular",
     fontSize: 14,
-    color: "#aaa",
-    marginTop: 5,
+    color: "#AAAAB4",
+  },
+  chatTime: {
+    fontFamily: "Outfit_Regular",
+    fontSize: 12,
+    color: "#AAAAB4",
+    marginRight: 10,
   },
 });
 

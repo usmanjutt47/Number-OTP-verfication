@@ -17,7 +17,6 @@ export default function WriteLetter() {
   const navigation = useNavigation();
 
   useEffect(() => {
-    // Fetch userId from AsyncStorage when the component mounts
     const fetchUserId = async () => {
       try {
         const storedUserId = await AsyncStorage.getItem("userId");

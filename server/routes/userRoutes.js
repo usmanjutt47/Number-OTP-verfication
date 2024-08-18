@@ -11,6 +11,8 @@ const {
   addToFavoriteController,
   getFavoritesController,
   paymentsController,
+  updateSubscriptionController,
+  getUserPlanController,
 } = require("../controllers/userContoller");
 
 const router = express.Router();
@@ -27,5 +29,7 @@ router.get("/users/:email", getUsersController);
 router.post("/addToFavorite", addToFavoriteController);
 router.get("/getFavorites", getFavoritesController);
 router.post("/payments", paymentsController);
+router.post("/updateSubscription", updateSubscriptionController);
+router.get("/user-plan", getUserPlanController);
 
 module.exports = router;

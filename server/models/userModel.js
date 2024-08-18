@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-
     otp: {
       type: String,
       required: false,
@@ -31,11 +30,34 @@ const userSchema = new mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: "Letter",
       },
-    ], // Array of Letter IDs
+    ],
+    subscriptionPlan: {
+      type: String,
+      enum: ["none", "weekly", "monthly", "yearly"],
+      default: "none",
+    },
+    subscriptionExpires: {
+      type: Date,
+      default: null,
+    },
+    hasPlan: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
 
-// userSchema.index({ otpExpiresAt: 1 }, { expireAfterSeconds: 60 });
+userSchema.methods.updateHasPlan = function () {
+  if (
+    this.subscriptionPlan !== "none" &&
+    this.subscriptionExpires > Date.now()
+  ) {
+    this.hasPlan = true;
+  } else {
+    this.hasPlan = false;
+  }
+  return this.save();
+};
 
 module.exports = mongoose.model("User", userSchema);

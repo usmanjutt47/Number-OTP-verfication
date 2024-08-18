@@ -51,7 +51,7 @@ const App = () => {
       const userId = await AsyncStorage.getItem("userId");
       console.log("User ID from AsyncStorage:", userId);
       if (userId) {
-        setInitialRoute("SelectPlan");
+        setInitialRoute("Home");
       } else {
         setInitialRoute("OnBoarding");
       }

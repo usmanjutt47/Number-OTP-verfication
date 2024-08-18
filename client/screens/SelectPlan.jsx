@@ -7,6 +7,7 @@ import { useStripe } from "@stripe/stripe-react-native";
 import axios from "axios";
 
 import PlanCard from "./../components/PlanCard";
+import { getUserId } from "../utils/asyncStorage";
 
 const SelectPlan = () => {
   const navigation = useNavigation();
@@ -40,16 +41,24 @@ const SelectPlan = () => {
   const handlePlanPress = async (planName) => {
     setActivePlan(planName);
     const price = planDetails[planName];
-    const amount = parseFloat(price.replace("$", "").replace(",", "")) * 100; // Convert price to amount in cents
+    const amount = parseFloat(price.replace("$", "").replace(",", "")) * 100;
 
     console.log(`Plan Name: ${planName}, Amount: ${amount}`);
 
     try {
       setLoading(true);
+      const userId = await getUserId(); 
+      if (!userId) {
+        throw new Error("User ID not found. Please log in again.");
+      }
+
+      // Make sure the URL is correct and matches your backend route
       const response = await axios.post(
         "http://192.168.100.6:8080/api/v1/auth/payments",
         {
-          amount: Math.round(amount), // Ensure amount is correctly sent to backend
+          amount: Math.round(amount),
+          userId: userId, // Include user ID in the request
+          subscriptionPlan: planName.toLowerCase(), // Ensure the subscription plan matches your backend
         }
       );
 
@@ -60,11 +69,9 @@ const SelectPlan = () => {
       }
 
       console.log("PaymentIntent client secret:", clientSecret);
-
-      // Initialize PaymentSheet with merchantDisplayName
       const { error: initError } = await initPaymentSheet({
         paymentIntentClientSecret: clientSecret,
-        merchantDisplayName: "Your Business Name", // Replace with your business name
+        merchantDisplayName: "Your Business Name",
       });
 
       if (initError) {
@@ -75,7 +82,6 @@ const SelectPlan = () => {
 
       console.log("PaymentSheet initialized successfully");
 
-      // Present PaymentSheet
       const { error: presentError } = await presentPaymentSheet();
 
       if (presentError) {

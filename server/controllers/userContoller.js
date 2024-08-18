@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const Letter = require("../models/letterModel");
 const Reply = require("../models/Reply");
 const Favorite = require("../models/Favorite");
+const userPlanModel = require("../models/userPlanModel");
 const stripe = require("stripe")(
   "sk_test_51PnyvfDw0HZ2rXEfHv77jdjoTrcCffI0rSZ3IdcG17gHvdB5t9H2M7yfMpysIIdRRS7zbpkThI90XVVFSjiBtEgY00UoTlPOS9"
 );
@@ -347,35 +348,31 @@ const replyLetterController = async (req, res) => {
 };
 
 const getRepliesController = async (req, res) => {
-  const { letterId } = req.query;
-  const loggedInUserId = req.userId;
-
   try {
-    if (!letterId) {
-      return res.status(400).json({ message: "Letter ID is required" });
+    const userId = req.query.userId; // Use req.query to access query parameters
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ message: "userId query parameter is required" });
     }
 
-    const replies = await Reply.find({
-      letterId,
-      userId: { $ne: loggedInUserId },
-    }).populate("letterId");
+    const replies = await Reply.find({ userId: userId });
 
-    if (!replies || replies.length === 0) {
+    if (replies.length === 0) {
       return res
         .status(404)
-        .json({ message: "No replies found for this letter" });
+        .json({ message: "No replies found for this user" });
     }
 
     res.status(200).json(replies);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", error });
   }
 };
 
 const getUsersController = async (req, res) => {
   try {
-    const { email } = req.params; // Email is extracted from URL parameters
+    const { email } = req.params;
 
     if (!email) {
       return res.status(400).json({ error: "Email parameter is required" });
@@ -490,15 +487,83 @@ const getFavoritesController = async (req, res) => {
 
 const paymentsController = async (req, res) => {
   try {
-    const { amount } = req.body; // Ensure you receive amount or any other necessary data
+    const { amount, userId, subscriptionPlan } = req.body;
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount, // Ensure amount is correctly processed
+      amount,
       currency: "usd",
       automatic_payment_methods: { enabled: true },
     });
-    res.json({ clientSecret: paymentIntent.client_secret }); // Ensure clientSecret is returned correctly
-  } catch (e) {
-    res.status(400).json({ error: e.message });
+
+    const user = await userModel.findOne({ userId });
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const expirationDate = new Date();
+    if (subscriptionPlan === "weekly")
+      expirationDate.setDate(expirationDate.getDate() + 7);
+    if (subscriptionPlan === "monthly")
+      expirationDate.setMonth(expirationDate.getMonth() + 1);
+    if (subscriptionPlan === "yearly")
+      expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+
+    await userModel.findOneAndUpdate(
+      { userId },
+      { subscriptionPlan, subscriptionExpires: expirationDate }
+    );
+
+    res.json({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const updateSubscriptionController = async (req, res) => {
+  try {
+    const { userId, subscriptionPlan, expirationDate } = req.body;
+
+    const user = await userModel.findOneAndUpdate(
+      { userId },
+      {
+        subscriptionPlan,
+        subscriptionExpires: expirationDate,
+      },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    await user.save();
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const getUserPlanController = async (req, res) => {
+  const userId = req.query.userId;
+
+  if (!userId) {
+    return res.status(400).json({ message: "User ID is required" });
+  }
+
+  try {
+    const user = await userModel.findOne({ userId });
+
+    if (!user) {
+      console.log("No user found for userId:", userId);
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({
+      active: user.subscriptionPlan !== "none",
+      planDetails: {
+        subscriptionPlan: user.subscriptionPlan,
+        subscriptionExpires: user.subscriptionExpires,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -514,4 +579,6 @@ module.exports = {
   addToFavoriteController,
   getFavoritesController,
   paymentsController,
+  updateSubscriptionController,
+  getUserPlanController,
 };

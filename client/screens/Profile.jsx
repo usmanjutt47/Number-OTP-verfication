@@ -10,15 +10,15 @@ import {
   Animated,
   Easing,
   Pressable,
-  ToastAndroid,
+  ActivityIndicator,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import CustomTopNav from "../components/CustomTopNav";
 import { useNavigation } from "@react-navigation/native";
 import { Entypo } from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NoReply from "../components/NoReply";
+import axios from "axios";
 
 const { width, height } = Dimensions.get("window");
 
@@ -210,46 +210,83 @@ const ReplyCard = ({ reply }) => {
   );
 };
 
+const NoReplyCard = () => (
+  <View style={styles.card}>
+    <View
+      style={{
+        height: responsiveHeight(300),
+        width: responsiveWidth(350),
+        backgroundColor: "#F5F5F5",
+        borderRadius: 26.22,
+        alignSelf: "center",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Text
+        style={{
+          fontSize: responsiveFontSize(18),
+          fontFamily: "Outfit_Medium",
+        }}
+      >
+        No Replies Available
+      </Text>
+    </View>
+  </View>
+);
+
 export default function Profile() {
+  const [userId, setUserId] = useState(null);
   const [replies, setReplies] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   const scaleValue = useRef(new Animated.Value(1)).current;
-  const [showPressable, setShowPressable] = useState(false);
-
-  const fetchReplies = async (letterId) => {
-    try {
-      const userId = await AsyncStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID is not available");
-      }
-
-      const response = await fetch(
-        `http://192.168.100.6:8080/api/v1/auth/replies?letterId=${letterId}`, // Pass letterId as a query parameter
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Network response was not ok: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      setReplies(data);
-    } catch (error) {
-      console.error("Fetch error:", error);
-      ToastAndroid.show("Failed to fetch replies", ToastAndroid.SHORT);
-    }
-  };
 
   useEffect(() => {
-    const letterId = "66c058bb25c04a9f881e4639";
-    fetchReplies(letterId);
+    const fetchUserId = async () => {
+      try {
+        const storedUserId = await AsyncStorage.getItem("userId");
+        if (storedUserId) {
+          setUserId(storedUserId);
+        } else {
+          console.error("No userId found in AsyncStorage");
+        }
+      } catch (error) {
+        console.error("Error retrieving userId:", error);
+      }
+    };
+
+    fetchUserId();
   }, []);
+
+  useEffect(() => {
+    const fetchReplies = async () => {
+      if (!userId) return; // Don't fetch if userId is not set
+
+      try {
+        console.log("Fetching replies for userId:", userId); // Debug logging
+        const response = await axios.get(
+          `http://192.168.100.6:8080/api/v1/auth/replies`,
+          { params: { userId } }
+        );
+
+        console.log("Fetched replies:", response.data); // Debug logging
+        if (response.data.length === 0) {
+          setReplies([]);
+        } else {
+          setReplies(response.data);
+        }
+      } catch (error) {
+        setError(error.message);
+        console.error("Error fetching replies:", error); // Debug logging
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReplies();
+  }, [userId]);
 
   useEffect(() => {
     const scaleAnimation = Animated.loop(
@@ -277,6 +314,14 @@ export default function Profile() {
     navigation.navigate("WriteLetter");
   };
 
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
+  if (error) {
+    return <Text>Error: {error}</Text>;
+  }
+
   return (
     <View style={styles.mainContainer}>
       <StatusBar style="auto" />
@@ -285,7 +330,7 @@ export default function Profile() {
           <CustomTopNav />
         </View>
         {replies.length === 0 ? (
-          <NoReply />
+          <NoReplyCard />
         ) : (
           <FlatList
             showsHorizontalScrollIndicator={false}
@@ -316,59 +361,6 @@ const styles = StyleSheet.create({
     width: width,
     padding: responsivePadding(20),
   },
-  noRepliesContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  circle: {
-    width: responsiveWidth(100),
-    height: responsiveWidth(100),
-    borderRadius: responsiveWidth(50),
-    backgroundColor: "#E0E0E0",
-    position: "absolute",
-    top: -responsiveWidth(50),
-    left: width / 2 - responsiveWidth(50),
-  },
-  imageContainer: {
-    height: responsiveHeight(240),
-    width: responsiveWidth(240),
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: responsiveHeight(20),
-  },
-  image: {
-    height: "100%",
-    width: "100%",
-    resizeMode: "contain",
-  },
-  headingsContainer: {
-    alignItems: "center",
-    marginBottom: responsiveHeight(20),
-  },
-  heading: {
-    fontSize: responsiveFontSize(24),
-    fontFamily: "Outfit_Bold",
-    color: "#000",
-  },
-  subHeading: {
-    fontSize: responsiveFontSize(18),
-    fontFamily: "Outfit_Regular",
-    color: "#999",
-  },
-  createPostButton: {
-    backgroundColor: "#075856",
-    borderRadius: 8,
-    padding: responsivePadding(15),
-    justifyContent: "center",
-    alignItems: "center",
-    width: responsiveWidth(220),
-  },
-  createPostButtonText: {
-    color: "#fff",
-    fontSize: responsiveFontSize(18),
-    fontFamily: "Outfit_Bold",
-  },
   flatListContainer: {
     paddingBottom: responsiveHeight(20),
   },
@@ -382,5 +374,12 @@ const styles = StyleSheet.create({
     height: responsiveWidth(60),
     justifyContent: "center",
     alignItems: "center",
+  },
+  card: {
+    marginVertical: responsiveHeight(10),
+    borderRadius: 26.22,
+    backgroundColor: "#F5F5F5",
+    width: responsiveWidth(350),
+    alignSelf: "center",
   },
 });

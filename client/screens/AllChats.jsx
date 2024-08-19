@@ -38,7 +38,7 @@ const AllChats = () => {
 
       // Fetch data from API
       const response = await fetch(
-        `http://192.168.10.6:8080/api/v1/auth/letters-of-subscribed-users?userId=${userId}`
+        `http://192.168.100.6:8080/api/v1/auth/letters-of-subscribed-users?userId=${userId}`
       );
 
       // Check if response is OK

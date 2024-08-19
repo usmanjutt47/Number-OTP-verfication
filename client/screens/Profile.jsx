@@ -267,7 +267,7 @@ export default function Profile() {
       try {
         console.log("Fetching replies for userId:", userId);
         const response = await axios.get(
-          "http://192.168.10.6:8080/api/v1/auth/replies",
+          "http://192.168.100.6:8080/api/v1/auth/replies",
           { params: { userId } }
         );
 

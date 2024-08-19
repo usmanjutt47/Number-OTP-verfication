@@ -19,13 +19,13 @@ const { width, height } = Dimensions.get("window");
 const responsiveFontSize = (size) => (size * width) / 375;
 const responsiveHeight = (size) => (size * height) / 812;
 
-export default function ReplyLetter() {
+export default function ReplyFromHome() {
   const [replyContent, setReplyContent] = useState("");
   const navigation = useNavigation();
   const route = useRoute();
   const [letters, setLetters] = useState([]);
 
-  const { selectedItem } = route.params || {};
+  const { letterId, letterContent } = route.params || {};
 
   const handleReply = async () => {
     try {
@@ -41,8 +41,8 @@ export default function ReplyLetter() {
         return;
       }
 
-      if (!selectedItem || !selectedItem._id) {
-        Alert.alert("Error", "No item selected");
+      if (!letterId) {
+        Alert.alert("Error", "No letter selected");
         return;
       }
 
@@ -56,7 +56,7 @@ export default function ReplyLetter() {
           body: JSON.stringify({
             userId: userId,
             content: replyContent,
-            letterId: selectedItem._id,
+            letterId: letterId,
           }),
         }
       );
@@ -66,13 +66,7 @@ export default function ReplyLetter() {
       if (response.ok) {
         Alert.alert("Success", "Reply sent successfully");
         setReplyContent("");
-        setLetters((prevLetters) =>
-          prevLetters.map((letter) =>
-            letter._id === selectedItem._id
-              ? { ...letter, replied: true }
-              : letter
-          )
-        );
+        // Assuming you need to navigate back or refresh data
         navigation.navigate("Home");
       } else {
         Alert.alert("Error", `Error: ${result.message}`);
@@ -121,20 +115,27 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     borderRadius: 23,
   },
-  headerContainer: {
+  header: {
+    height: responsiveHeight(50),
     flexDirection: "row",
-    marginTop: "5%",
     alignItems: "center",
   },
-  heading: {
+  headerText: {
     fontFamily: "Inter_Bold",
-    marginLeft: "5%",
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: responsiveFontSize(24),
+    color: "#000",
+    marginLeft: 10,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+  },
+  letterContent: {
+    fontSize: responsiveFontSize(18),
+    marginBottom: responsiveHeight(10),
+    color: "#000",
   },
   textInput: {
     fontFamily: "Outfit_Regular",
-    marginTop: "5%",
     fontSize: 18,
     paddingRight: 20,
     width: "70%",
@@ -148,33 +149,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     borderRadius: 35,
     position: "absolute",
-    bottom: "2%",
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#FFF",
-  },
-  header: {
-    height: responsiveHeight(50),
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  headerText: {
-    fontFamily: "Inter_Bold",
-    fontSize: responsiveFontSize(24),
-    color: "#000",
-  },
-  scrollContainer: {
-    flexGrow: 1,
-  },
-  input: {
-    fontSize: responsiveFontSize(26),
-    fontFamily: "Outfit_Regular",
-    width: "100%",
-    color: "#000",
-    minHeight: responsiveHeight(200),
-    borderBottomColor: "#ccc",
+    bottom: responsiveHeight(10),
   },
   sendButtonText: {
     textAlign: "center",

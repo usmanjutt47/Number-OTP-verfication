@@ -3,90 +3,76 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Pressable,
   StyleSheet,
   Dimensions,
-  ToastAndroid,
+  Alert,
 } from "react-native";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios"; // Import axios
 
 const { width, height } = Dimensions.get("window");
 
 const responsiveFontSize = (size) => (size * width) / 375;
 const responsivePadding = (size) => (size * width) / 375;
-const responsiveMargin = (size) => (size * width) / 375;
 const responsiveHeight = (size) => (size * height) / 812;
 const responsiveWidth = (size) => (size * width) / 375;
 
 export default function ViewLetter() {
   const route = useRoute();
-  const { content, title, isFavorite: initialFavorite } = route.params;
-  const [isFavorite, setIsFavorite] = useState(initialFavorite);
+  const navigation = useNavigation();
+  const { letter } = route.params;
+  const [isFavorite, setIsFavorite] = useState(letter.isFavorite);
 
-  const toggleFavorite = () => {
-    setIsFavorite((prev) => !prev);
-  };
-
-  const handleReply = async () => {
+  const handleFavoriteClick = async () => {
     try {
       const userId = await AsyncStorage.getItem("userId");
 
       if (!userId) {
-        ToastAndroid.show("User ID not found", ToastAndroid.SHORT);
+        Alert.alert("Error", "User ID not found.");
         return;
       }
 
-      if (!replyContent.trim()) {
-        ToastAndroid.show("Content cannot be empty", ToastAndroid.SHORT);
-        return;
-      }
+      const data = {
+        userId,
+        letterId: letter._id, // Use letter._id instead of selectedItem._id
+      };
 
-      if (!selectedItem || !selectedItem._id) {
-        ToastAndroid.show("No item selected", ToastAndroid.SHORT);
-        return;
-      }
+      console.log("Sending request with data:", data);
 
-      const response = await fetch(
-        "http://192.168.10.3:8080/api/v1/auth/reply",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: userId,
-            content: replyContent,
-            letterId: selectedItem._id,
-          }),
-        }
+      const response = await axios.post(
+        "http://192.168.100.6:8080/api/v1/auth/addToFavorite",
+        data
       );
 
-      const rawResponse = await response.text();
-      const result = JSON.parse(rawResponse);
-
-      if (response.ok) {
-        ToastAndroid.show("Reply sent successfully", ToastAndroid.SHORT);
-        setReplyContent("");
-        setLetters((prevLetters) =>
-          prevLetters.map((letter) =>
-            letter._id === selectedItem._id
-              ? { ...letter, replied: true }
-              : letter
-          )
-        );
-        bottomSheetRef.current?.close();
+      if (response.data.success) {
+        if (isFavorite) {
+          Alert.alert("Info", "This letter is already in your favorites.");
+        } else {
+          setIsFavorite(true);
+          Alert.alert("Success", "Letter added to favorites!");
+        }
       } else {
-        ToastAndroid.show(`Error: ${result.message}`, ToastAndroid.SHORT);
+        Alert.alert(
+          "Error",
+          "Failed to add letter to favorites. Please try again."
+        );
       }
     } catch (error) {
-      ToastAndroid.show(
-        `Failed to send reply: ${error.message}`,
-        ToastAndroid.SHORT
+      Alert.alert(
+        "Error",
+        "Error occurred while adding to favorites: " +
+          (error.response ? error.response.data : error.message)
       );
-      console.log(`Failed to send reply: ${error.message}`);
     }
+  };
+
+  const handleReply = () => {
+    navigation.navigate("ReplyFromHome", {
+      letterId: letter._id, // Pass letter ID
+      letterContent: letter.content, // Pass letter content if needed
+    });
   };
 
   return (
@@ -116,7 +102,7 @@ export default function ViewLetter() {
               justifyContent: "center",
               borderRadius: 50,
             }}
-            onPress={toggleFavorite}
+            onPress={handleFavoriteClick}
           >
             {isFavorite ? (
               <AntDesign
@@ -135,7 +121,7 @@ export default function ViewLetter() {
             )}
           </TouchableOpacity>
         </View>
-        <Text style={{ fontSize: 18, marginBottom: 20 }}>{content}</Text>
+        <Text style={{ fontSize: 18, marginBottom: 20 }}>{letter.content}</Text>
 
         <TouchableOpacity style={styles.replyButton} onPress={handleReply}>
           <Text style={styles.replyButtonText}>Reply Now</Text>
@@ -144,6 +130,7 @@ export default function ViewLetter() {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   replyButton: {
     height: 62,

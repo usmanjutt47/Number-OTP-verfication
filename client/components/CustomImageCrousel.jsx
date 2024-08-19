@@ -57,8 +57,6 @@ export default function CustomImageCarousel() {
   const [replyContent, setReplyContent] = useState("");
   const scrollX = new Animated.Value(0);
   const bottomSheetRef = useRef(null);
-  const replyBottomSheetRef = useRef(null);
-  const [content, setContent] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
   const navigation = useNavigation();
 
@@ -79,7 +77,7 @@ export default function CustomImageCarousel() {
       console.log("Sending request with data:", data);
 
       const response = await axios.post(
-        "http://192.168.10.6:8080/api/v1/auth/addToFavorite",
+        "http://192.168.100.6:8080/api/v1/auth/addToFavorite",
         data
       );
 
@@ -111,7 +109,7 @@ export default function CustomImageCarousel() {
         }
 
         const response = await axios.get(
-          `http://192.168.10.6:8080/api/v1/auth/letters`,
+          `http://192.168.100.6:8080/api/v1/auth/letters`,
           { params: { userId } }
         );
 
@@ -142,8 +140,7 @@ export default function CustomImageCarousel() {
   }
 
   const handleOpenBottomSheet = (item) => {
-    setSelectedItem(item);
-    bottomSheetRef.current?.expand();
+    navigation.navigate("ViewLetter", { letter: item });
   };
   const handleReply = async () => {
     try {
@@ -165,7 +162,7 @@ export default function CustomImageCarousel() {
       }
 
       const response = await fetch(
-        "http://192.168.10.6:8080/api/v1/auth/reply",
+        "http://192.168.100.6:8080/api/v1/auth/reply",
         {
           method: "POST",
           headers: {
@@ -205,8 +202,8 @@ export default function CustomImageCarousel() {
     }
   };
 
-  const handleReplyBottomSheetOpen = () => {
-    replyBottomSheetRef.current?.expand();
+  const handleReplyBottomSheetOpen = (item) => {
+    navigation.navigate("ReplyLetter", { selectedItem: item });
   };
 
   return (
@@ -316,7 +313,9 @@ export default function CustomImageCarousel() {
                 >
                   <TouchableOpacity
                     style={styles.button}
-                    onPress={handleReplyBottomSheetOpen}
+                    onPress={() => {
+                      handleReplyBottomSheetOpen(item);
+                    }}
                   >
                     <FontAwesome5 name="pen" size={20} style={styles.icon} />
                     <Text style={styles.buttonText}>Reply</Text>
@@ -334,141 +333,6 @@ export default function CustomImageCarousel() {
           }}
         />
       )}
-
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={["25%", "50%", "100%"]}
-        enablePanDownToClose
-      >
-        <ScrollView contentContainerStyle={styles.bottomSheetContent}>
-          {selectedItem && (
-            <>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Text style={styles.bottomSheetTitle}>Anonymous</Text>
-                <Pressable
-                  onPress={handleFavoriteClick}
-                  style={{
-                    height: responsiveHeight(53),
-                    width: responsiveWidth(53),
-                    backgroundColor: "#FFF8E4",
-                    borderRadius: 50,
-                    justifyContent: "center",
-                  }}
-                >
-                  {isFavorite ? (
-                    <Image
-                      source={require("../assets/icons/star.png")}
-                      style={{
-                        height: responsiveHeight(20),
-                        width: responsiveWidth(20),
-                        alignSelf: "center",
-                      }}
-                    />
-                  ) : (
-                    <AntDesign
-                      name="staro"
-                      size={25}
-                      color="#FFCD26"
-                      style={{ alignSelf: "center" }}
-                    />
-                  )}
-                </Pressable>
-              </View>
-              <Text style={styles.bottomSheetContentText}>
-                {selectedItem.content}
-              </Text>
-              <TouchableOpacity
-                style={styles.replyButton}
-                onPress={handleReplyBottomSheetOpen}
-              >
-                <Text style={styles.replyButtonText}>Reply Now</Text>
-              </TouchableOpacity>
-            </>
-          )}
-        </ScrollView>
-      </BottomSheet>
-
-      <BottomSheet
-        ref={replyBottomSheetRef}
-        snapPoints={["25%", "50%", "100%"]}
-        index={-1}
-        enablePanDownToClose={true}
-        backgroundStyle={styles.bottomSheetBackground}
-        handleIndicatorStyle={styles.handleIndicator}
-      >
-        <View
-          style={{
-            width: "100%",
-            height: "100%",
-            paddingLeft: "5%",
-            paddingRight: "5%",
-          }}
-        >
-          <View
-            style={{
-              height: responsiveHeight(50),
-              width: "100%",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 10,
-            }}
-          >
-            <MaterialIcons name="mail-outline" size={20} color="#000" />
-            <Text
-              style={{
-                fontFamily: "Inter_Bold",
-                fontSize: responsiveFontSize(24),
-              }}
-            >
-              Write Reply
-            </Text>
-          </View>
-          <ScrollView>
-            <TextInput
-              multiline
-              value={replyContent}
-              onChangeText={setReplyContent}
-              placeholder="Type here..."
-              placeholderTextColor={"#000"}
-              cursorColor={"#000"}
-              style={{
-                fontSize: responsiveFontSize(26),
-                fontFamily: "Outfit_Regular",
-                width: responsiveHeight(200),
-              }}
-            />
-            <TouchableOpacity
-              onPress={handleReply}
-              style={{
-                width: "100%",
-                height: responsiveHeight(62),
-                backgroundColor: "#075856",
-                justifyContent: "center",
-                borderRadius: 44,
-                alignSelf: "center",
-                marginTop: responsiveHeight(500),
-              }}
-            >
-              <Text
-                style={{
-                  textAlign: "center",
-                  fontSize: responsiveFontSize(18),
-                  color: "#fff",
-                }}
-              >
-                Send Now
-              </Text>
-            </TouchableOpacity>
-          </ScrollView>
-        </View>
-      </BottomSheet>
       <Toast />
     </View>
   );

@@ -40,7 +40,7 @@ export default function WriteLetter() {
 
     try {
       const response = await fetch(
-        "http://192.168.10.6:8080/api/v1/auth/create-letter",
+        "http://192.168.10.3:8080/api/v1/auth/create-letter",
         {
           method: "POST",
           headers: {
@@ -58,7 +58,7 @@ export default function WriteLetter() {
 
       if (response.status === 201) {
         Alert.alert("Success", "Letter created successfully.");
-        setContent(""); // Clear the content field
+        setContent("");
       } else if (response.status === 403) {
         Alert.alert("Limit Reached", result.message, [
           {

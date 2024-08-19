@@ -5508,6 +5508,11 @@ react-native-svg@^15.4.0:
     css-tree "^1.1.3"
     warn-once "0.1.1"
 
+react-native-toast-android@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-toast-android/-/react-native-toast-android-2.0.0.tgz#c944506c08acd122de865f8166126946beb4960c"
+  integrity sha512-eAV/NK/C3Lja2gBLUazawo/9RC/A5ua6+JmGYByxZLp8pMUYhFnejo8YvQsic/b+2fOxl9HtaLkyCTmS849t7A==
+
 react-native-toast-message@^2.2.0:
   version "2.2.0"
   resolved "https://registry.npmjs.org/react-native-toast-message/-/react-native-toast-message-2.2.0.tgz"

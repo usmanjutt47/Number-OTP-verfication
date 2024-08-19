@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,27 +7,68 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  Pressable,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
+import pusher from "../utils/pusherClient"; // Adjust path as necessary
 
 const ChatDetail = () => {
   const route = useRoute();
   const { chatId, chatContent, senderName, timestamp } = route.params;
 
-  const messages = [
+  const [messages, setMessages] = useState([
     {
-      id: chatId,
-      text: chatContent,
-      sender: senderName,
-      timestamp: timestamp,
+      id: chatId || Date.now(),
+      text: chatContent || "",
+      sender: senderName || "You",
+      timestamp: timestamp || new Date().toLocaleTimeString(),
     },
-  ];
+  ]);
+  const [messageText, setMessageText] = useState("");
+
+  useEffect(() => {
+    const channel = pusher.subscribe("chat-channel");
+    channel.bind("message", (data) => {
+      setMessages((prevMessages) => [...prevMessages, data]);
+    });
+
+    return () => {
+      pusher.unsubscribe("chat-channel");
+    };
+  }, []);
+
+  const sendMessage = async () => {
+    if (!messageText.trim()) return;
+
+    const newMessage = {
+      id: Date.now().toString(),
+      sender: "You",
+      text: messageText,
+      timestamp: new Date().toLocaleTimeString(),
+    };
+
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
+
+    try {
+      await fetch("http://192.168.10.3:8080/api/v1/auth/send-message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          channel: "chat-channel",
+          message: messageText,
+        }),
+      });
+
+      setMessageText("");
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <View>
-        <Pressable></Pressable>
         <Text style={styles.heading}>Chat Details</Text>
       </View>
       <FlatList
@@ -62,47 +103,20 @@ const ChatDetail = () => {
             <Text style={styles.messageTimestamp}>{item.timestamp}</Text>
           </View>
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id || Date.now().toString()} // Ensure id is a string
         contentContainerStyle={styles.messageList}
       />
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          backgroundColor: "#fff",
-          position: "absolute",
-          bottom: 20,
-          width: "100%",
-          alignSelf: "center",
-        }}
-      >
+      <View style={styles.inputContainer}>
         <TextInput
-          style={{
-            flex: 1,
-            borderRadius: 28,
-            backgroundColor: "#FEFEFE",
-            elevation: 1,
-            height: 55,
-            paddingLeft: 10,
-          }}
+          style={styles.input}
           placeholder="Type a message"
+          value={messageText}
+          onChangeText={setMessageText}
         />
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            right: 15, // Adjust this value to position the image
-            height: 24,
-            width: 24,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
+        <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
           <Image
             source={require("../assets/icons/send.png")} // Replace with your image path
-            style={{
-              width: 24,
-              height: 24,
-            }}
+            style={styles.image}
           />
         </TouchableOpacity>
       </View>
@@ -133,7 +147,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     backgroundColor: "#FEFEFE",
     marginLeft: 5,
-    flexDirection: "column", // Ensure the timestamp is below the text
+    flexDirection: "column",
   },
   messageYou: {
     backgroundColor: "#075856",
@@ -171,44 +185,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#888",
     marginTop: 5,
-    alignSelf: "flex-end", // Ensure it aligns well in message container
+    alignSelf: "flex-end",
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "#fff",
+    position: "absolute",
+    bottom: 20,
     width: "100%",
-    height: "7%",
-  },
-  input: {
-    flex: 1,
-    borderRadius: 28,
-    backgroundColor: "#FEFEFE",
-    elevation: 1,
-    height: 55,
-    paddingLeft: 10,
-  },
-  sendButton: {
-    backgroundColor: "#075856",
     padding: 10,
-    borderRadius: 20,
-  },
-  sendButtonText: {
-    color: "#fff",
-    fontSize: 16,
-  },
-  messageList: {
-    flexGrow: 1,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
     borderTopWidth: 1,
     borderTopColor: "#ddd",
-    padding: 10,
-    position: "absolute",
-    bottom: 60, // Adjust based on your timestamp container's height
-    width: "100%",
-    backgroundColor: "#fff",
   },
   input: {
     flex: 1,
@@ -218,31 +206,17 @@ const styles = StyleSheet.create({
     padding: 10,
     marginRight: 10,
   },
-  imageButton: {
-    padding: 5,
-    marginRight: 10,
-  },
-  image: {
-    width: 24,
-    height: 24,
-  },
   sendButton: {
     backgroundColor: "#075856",
     padding: 10,
     borderRadius: 20,
   },
-  sendButtonText: {
-    color: "#fff",
-    fontSize: 16,
+  image: {
+    width: 24,
+    height: 24,
   },
-  timestampContainer: {
-    alignItems: "center",
-    paddingVertical: 10,
-    backgroundColor: "#fff",
-  },
-  timestampText: {
-    fontSize: 12,
-    color: "#888",
+  messageList: {
+    flexGrow: 1,
   },
 });
 

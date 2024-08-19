@@ -22,11 +22,27 @@ export default function EmailVerification() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
   const handelSendOTP = async () => {
+    if (!validateEmail(email)) {
+      Toast.show({
+        type: "error",
+        text1: "Invalid Email",
+        text2: "Please enter a valid email address.",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
+      console.log("Sending OTP to:", email);
+
       const response = await fetch(
-        "http://192.168.100.6:8080/api/v1/auth/send-otp",
+        "http://192.168.10.3:8080/api/v1/auth/send-otp",
         {
           method: "POST",
           headers: {
@@ -41,6 +57,7 @@ export default function EmailVerification() {
       }
 
       const data = await response.json();
+      console.log("Response data:", data);
 
       if (data.success) {
         Toast.show({

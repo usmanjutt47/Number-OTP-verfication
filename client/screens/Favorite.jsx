@@ -49,7 +49,7 @@ const formatDateTime = (dateString) => {
   };
 };
 
-const API_BASE_URL = "http://192.168.100.6:8080/api/v1/auth/getFavorites";
+const API_BASE_URL = "http://192.168.10.3:8080/api/v1/auth/getFavorites";
 
 export default function Favorite() {
   const [letters, setLetters] = useState([]);
@@ -62,6 +62,7 @@ export default function Favorite() {
   const replyBottomSheetRef = useRef(null);
   const [content, setContent] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
+  const [noFavorites, setNoFavorites] = useState(false);
 
   const [favorites, setFavorites] = useState([]);
 
@@ -82,7 +83,7 @@ export default function Favorite() {
       console.log("Sending request with data:", data);
 
       const response = await axios.post(
-        "http://192.168.100.6:8080/api/v1/auth/addToFavorite",
+        "http://192.168.10.3:8080/api/v1/auth/addToFavorite",
         data
       );
 
@@ -109,26 +110,26 @@ export default function Favorite() {
         const userId = await AsyncStorage.getItem("userId");
 
         if (!userId) {
-          setError("User ID not found.");
+          console.error("User ID not found.");
           setLoading(false);
           return;
         }
-        const response = await axios.get(API_BASE_URL, {
-          params: { userId },
-        });
-        if (response.data.success) {
+
+        const response = await axios.get(API_BASE_URL, { params: { userId } });
+
+        if (response.data && response.data.success) {
           setFavorites(response.data.favorites);
         } else {
-          setError(
-            response.data.message || "Failed to fetch favorite letters."
+          console.error(
+            response.data?.message || "Failed to fetch favorite letters."
           );
         }
       } catch (error) {
-        setError("An error occurred while fetching favorite letters.");
       } finally {
         setLoading(false);
       }
     };
+
     fetchFavorites();
   }, []);
 
@@ -167,7 +168,7 @@ export default function Favorite() {
       }
 
       const response = await fetch(
-        "http://192.168.100.6:8080/api/v1/auth/reply",
+        "http://192.168.10.3:8080/api/v1/auth/reply",
         {
           method: "POST",
           headers: {
@@ -216,7 +217,12 @@ export default function Favorite() {
       <View style={{ padding: "5%" }}>
         <CustomTopNav />
       </View>
-      {favorites.length === 0 ? (
+
+      {loading ? (
+        <ActivityIndicator size="large" color="#fff" style={styles.centered} />
+      ) : error ? (
+        <Text style={styles.centered}>{error}</Text>
+      ) : favorites.length === 0 ? (
         <View style={styles.centered}>
           <Text style={styles.noPostsText}>No favorite letters found</Text>
         </View>

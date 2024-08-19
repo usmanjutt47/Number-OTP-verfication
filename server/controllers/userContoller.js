@@ -221,7 +221,6 @@ const createLetterController = async (req, res) => {
         .json({ message: "User ID and content are required" });
     }
 
-    // Find user by ID
     let user = await userModel.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -229,10 +228,9 @@ const createLetterController = async (req, res) => {
 
     const now = new Date();
     const hoursSinceLastLetter =
-      (now - user.lastLetterCreatedAt) / (1000 * 60 * 60); // Difference in hours
+      (now - user.lastLetterCreatedAt) / (1000 * 60 * 60);
 
     if (hoursSinceLastLetter >= 24) {
-      // Reset the counter and timestamp after 24 hours
       user.lettersCreatedToday = 0;
       user.lastLetterCreatedAt = now;
     }
@@ -243,7 +241,6 @@ const createLetterController = async (req, res) => {
       });
     }
 
-    // Create the letter
     const newLetter = new Letter({
       userId,
       content,
@@ -253,15 +250,13 @@ const createLetterController = async (req, res) => {
     // Save the letter
     await newLetter.save();
 
-    // Update the user's letter creation count and timestamp
     user.lettersCreatedToday += 1;
     user.lastLetterCreatedAt = now;
     await user.save();
 
-    // Respond with the newly created letter and its letterId
     res.status(201).json({
       message: "Letter created successfully",
-      letterId: newLetter._id.toString(), // Ensure letterId is a string
+      letterId: newLetter._id.toString(),
       letter: {
         _id: newLetter._id.toString(),
         userId: newLetter.userId,
@@ -307,35 +302,31 @@ const replyLetterController = async (req, res) => {
   try {
     const { userId, content, letterId } = req.body;
 
-    // Validate that all required fields are present
     if (!userId || !content || !letterId) {
       return res
         .status(400)
         .json({ message: "userId, content, and letterId are required" });
     }
 
-    // Verify that the user exists
     const user = await userModel.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Verify that the letter exists
     const letter = await Letter.findById(letterId);
     if (!letter) {
       return res.status(404).json({ message: "Letter not found" });
     }
 
-    // Create the reply associated with the specific letter
     const newReply = new Reply({
-      letterId, // Store the letterId in the reply
+      letterId,
       userId,
       content,
+      replyTo: letter?.userId,
     });
 
     await newReply.save();
 
-    // Return the created reply and associated letterId
     res.status(201).json({
       message: "Reply created successfully",
       reply: newReply,
@@ -349,14 +340,13 @@ const replyLetterController = async (req, res) => {
 
 const getRepliesController = async (req, res) => {
   try {
-    const userId = req.query.userId; // Use req.query to access query parameters
+    const userId = req.query.userId;
+
     if (!userId) {
-      return res
-        .status(400)
-        .json({ message: "userId query parameter is required" });
+      return res.status(400).json({ message: "userId is required" });
     }
 
-    const replies = await Reply.find({ userId: userId });
+    const replies = await Reply.find({ replyTo: userId });
 
     if (replies.length === 0) {
       return res
@@ -366,7 +356,7 @@ const getRepliesController = async (req, res) => {
 
     res.status(200).json(replies);
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -393,7 +383,6 @@ const addToFavoriteController = async (req, res) => {
   const { userId, letterId } = req.body;
 
   try {
-    // Validate input
     if (!userId || !letterId) {
       return res.status(400).json({
         success: false,
@@ -489,18 +478,15 @@ const paymentsController = async (req, res) => {
   try {
     const { amount, userId, subscriptionPlan } = req.body;
 
-    // Create a PaymentIntent with Stripe
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency: "usd",
       automatic_payment_methods: { enabled: true },
     });
 
-    // Find the user in the database
     const user = await userModel.findOne({ userId });
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    // Calculate the expiration date based on the selected plan
     const expirationDate = new Date();
     if (subscriptionPlan === "weekly") {
       expirationDate.setDate(expirationDate.getDate() + 7);
@@ -510,20 +496,18 @@ const paymentsController = async (req, res) => {
       expirationDate.setFullYear(expirationDate.getFullYear() + 1);
     }
 
-    // Update the user's subscription details and set hasPlan to true
     await userModel.findOneAndUpdate(
       { userId },
       {
         subscriptionPlan,
         subscriptionExpires: expirationDate,
-        hasPlan: true, // Set hasPlan to true
+        hasPlan: true,
       }
     );
 
-    // Return the client secret to complete the payment process
     res.json({ clientSecret: paymentIntent.client_secret });
   } catch (error) {
-    console.error("Payment processing error:", error); // Log the error
+    console.error("Payment processing error:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -581,17 +565,23 @@ const getUserPlanController = async (req, res) => {
 
 const getLettersOfSubscribedUsers = async (req, res) => {
   try {
-    const subscribedUsers = await userModel
-      .find({ hasPlan: true })
-      .select("userId");
+    const { userId } = req.query;
 
-    if (subscribedUsers.length === 0) {
-      return res.status(404).json({ error: "No subscribed users found" });
+    if (!userId) {
+      return res.status(400).json({ error: "userId is required" });
     }
 
-    const userIds = subscribedUsers.map((user) => user.userId);
+    // Check if the user exists and has an active plan
+    const user = await userModel.findOne({ _id: userId, hasPlan: true });
 
-    const replies = await Reply.find({ userId: { $in: userIds } });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ error: "User not found or no active plan" });
+    }
+
+    // Fetch replies where replyTo matches the userId
+    const replies = await Reply.find({ replyTo: userId });
 
     res.json({ success: true, replies });
   } catch (error) {

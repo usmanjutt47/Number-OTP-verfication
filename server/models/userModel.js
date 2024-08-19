@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema(
     userId: {
       type: String,
       unique: true,
+      required: [true, "User ID is required"],
     },
     favorites: [
       {
@@ -33,8 +34,8 @@ const userSchema = new mongoose.Schema(
     ],
     subscriptionPlan: {
       type: String,
-      enum: ["none", "weekly", "monthly", "yearly"],
-      default: "none",
+      enum: ["free", "basic", "premium", "standard plan"], 
+      required: true,
     },
     subscriptionExpires: {
       type: Date,
@@ -48,19 +49,18 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Method to update the subscription plan
 userSchema.methods.updateSubscription = function (plan) {
   let duration;
 
   switch (plan) {
     case "weekly":
-      duration = 7; // 7 days
+      duration = 7;
       break;
     case "monthly":
-      duration = 30; // 30 days
+      duration = 30;
       break;
     case "yearly":
-      duration = 365; // 365 days
+      duration = 365;
       break;
     default:
       duration = 0;

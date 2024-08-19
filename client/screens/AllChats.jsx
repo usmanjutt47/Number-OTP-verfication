@@ -12,6 +12,7 @@ import {
 import { StatusBar } from "expo-status-bar";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AllChats = () => {
   const navigation = useNavigation();
@@ -23,27 +24,50 @@ const AllChats = () => {
 
   const fetchChats = useCallback(async () => {
     setLoading(true);
+    setError(null);
+    setRefreshing(true);
+
     try {
+      // Retrieve userId from AsyncStorage
+      const userId = await AsyncStorage.getItem("userId");
+      if (!userId) {
+        console.warn("No userId found in AsyncStorage");
+        setError("No userId found in AsyncStorage");
+        return;
+      }
+
+      // Fetch data from API
       const response = await fetch(
-        "http://192.168.100.6:8080/api/v1/auth/letters-of-subscribed-users"
+        `http://192.168.10.6:8080/api/v1/auth/letters-of-subscribed-users?userId=${userId}`
       );
+
+      // Check if response is OK
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error(`Failed to fetch: ${response.statusText}`);
       }
+
+      // Parse response data
       const data = await response.json();
+
+      // Handle success and update state
       if (data.success) {
-        setChats(data.replies);
+        setChats(data.replies || []);
       } else {
-        throw new Error(data.error);
+        setError(data.error || "Something went wrong");
       }
-    } catch (err) {
-      setError(err.message);
-      Alert.alert("Error", err.message);
+    } catch (error) {
+      // Log the error and update state
+      console.error("Error fetching chats:", error);
+      setError(error.message);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   }, []);
+
+  const onRefresh = useCallback(() => {
+    fetchChats();
+  }, [fetchChats]);
 
   useEffect(() => {
     fetchChats();
@@ -105,11 +129,6 @@ const AllChats = () => {
     </Pressable>
   );
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    fetchChats();
-  };
-
   if (loading) {
     return (
       <View style={styles.container}>
@@ -148,15 +167,23 @@ const AllChats = () => {
             style={styles.searchIcon}
           />
         </View>
-        <FlatList
-          data={filteredChats}
-          renderItem={renderItem}
-          keyExtractor={(item) => item._id}
-          style={styles.chatList}
-          showsVerticalScrollIndicator={false}
-          onRefresh={onRefresh}
-          refreshing={refreshing}
-        />
+        {filteredChats.length > 0 ? (
+          <FlatList
+            data={filteredChats}
+            renderItem={renderItem}
+            keyExtractor={(item) => item._id}
+            style={styles.chatList}
+            showsVerticalScrollIndicator={false}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+          />
+        ) : (
+          <View style={styles.noChatsContainer}>
+            <Text style={styles.noChatsText}>
+              You have currently no plan active.
+            </Text>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -246,6 +273,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#AAAAB4",
     marginRight: 10,
+  },
+  noChatsContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  noChatsText: {
+    fontFamily: "Outfit_Regular",
+    fontSize: 16,
+    color: "#AAAAB4",
+    textAlign: "center",
   },
 });
 

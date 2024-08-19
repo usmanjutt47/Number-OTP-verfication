@@ -40,7 +40,7 @@ export default function WriteLetter() {
 
     try {
       const response = await fetch(
-        "http://192.168.10.9:8080/api/v1/auth/create-letter",
+        "http://192.168.10.6:8080/api/v1/auth/create-letter",
         {
           method: "POST",
           headers: {
@@ -104,7 +104,7 @@ export default function WriteLetter() {
               fontFamily: "Outfit_Medium",
             }}
           >
-            Send Now
+            usamn Now
           </Text>
         </TouchableOpacity>
       </View>

@@ -17,8 +17,8 @@ import CustomTopNav from "../components/CustomTopNav";
 import { useNavigation } from "@react-navigation/native";
 import { Entypo } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import NoReply from "../components/NoReply";
 import axios from "axios";
+import NoReply from "../components/NoReply";
 
 const { width, height } = Dimensions.get("window");
 
@@ -210,30 +210,30 @@ const ReplyCard = ({ reply }) => {
   );
 };
 
-const NoReplyCard = () => (
-  <View style={styles.card}>
-    <View
-      style={{
-        height: responsiveHeight(300),
-        width: responsiveWidth(350),
-        backgroundColor: "#F5F5F5",
-        borderRadius: 26.22,
-        alignSelf: "center",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text
-        style={{
-          fontSize: responsiveFontSize(18),
-          fontFamily: "Outfit_Medium",
-        }}
-      >
-        No Replies Available
-      </Text>
-    </View>
-  </View>
-);
+// const NoReplyCard = () => (
+//   <View style={styles.card}>
+//     <View
+//       style={{
+//         height: responsiveHeight(300),
+//         width: responsiveWidth(350),
+//         backgroundColor: "#F5F5F5",
+//         borderRadius: 26.22,
+//         alignSelf: "center",
+//         justifyContent: "center",
+//         alignItems: "center",
+//       }}
+//     >
+//       <Text
+//         style={{
+//           fontSize: responsiveFontSize(18),
+//           fontFamily: "Outfit_Medium",
+//         }}
+//       >
+//         No Replies Available
+//       </Text>
+//     </View>
+//   </View>
+// );
 
 export default function Profile() {
   const [userId, setUserId] = useState(null);
@@ -262,24 +262,30 @@ export default function Profile() {
 
   useEffect(() => {
     const fetchReplies = async () => {
-      if (!userId) return; // Don't fetch if userId is not set
+      if (!userId) return;
 
       try {
-        console.log("Fetching replies for userId:", userId); // Debug logging
+        console.log("Fetching replies for userId:", userId);
         const response = await axios.get(
-          `http://192.168.100.6:8080/api/v1/auth/replies`,
+          "http://192.168.10.6:8080/api/v1/auth/replies",
           { params: { userId } }
         );
 
-        console.log("Fetched replies:", response.data); // Debug logging
-        if (response.data.length === 0) {
-          setReplies([]);
-        } else {
-          setReplies(response.data);
+        if (response.status === 200) {
+          if (Array.isArray(response.data)) {
+            setReplies(response.data);
+          } else {
+            console.warn("Unexpected response structure:", response.data);
+            setReplies([]);
+          }
         }
       } catch (error) {
-        setError(error.message);
-        console.error("Error fetching replies:", error); // Debug logging
+        if (error.response && error.response.status === 404) {
+          setReplies([]);
+        } else {
+          setError(error.message);
+          console.error("Error fetching replies:", error);
+        }
       } finally {
         setLoading(false);
       }
@@ -330,7 +336,7 @@ export default function Profile() {
           <CustomTopNav />
         </View>
         {replies.length === 0 ? (
-          <NoReplyCard />
+          <NoReply />
         ) : (
           <FlatList
             showsHorizontalScrollIndicator={false}
@@ -342,7 +348,7 @@ export default function Profile() {
           />
         )}
 
-        <Pressable style={styles.pressable} onPress={() => handlePress()}>
+        <Pressable style={styles.pressable} onPress={handlePress}>
           <Entypo name="plus" size={40} color="white" />
         </Pressable>
       </View>

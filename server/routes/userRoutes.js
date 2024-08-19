@@ -1,4 +1,5 @@
 const express = require("express");
+const Pusher = require("pusher");
 const {
   EmailVerificationController,
   VerifyOtpController,
@@ -18,6 +19,15 @@ const {
 
 const router = express.Router();
 
+// Initialize Pusher
+const pusher = new Pusher({
+  appId: process.env.PUSHER_APP_ID,
+  key: process.env.PUSHER_KEY,
+  secret: process.env.PUSHER_SECRET,
+  cluster: process.env.PUSHER_CLUSTER,
+  useTLS: true,
+});
+
 // Existing routes
 router.post("/send-otp", EmailVerificationController);
 router.post("/verify-otp", VerifyOtpController);
@@ -27,11 +37,29 @@ router.get("/letters", getLetterController);
 router.post("/reply", replyLetterController);
 router.get("/replies", getRepliesController);
 router.get("/users/:email", getUsersController);
+
 router.post("/addToFavorite", addToFavoriteController);
 router.get("/getFavorites", getFavoritesController);
+
 router.post("/payments", paymentsController);
 router.post("/updateSubscription", updateSubscriptionController);
 router.get("/user-plan", getUserPlanController);
 router.get("/letters-of-subscribed-users", getLettersOfSubscribedUsers);
+
+router.post("/send-message", (req, res) => {
+  const { channel, message } = req.body;
+
+  pusher.trigger(channel, "message", {
+    message: message,
+    sender: "User",
+    timestamp: new Date().toISOString(),
+  });
+
+  res.status(200).send("Message sent");
+});
+
+router.get("/test", (req, res) => {
+  res.send("Pusher routes are working!");
+});
 
 module.exports = router;

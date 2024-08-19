@@ -142,7 +142,7 @@ export default function OTPVerification({ navigation }) {
 
     try {
       const response = await axios.post(
-        "http://192.168.100.6:8080/api/v1/auth/verify-otp",
+        "http://192.168.10.3:8080/api/v1/auth/verify-otp",
         { email, otp }
       );
 

@@ -11,6 +11,12 @@ const replySchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  replyTo: {
+    type:String,
+    required: true,
+    default: null,
+
+  },
   content: {
     type: String,
     required: true,

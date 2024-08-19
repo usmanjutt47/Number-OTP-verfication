@@ -3,7 +3,6 @@ import {
   View,
   Text,
   Dimensions,
-  Alert,
   Image,
   Animated,
   ActivityIndicator,
@@ -20,7 +19,7 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
-import { responsiveScreenHeight } from "react-native-responsive-dimensions";
+import { useNavigation } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.9;
@@ -61,6 +60,7 @@ export default function CustomImageCarousel() {
   const replyBottomSheetRef = useRef(null);
   const [content, setContent] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
+  const navigation = useNavigation();
 
   const handleFavoriteClick = async () => {
     try {
@@ -79,13 +79,12 @@ export default function CustomImageCarousel() {
       console.log("Sending request with data:", data);
 
       const response = await axios.post(
-        "http://192.168.100.6:8080/api/v1/auth/addToFavorite",
+        "http://192.168.10.6:8080/api/v1/auth/addToFavorite",
         data
       );
 
       if (response.data.success) {
         setIsFavorite(true);
-        // console.log("Letter added to favorites successfully.");
       } else {
         console.error(
           "Failed to add letter to favorites. Server response:",
@@ -112,8 +111,8 @@ export default function CustomImageCarousel() {
         }
 
         const response = await axios.get(
-          `http://192.168.100.6:8080/api/v1/auth/letters`,
-          { params: { userId } } // Adding the userId as a query parameter
+          `http://192.168.10.6:8080/api/v1/auth/letters`,
+          { params: { userId } }
         );
 
         if (response.data.success) {
@@ -166,7 +165,7 @@ export default function CustomImageCarousel() {
       }
 
       const response = await fetch(
-        "http://192.168.100.6:8080/api/v1/auth/reply",
+        "http://192.168.10.6:8080/api/v1/auth/reply",
         {
           method: "POST",
           headers: {
@@ -620,5 +619,18 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit_Medium",
     color: "#515151",
     marginRight: responsiveMargin(40),
+  },
+  bottomSheetContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  bottomSheet: {
+    flex: 1,
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  flatList: {
+    flex: 1, // Ensure FlatList takes the remaining space
   },
 });

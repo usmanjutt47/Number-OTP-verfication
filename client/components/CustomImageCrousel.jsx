@@ -97,6 +97,41 @@ export default function CustomImageCarousel() {
     }
   };
 
+  const handlePass = async (letterId) => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+
+      if (!userId) {
+        ToastAndroid.show("User ID not found", ToastAndroid.SHORT);
+        return;
+      }
+
+      const response = await axios.post(
+        "http://192.168.100.6:8080/api/v1/auth/hideLetter",
+        { userId, letterId }
+      );
+
+      if (response.data.success) {
+        // Update the state to remove the passed letter
+        setLetters((prevLetters) =>
+          prevLetters.filter((letter) => letter._id !== letterId)
+        );
+        ToastAndroid.show("Letter passed successfully", ToastAndroid.SHORT);
+      } else {
+        ToastAndroid.show(
+          `Error: ${response.data.message}`,
+          ToastAndroid.SHORT
+        );
+      }
+    } catch (error) {
+      ToastAndroid.show(
+        `Failed to pass letter: ${error.message}`,
+        ToastAndroid.SHORT
+      );
+      console.log(`Failed to pass letter: ${error.message}`);
+    }
+  };
+
   useEffect(() => {
     const fetchLetters = async () => {
       try {
@@ -142,6 +177,7 @@ export default function CustomImageCarousel() {
   const handleOpenBottomSheet = (item) => {
     navigation.navigate("ViewLetter", { letter: item });
   };
+
   const handleReply = async () => {
     try {
       const userId = await AsyncStorage.getItem("userId");
@@ -320,7 +356,10 @@ export default function CustomImageCarousel() {
                     <FontAwesome5 name="pen" size={20} style={styles.icon} />
                     <Text style={styles.buttonText}>Reply</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.button}>
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => handlePass(item._id)}
+                  >
                     <Image
                       source={require("../assets/icons/pass.png")}
                       style={styles.imageIcon}

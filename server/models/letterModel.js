@@ -33,6 +33,12 @@ const letterSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  hiddenBy: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
 });
 
 letterSchema.pre("save", function (next) {

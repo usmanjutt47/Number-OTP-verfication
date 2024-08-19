@@ -589,6 +589,39 @@ const getLettersOfSubscribedUsers = async (req, res) => {
   }
 };
 
+const hideLetter = async (req, res) => {
+  const { userId, letterId } = req.body;
+
+  if (!userId || !letterId) {
+    return res
+      .status(400)
+      .json({ success: false, message: "User ID and Letter ID are required" });
+  }
+
+  try {
+    const letter = await Letter.findById(letterId);
+    if (!letter) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Letter not found" });
+    }
+
+    if (!letter.hiddenBy.includes(userId)) {
+      letter.hiddenBy.push(userId);
+      await letter.save();
+      return res.json({ success: true, message: "Letter hidden successfully" });
+    } else {
+      return res.json({
+        success: false,
+        message: "Letter is already hidden by this user",
+      });
+    }
+  } catch (error) {
+    console.error("Error hiding letter:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 module.exports = {
   EmailVerificationController,
   VerifyOtpController,
@@ -604,4 +637,5 @@ module.exports = {
   updateSubscriptionController,
   getUserPlanController,
   getLettersOfSubscribedUsers,
+  hideLetter,
 };

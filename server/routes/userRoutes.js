@@ -15,6 +15,7 @@ const {
   updateSubscriptionController,
   getUserPlanController,
   getLettersOfSubscribedUsers,
+  hideLetter,
 } = require("../controllers/userContoller");
 
 const router = express.Router();
@@ -45,6 +46,7 @@ router.post("/payments", paymentsController);
 router.post("/updateSubscription", updateSubscriptionController);
 router.get("/user-plan", getUserPlanController);
 router.get("/letters-of-subscribed-users", getLettersOfSubscribedUsers);
+router.post("/hideLetter", hideLetter);
 
 router.post("/send-message", (req, res) => {
   const { channel, message } = req.body;

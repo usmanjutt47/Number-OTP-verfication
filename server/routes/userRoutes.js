@@ -11,10 +11,10 @@ const {
   getUsersController,
   addToFavoriteController,
   getFavoritesController,
-  paymentsController,
-  updateSubscriptionController,
-  getUserPlanController,
-  getLettersOfSubscribedUsers,
+  // paymentsController,
+  // updateSubscriptionController,
+  // getUserPlanController,
+  // getLettersOfSubscribedUsers,
   hideLetter,
 } = require("../controllers/userContoller");
 
@@ -41,24 +41,12 @@ router.get("/users/:email", getUsersController);
 
 router.post("/addToFavorite", addToFavoriteController);
 router.get("/getFavorites", getFavoritesController);
-
-router.post("/payments", paymentsController);
-router.post("/updateSubscription", updateSubscriptionController);
-router.get("/user-plan", getUserPlanController);
-router.get("/letters-of-subscribed-users", getLettersOfSubscribedUsers);
 router.post("/hideLetter", hideLetter);
 
-router.post("/send-message", (req, res) => {
-  const { channel, message } = req.body;
-
-  pusher.trigger(channel, "message", {
-    message: message,
-    sender: "User",
-    timestamp: new Date().toISOString(),
-  });
-
-  res.status(200).send("Message sent");
-});
+// router.post("/payments", paymentsController);
+// router.post("/updateSubscription", updateSubscriptionController);
+// router.get("/user-plan", getUserPlanController);
+// router.get("/letters-of-subscribed-users", getLettersOfSubscribedUsers);
 
 router.get("/test", (req, res) => {
   res.send("Pusher routes are working!");

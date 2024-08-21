@@ -60,42 +60,7 @@ export default function CustomImageCarousel() {
   const [isFavorite, setIsFavorite] = useState(false);
   const navigation = useNavigation();
 
-  const handleFavoriteClick = async () => {
-    try {
-      const userId = await AsyncStorage.getItem("userId");
 
-      if (!userId) {
-        console.error("User ID not found.");
-        return;
-      }
-
-      const data = {
-        userId,
-        letterId: selectedItem._id,
-      };
-
-      console.log("Sending request with data:", data);
-
-      const response = await axios.post(
-        "http://192.168.100.6:8080/api/v1/auth/addToFavorite",
-        data
-      );
-
-      if (response.data.success) {
-        setIsFavorite(true);
-      } else {
-        console.error(
-          "Failed to add letter to favorites. Server response:",
-          response.data
-        );
-      }
-    } catch (error) {
-      console.error(
-        "Error occurred while adding to favorites:",
-        error.response ? error.response.data : error.message
-      );
-    }
-  };
 
   const handlePass = async (letterId) => {
     try {
@@ -107,7 +72,7 @@ export default function CustomImageCarousel() {
       }
 
       const response = await axios.post(
-        "http://192.168.100.6:8080/api/v1/auth/hideLetter",
+        "http://192.168.100.175:8080/api/v1/auth/hideLetter",
         { userId, letterId }
       );
 
@@ -144,7 +109,7 @@ export default function CustomImageCarousel() {
         }
 
         const response = await axios.get(
-          `http://192.168.100.6:8080/api/v1/auth/letters`,
+          `http://192.168.100.175:8080/api/v1/auth/letters`,
           { params: { userId } }
         );
 
@@ -178,65 +143,6 @@ export default function CustomImageCarousel() {
     navigation.navigate("ViewLetter", { letter: item });
   };
 
-  const handleReply = async () => {
-    try {
-      const userId = await AsyncStorage.getItem("userId");
-
-      if (!userId) {
-        ToastAndroid.show("User ID not found", ToastAndroid.SHORT);
-        return;
-      }
-
-      if (!replyContent.trim()) {
-        ToastAndroid.show("Content cannot be empty", ToastAndroid.SHORT);
-        return;
-      }
-
-      if (!selectedItem || !selectedItem._id) {
-        ToastAndroid.show("No item selected", ToastAndroid.SHORT);
-        return;
-      }
-
-      const response = await fetch(
-        "http://192.168.100.6:8080/api/v1/auth/reply",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: userId,
-            content: replyContent,
-            letterId: selectedItem._id,
-          }),
-        }
-      );
-
-      const rawResponse = await response.text();
-      const result = JSON.parse(rawResponse);
-
-      if (response.ok) {
-        ToastAndroid.show("Reply sent successfully", ToastAndroid.SHORT);
-        setReplyContent("");
-        setLetters((prevLetters) =>
-          prevLetters.map((letter) =>
-            letter._id === selectedItem._id
-              ? { ...letter, replied: true }
-              : letter
-          )
-        );
-        bottomSheetRef.current?.close();
-      } else {
-        ToastAndroid.show(`Error: ${result.message}`, ToastAndroid.SHORT);
-      }
-    } catch (error) {
-      ToastAndroid.show(
-        `Failed to send reply: ${error.message}`,
-        ToastAndroid.SHORT
-      );
-      console.log(`Failed to send reply: ${error.message}`);
-    }
-  };
 
   const handleReplyBottomSheetOpen = (item) => {
     navigation.navigate("ReplyLetter", { selectedItem: item });

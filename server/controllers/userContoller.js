@@ -9,7 +9,6 @@ const userPlanModel = require("../models/userPlanModel");
 const stripe = require("stripe")(
   "sk_test_51PnyvfDw0HZ2rXEfHv77jdjoTrcCffI0rSZ3IdcG17gHvdB5t9H2M7yfMpysIIdRRS7zbpkThI90XVVFSjiBtEgY00UoTlPOS9"
 );
-
 function validateEmail(email) {
   const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   return re.test(email);
@@ -91,7 +90,6 @@ const EmailVerificationController = async (req, res) => {
     });
   }
 };
-
 const VerifyOtpController = async (req, res) => {
   try {
     const { email, otp } = req.body;
@@ -134,7 +132,6 @@ const VerifyOtpController = async (req, res) => {
     });
   }
 };
-
 const ResendOTPController = async (req, res) => {
   try {
     const userEmail = req.body.email;
@@ -228,19 +225,24 @@ const createLetterController = async (req, res) => {
 
     const now = new Date();
     const hoursSinceLastLetter =
-      (now - user.lastLetterCreatedAt) / (1000 * 60 * 60);
+      (now - user.lastLetterCreatedAt) / (1000 * 60 * 60); // Calculate time difference in hours
 
+    // Reset the count if more than 24 hours have passed
     if (hoursSinceLastLetter >= 24) {
       user.lettersCreatedToday = 0;
+      user.todayCreatedLetters = 0; // Reset today's count
       user.lastLetterCreatedAt = now;
     }
 
+    // Check if the user has reached the limit
     if (user.lettersCreatedToday >= 2) {
       return res.status(403).json({
-        message: `You can only create 2 letters per day. Please wait until the next day to create a new letter.`,
+        message:
+          "You can only create 2 letters per day. Please wait until the next day to create a new letter.",
       });
     }
 
+    // Create a new letter
     const newLetter = new Letter({
       userId,
       content,
@@ -250,7 +252,9 @@ const createLetterController = async (req, res) => {
     // Save the letter
     await newLetter.save();
 
+    // Update user details
     user.lettersCreatedToday += 1;
+    user.todayCreatedLetters += 1; // Increment today's letter count
     user.lastLetterCreatedAt = now;
     await user.save();
 
@@ -264,6 +268,7 @@ const createLetterController = async (req, res) => {
         createdAt: newLetter.createdAt,
         updatedAt: newLetter.updatedAt,
       },
+      lettersCreatedToday: user.todayCreatedLetters,
     });
   } catch (error) {
     console.error(error);
@@ -474,120 +479,120 @@ const getFavoritesController = async (req, res) => {
   }
 };
 
-const paymentsController = async (req, res) => {
-  try {
-    const { amount, userId, subscriptionPlan } = req.body;
+// const paymentsController = async (req, res) => {
+//   try {
+//     const { amount, userId, subscriptionPlan } = req.body;
 
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency: "usd",
-      automatic_payment_methods: { enabled: true },
-    });
+//     const paymentIntent = await stripe.paymentIntents.create({
+//       amount,
+//       currency: "usd",
+//       automatic_payment_methods: { enabled: true },
+//     });
 
-    const user = await userModel.findOne({ userId });
-    if (!user) return res.status(404).json({ error: "User not found" });
+//     const user = await userModel.findOne({ userId });
+//     if (!user) return res.status(404).json({ error: "User not found" });
 
-    const expirationDate = new Date();
-    if (subscriptionPlan === "weekly") {
-      expirationDate.setDate(expirationDate.getDate() + 7);
-    } else if (subscriptionPlan === "monthly") {
-      expirationDate.setMonth(expirationDate.getMonth() + 1);
-    } else if (subscriptionPlan === "yearly") {
-      expirationDate.setFullYear(expirationDate.getFullYear() + 1);
-    }
+//     const expirationDate = new Date();
+//     if (subscriptionPlan === "weekly") {
+//       expirationDate.setDate(expirationDate.getDate() + 7);
+//     } else if (subscriptionPlan === "monthly") {
+//       expirationDate.setMonth(expirationDate.getMonth() + 1);
+//     } else if (subscriptionPlan === "yearly") {
+//       expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+//     }
 
-    await userModel.findOneAndUpdate(
-      { userId },
-      {
-        subscriptionPlan,
-        subscriptionExpires: expirationDate,
-        hasPlan: true,
-      }
-    );
+//     await userModel.findOneAndUpdate(
+//       { userId },
+//       {
+//         subscriptionPlan,
+//         subscriptionExpires: expirationDate,
+//         hasPlan: true,
+//       }
+//     );
 
-    res.json({ clientSecret: paymentIntent.client_secret });
-  } catch (error) {
-    console.error("Payment processing error:", error);
-    res.status(500).json({ error: error.message });
-  }
-};
+//     res.json({ clientSecret: paymentIntent.client_secret });
+//   } catch (error) {
+//     console.error("Payment processing error:", error);
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
-const updateSubscriptionController = async (req, res) => {
-  try {
-    const { userId, subscriptionPlan, expirationDate } = req.body;
+// const updateSubscriptionController = async (req, res) => {
+//   try {
+//     const { userId, subscriptionPlan, expirationDate } = req.body;
 
-    const user = await userModel.findOneAndUpdate(
-      { userId },
-      {
-        subscriptionPlan,
-        subscriptionExpires: expirationDate,
-      },
-      { new: true }
-    );
+//     const user = await userModel.findOneAndUpdate(
+//       { userId },
+//       {
+//         subscriptionPlan,
+//         subscriptionExpires: expirationDate,
+//       },
+//       { new: true }
+//     );
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
 
-    await user.save();
+//     await user.save();
 
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+//     res.json(user);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
-const getUserPlanController = async (req, res) => {
-  const userId = req.query.userId;
+// const getUserPlanController = async (req, res) => {
+//   const userId = req.query.userId;
 
-  if (!userId) {
-    return res.status(400).json({ message: "User ID is required" });
-  }
+//   if (!userId) {
+//     return res.status(400).json({ message: "User ID is required" });
+//   }
 
-  try {
-    const user = await userModel.findOne({ userId });
+//   try {
+//     const user = await userModel.findOne({ userId });
 
-    if (!user) {
-      console.log("No user found for userId:", userId);
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.json({
-      active: user.subscriptionPlan !== "none",
-      planDetails: {
-        subscriptionPlan: user.subscriptionPlan,
-        subscriptionExpires: user.subscriptionExpires,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
+//     if (!user) {
+//       console.log("No user found for userId:", userId);
+//       return res.status(404).json({ message: "User not found" });
+//     }
+//     res.json({
+//       active: user.subscriptionPlan !== "none",
+//       planDetails: {
+//         subscriptionPlan: user.subscriptionPlan,
+//         subscriptionExpires: user.subscriptionExpires,
+//       },
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
 
-const getLettersOfSubscribedUsers = async (req, res) => {
-  try {
-    const { userId } = req.query;
+// const getLettersOfSubscribedUsers = async (req, res) => {
+//   try {
+//     const { userId } = req.query;
 
-    if (!userId) {
-      return res.status(400).json({ error: "userId is required" });
-    }
+//     if (!userId) {
+//       return res.status(400).json({ error: "userId is required" });
+//     }
 
-    // Check if the user exists and has an active plan
-    const user = await userModel.findOne({ _id: userId, hasPlan: true });
+//     // Check if the user exists and has an active plan
+//     const user = await userModel.findOne({ _id: userId, hasPlan: true });
 
-    if (!user) {
-      return res
-        .status(404)
-        .json({ error: "User not found or no active plan" });
-    }
+//     if (!user) {
+//       return res
+//         .status(404)
+//         .json({ error: "User not found or no active plan" });
+//     }
 
-    // Fetch replies where replyTo matches the userId
-    const replies = await Reply.find({ replyTo: userId });
+//     // Fetch replies where replyTo matches the userId
+//     const replies = await Reply.find({ replyTo: userId });
 
-    res.json({ success: true, replies });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+//     res.json({ success: true, replies });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
 const hideLetter = async (req, res) => {
   const { userId, letterId } = req.body;
@@ -633,9 +638,9 @@ module.exports = {
   getUsersController,
   addToFavoriteController,
   getFavoritesController,
-  paymentsController,
-  updateSubscriptionController,
-  getUserPlanController,
-  getLettersOfSubscribedUsers,
+  // paymentsController,
+  // updateSubscriptionController,
+  // getUserPlanController,
+  // getLettersOfSubscribedUsers,
   hideLetter,
 };

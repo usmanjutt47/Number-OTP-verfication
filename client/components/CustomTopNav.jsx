@@ -62,7 +62,7 @@ export default function CustomTopNav() {
           <AntDesign name="inbox" size={responsiveIconSize(24)} color="black" />
         </Pressable>
 
-        <Pressable
+        {/* <Pressable
           style={[
             styles.sent,
             activeScreen === "Profile" && styles.activeButton,
@@ -70,7 +70,7 @@ export default function CustomTopNav() {
           onPress={() => handlePress("Profile")}
         >
           <Feather name="send" size={responsiveIconSize(24)} color="black" />
-        </Pressable>
+        </Pressable> */}
       </View>
     </View>
   );

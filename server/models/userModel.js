@@ -21,6 +21,14 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    todayCreatedLetters: {
+      type: Number,
+      default: 0,
+    },
+    lastLetterCreatedAt: {
+      type: Date,
+      default: null,
+    },
     userId: {
       type: String,
       unique: true,
@@ -32,54 +40,25 @@ const userSchema = new mongoose.Schema(
         ref: "Letter",
       },
     ],
-    subscriptionPlan: {
-      type: String,
-      enum: ["free", "basic", "premium", "standard plan"], 
-      required: true,
-    },
-    subscriptionExpires: {
-      type: Date,
-      default: null,
-    },
-    hasPlan: {
-      type: Boolean,
-      default: false,
-    },
+    // subscriptionPlan: {
+    //   type: String,
+    //   enum: ["free", "basic", "premium", "standard plan"],
+    //   required: true,
+    // },
+    // subscriptionExpires: {
+    //   type: Date,
+    //   default: null,
+    // },
+    // hasPlan: {
+    //   type: Boolean,
+    //   default: false,
+    // },
+    // isBlurred: {
+    //   type: Boolean,
+    //   default: true,
+    // },
   },
   { timestamps: true }
 );
-
-userSchema.methods.updateSubscription = function (plan) {
-  let duration;
-
-  switch (plan) {
-    case "weekly":
-      duration = 7;
-      break;
-    case "monthly":
-      duration = 30;
-      break;
-    case "yearly":
-      duration = 365;
-      break;
-    default:
-      duration = 0;
-      break;
-  }
-
-  if (duration > 0) {
-    this.subscriptionPlan = plan;
-    this.subscriptionExpires = new Date(
-      Date.now() + duration * 24 * 60 * 60 * 1000
-    );
-    this.hasPlan = true;
-  } else {
-    this.subscriptionPlan = "none";
-    this.subscriptionExpires = null;
-    this.hasPlan = false;
-  }
-
-  return this.save();
-};
 
 module.exports = mongoose.model("User", userSchema);

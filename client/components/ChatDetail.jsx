@@ -49,7 +49,7 @@ const ChatDetail = () => {
     setMessages((prevMessages) => [...prevMessages, newMessage]);
 
     try {
-      await fetch("http://192.168.10.3:8080/api/v1/auth/send-message", {
+      await fetch("http://192.168.100.175:8080/api/v1/auth/send-message", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

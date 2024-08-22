@@ -1,32 +1,13 @@
 const mongoose = require("mongoose");
 
-const replySchema = new mongoose.Schema({
-  letterId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Letter",
-    required: true,
+const schema = new mongoose.Schema(
+  {
+    senderId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    letterId: { type: mongoose.Schema.Types.ObjectId, ref: "Letter" },
+    content: { type: String, required: true },
+    isRead: { type: Boolean, required: false, default: false },
   },
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  replyTo: {
-    type:String,
-    required: true,
-    default: null,
+  { timestamps: true }
+);
 
-  },
-  content: {
-    type: String,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
-
-const Reply = mongoose.model("Reply", replySchema);
-
-module.exports = Reply;
+module.exports = Reply = mongoose.model("Reply", schema);

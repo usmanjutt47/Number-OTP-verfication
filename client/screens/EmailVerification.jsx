@@ -42,7 +42,7 @@ export default function EmailVerification() {
       console.log("Sending OTP to:", email);
 
       const response = await fetch(
-        "http://192.168.10.3:8080/api/v1/auth/send-otp",
+        "http://192.168.100.140:8080/api/v1/auth/send-otp",
         {
           method: "POST",
           headers: {

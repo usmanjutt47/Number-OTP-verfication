@@ -49,7 +49,7 @@ const formatDateTime = (dateString) => {
   };
 };
 
-const API_BASE_URL = "http://192.168.10.3:8080/api/v1/auth/getFavorites";
+const API_BASE_URL = "http://192.168.100.140:8080/api/v1/auth/getFavorites";
 
 export default function Favorite() {
   const [letters, setLetters] = useState([]);
@@ -83,7 +83,7 @@ export default function Favorite() {
       console.log("Sending request with data:", data);
 
       const response = await axios.post(
-        "http://192.168.100.6:8080/api/v1/auth/addToFavorite",
+        "http://192.168.100.140:8080/api/v1/auth/addToFavorite",
         data
       );
 
@@ -168,7 +168,7 @@ export default function Favorite() {
       }
 
       const response = await fetch(
-        "http://192.168.10.3:8080/api/v1/auth/reply",
+        "http://192.168.100.140:8080/api/v1/auth/reply",
         {
           method: "POST",
           headers: {
@@ -213,7 +213,7 @@ export default function Favorite() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: "#bcbaba" }}>
       <View style={{ padding: "5%" }}>
         <CustomTopNav />
       </View>

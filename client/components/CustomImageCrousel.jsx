@@ -60,8 +60,6 @@ export default function CustomImageCarousel() {
   const [isFavorite, setIsFavorite] = useState(false);
   const navigation = useNavigation();
 
-
-
   const handlePass = async (letterId) => {
     try {
       const userId = await AsyncStorage.getItem("userId");
@@ -72,7 +70,7 @@ export default function CustomImageCarousel() {
       }
 
       const response = await axios.post(
-        "http://192.168.100.175:8080/api/v1/auth/hideLetter",
+        "http://192.168.100.140:8080/api/v1/auth/hideLetter",
         { userId, letterId }
       );
 
@@ -109,7 +107,7 @@ export default function CustomImageCarousel() {
         }
 
         const response = await axios.get(
-          `http://192.168.100.175:8080/api/v1/auth/letters`,
+          `http://192.168.100.140:8080/api/v1/auth/letters`,
           { params: { userId } }
         );
 
@@ -142,7 +140,6 @@ export default function CustomImageCarousel() {
   const handleOpenBottomSheet = (item) => {
     navigation.navigate("ViewLetter", { letter: item });
   };
-
 
   const handleReplyBottomSheetOpen = (item) => {
     navigation.navigate("ReplyLetter", { selectedItem: item });

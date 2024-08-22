@@ -7,14 +7,10 @@ import {
   Easing,
   Pressable,
   Dimensions,
-  TouchableOpacity,
 } from "react-native";
 import React, { useRef, useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import CustomTopNav from "../components/CustomTopNav";
 import { useNavigation } from "@react-navigation/native";
-import { Entypo } from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
 
 const { width, height } = Dimensions.get("window");
 

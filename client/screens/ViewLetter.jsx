@@ -42,7 +42,7 @@ export default function ViewLetter() {
       console.log("Sending request with data:", data);
 
       const response = await axios.post(
-        "http://192.168.100.6:8080/api/v1/auth/addToFavorite",
+        "http://192.168.100.140:8080/api/v1/auth/addToFavorite",
         data
       );
 

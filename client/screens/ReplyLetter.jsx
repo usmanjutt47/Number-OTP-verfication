@@ -47,7 +47,7 @@ export default function ReplyLetter() {
       }
 
       const response = await fetch(
-        "http://192.168.100.6:8080/api/v1/auth/reply",
+        "http://192.168.100.140:8080/api/v1/auth/reply",
         {
           method: "POST",
           headers: {

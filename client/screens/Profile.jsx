@@ -267,7 +267,7 @@ export default function Profile() {
       try {
         console.log("Fetching replies for userId:", userId);
         const response = await axios.get(
-          "http://192.168.100.6:8080/api/v1/auth/replies",
+          "http://192.168.100.140:8080/api/v1/auth/replies",
           { params: { userId } }
         );
 
@@ -331,10 +331,10 @@ export default function Profile() {
   return (
     <View style={styles.mainContainer}>
       <StatusBar style="auto" />
+      <View style={{ padding: "5%" }}>
+        <CustomTopNav />
+      </View>
       <View style={styles.contentContainer}>
-        <View style={{ marginTop: responsiveHeight(20) }}>
-          <CustomTopNav />
-        </View>
         {replies.length === 0 ? (
           <NoReply />
         ) : (
@@ -359,7 +359,7 @@ export default function Profile() {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#bcbaba",
     alignItems: "center",
   },
   contentContainer: {

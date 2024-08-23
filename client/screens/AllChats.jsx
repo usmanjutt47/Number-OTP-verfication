@@ -18,60 +18,8 @@ const AllChats = () => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
   const [chats, setChats] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
-
-  const fetchChats = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    setRefreshing(true);
-
-    try {
-      // Retrieve userId from AsyncStorage
-      const userId = await AsyncStorage.getItem("userId");
-      if (!userId) {
-        console.warn("No userId found in AsyncStorage");
-        setError("No userId found in AsyncStorage");
-        return;
-      }
-
-      // Fetch data from API
-      const response = await fetch(
-        `http://192.168.100.140:8080/api/v1/auth/letters-of-subscribed-users?userId=${userId}`
-      );
-
-      // Check if response is OK
-      if (!response.ok) {
-        throw new Error(`Failed to fetch: ${response.statusText}`);
-      }
-
-      // Parse response data
-      const data = await response.json();
-
-      // Handle success and update state
-      if (data.success) {
-        setChats(data.replies || []);
-      } else {
-        setError(data.error || "Something went wrong");
-      }
-    } catch (error) {
-      // Log the error and update state
-      console.error("Error fetching chats:", error);
-      setError(error.message);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
-
-  const onRefresh = useCallback(() => {
-    fetchChats();
-  }, [fetchChats]);
-
-  useEffect(() => {
-    fetchChats();
-  }, [fetchChats]);
 
   const filteredChats = chats.filter(
     (chat) =>
@@ -129,14 +77,6 @@ const AllChats = () => {
     </Pressable>
   );
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
@@ -180,7 +120,7 @@ const AllChats = () => {
         ) : (
           <View style={styles.noChatsContainer}>
             <Text style={styles.noChatsText}>
-              You have currently no plan active.
+              You have currently no chats.
             </Text>
           </View>
         )}

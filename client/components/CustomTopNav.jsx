@@ -108,7 +108,7 @@ export default function CustomTopNav() {
           <AntDesign name="inbox" size={responsiveIconSize(24)} color="black" />
         </Pressable>
 
-        <Pressable
+        {/* <Pressable
           style={[
             styles.button,
             activeScreen === "Profile" && styles.activeButton,
@@ -118,7 +118,7 @@ export default function CustomTopNav() {
           disabled={modalVisible} // Disable if modal is active
         >
           <Feather name="send" size={responsiveIconSize(24)} color="black" />
-        </Pressable>
+        </Pressable> */}
       </View>
 
       <Pressable

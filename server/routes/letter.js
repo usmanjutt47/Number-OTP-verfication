@@ -43,26 +43,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    if (!id) {
-      return res.json({ error: "Letter ID is required" });
-    }
-
-    const letter = await Letter.findById(id);
-
-    if (!letter) {
-      return res.json({ error: "Letter not found" });
-    }
-
-    return res.json({ letter });
-  } catch (err) {
-    return res.json({ error: err.message });
-  }
-});
-
 router.get("/inbox/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -109,25 +89,64 @@ router.get("/sent/:id", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/toggle-favorite/:letterId", async (req, res) => {
+  const { letterId } = req.params;
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({ message: "userId is required" });
+  }
+
   try {
-    const { id } = req.params;
-
-    if (!id) {
-      return res.send({ error: "Letter ID is required" });
-    }
-
-    const letter = await Letter.findById(id);
+    const letter = await Letter.findById(letterId);
 
     if (!letter) {
-      return res.send({ error: "Letter not found" });
+      return res.status(404).json({ message: "Letter not found" });
     }
 
-    await Letter.findByIdAndUpdate(id, { isFavorite: true });
+    const user = await userModel.findById(userId);
 
-    return res.send({ message: "Letter added to favorites" });
-  } catch (err) {
-    return res.send({ error: err.message });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.isFavoriteLetters.includes(letterId)) {
+      user.isFavoriteLetters.pull(letterId);
+    } else {
+      user.isFavoriteLetters.push(letterId);
+    }
+
+    await user.save();
+
+    const action = user.isFavoriteLetters.includes(letterId)
+      ? "marked as favorite"
+      : "removed from favorites";
+
+    res.status(200).json({ message: `Letter ${action}`, user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.get("/favorites/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await userModel.findById(userId).populate("isFavoriteLetters");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.isFavoriteLetters.length === 0) {
+      return res.status(200).json({ message: "No favorites", favorites: [] });
+    }
+
+    res.status(200).json({ favorites: user.isFavoriteLetters });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -166,6 +185,26 @@ router.get("/all-excluding-creator/:userId", async (req, res) => {
     return res.status(200).json(letters);
   } catch (err) {
     return res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.json({ error: "Letter ID is required" });
+    }
+
+    const letter = await Letter.findById(id);
+
+    if (!letter) {
+      return res.json({ error: "Letter not found" });
+    }
+
+    return res.json({ letter });
+  } catch (err) {
+    return res.json({ error: err.message });
   }
 });
 

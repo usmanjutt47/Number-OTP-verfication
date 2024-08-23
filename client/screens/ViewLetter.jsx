@@ -1,16 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-  Alert,
+  ActivityIndicator, // Import ActivityIndicator
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
+import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios"; // Import axios
 
 const { width, height } = Dimensions.get("window");
 
@@ -24,54 +24,55 @@ export default function ViewLetter() {
   const navigation = useNavigation();
   const { letter } = route.params;
   const [isFavorite, setIsFavorite] = useState(letter.isFavorite);
+  const [loading, setLoading] = useState(false); // Loading state
 
-  const handleFavoriteClick = async () => {
+  useEffect(() => {
+    const fetchFavoriteStatus = async () => {
+      try {
+        const status = await AsyncStorage.getItem(`favorite-${letter._id}`);
+        if (status !== null) {
+          setIsFavorite(status === "true");
+        }
+      } catch (error) {
+        console.error("Error fetching favorite status:", error);
+      }
+    };
+
+    fetchFavoriteStatus();
+  }, [letter._id]);
+
+  const toggleFavorite = async () => {
+    setLoading(true);
     try {
       const userId = await AsyncStorage.getItem("userId");
-
       if (!userId) {
-        Alert.alert("Error", "User ID not found.");
-        return;
+        throw new Error("User ID not found");
       }
 
-      const data = {
-        userId,
-        letterId: letter._id, // Use letter._id instead of selectedItem._id
-      };
-
-      console.log("Sending request with data:", data);
-
-      const response = await axios.post(
-        "http://192.168.100.140:8080/api/v1/auth/addToFavorite",
-        data
-      );
-
-      if (response.data.success) {
-        if (isFavorite) {
-          Alert.alert("Info", "This letter is already in your favorites.");
-        } else {
-          setIsFavorite(true);
-          Alert.alert("Success", "Letter added to favorites!");
+      const response = await axios.put(
+        `http://192.168.100.6:8080/api/letter/toggle-favorite/${letter._id}`,
+        {
+          userId,
         }
-      } else {
-        Alert.alert(
-          "Error",
-          "Failed to add letter to favorites. Please try again."
-        );
-      }
-    } catch (error) {
-      Alert.alert(
-        "Error",
-        "Error occurred while adding to favorites: " +
-          (error.response ? error.response.data : error.message)
       );
+
+      setIsFavorite(!isFavorite);
+      await AsyncStorage.setItem(
+        `favorite-${letter._id}`,
+        !isFavorite ? "true" : "false"
+      );
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
   const handleReply = () => {
     navigation.navigate("ReplyFromHome", {
-      letterId: letter._id, // Pass letter ID
-      letterContent: letter.content, // Pass letter content if needed
+      letterId: letter._id,
+      letterContent: letter.content,
     });
   };
 
@@ -102,9 +103,12 @@ export default function ViewLetter() {
               justifyContent: "center",
               borderRadius: 50,
             }}
-            onPress={handleFavoriteClick}
+            onPress={toggleFavorite}
+            disabled={loading} // Disable button while loading
           >
-            {isFavorite ? (
+            {loading ? (
+              <ActivityIndicator size="small" color="gray" /> // Show loader
+            ) : isFavorite ? (
               <AntDesign
                 name="star"
                 size={24}

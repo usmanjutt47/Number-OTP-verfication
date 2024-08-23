@@ -6,7 +6,6 @@ const schema = new mongoose.Schema(
     receiverId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     content: { type: String, required: true },
     title: { type: String, required: false },
-    isFavorite: { type: Boolean, required: false, default: false },
     viewedId: { type: String, required: false },
   },
   { timestamps: true }

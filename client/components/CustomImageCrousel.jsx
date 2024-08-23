@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,17 +9,12 @@ import {
   StyleSheet,
   Pressable,
   TouchableOpacity,
-  ScrollView,
-  TextInput,
-  ToastAndroid,
 } from "react-native";
 import axios from "axios";
-import BottomSheet from "@gorhom/bottom-sheet";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
-import Toast from "react-native-toast-message";
 import { useNavigation } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
 
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.9;
@@ -64,7 +59,7 @@ export default function CustomImageCarousel() {
           throw new Error("User ID not found in AsyncStorage");
         }
         const response = await axios.get(
-          `http://192.168.10.6:8080/api/letter/all-excluding-creator/${userId}`
+          `http://192.168.100.6:8080/api/letter/all-excluding-creator/${userId}`
         );
         setLetters(response.data);
       } catch (err) {
@@ -214,7 +209,6 @@ export default function CustomImageCarousel() {
           }}
         />
       )}
-      <Toast />
     </View>
   );
 }

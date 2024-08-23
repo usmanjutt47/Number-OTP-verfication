@@ -33,9 +33,12 @@ export default function EmailVerification() {
 
     setLoading(true);
     try {
-      const response = await axios.post("http://192.168.10.3:8080/api/user/", {
-        email,
-      });
+      const response = await axios.post(
+        "http://192.168.100.175:8080/api/user/",
+        {
+          email,
+        }
+      );
 
       if (response.status === 200) {
         Toast.show({
@@ -44,7 +47,8 @@ export default function EmailVerification() {
           text2: "OTP sent to your email address.",
         });
         setLoading(false);
-        navigation.navigate("OTPVerification");
+        navigation.navigate("OTPVerification", { email });
+        setEmail("");
       }
     } catch (err) {
       Toast.show({

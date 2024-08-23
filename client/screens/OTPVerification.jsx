@@ -6,14 +6,13 @@ import {
   StyleSheet,
   Pressable,
   TextInput,
-  Alert,
+  ActivityIndicator,
   Dimensions,
 } from "react-native";
 import axios from "axios";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRoute } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { height, width } = Dimensions.get("window");
 
@@ -26,6 +25,7 @@ export default function OTPVerification({ navigation }) {
   const email = route.params?.email || "";
   const [countdown, setCountdown] = useState(60);
   const [isResendEnabled, setIsResendEnabled] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -41,36 +41,6 @@ export default function OTPVerification({ navigation }) {
 
     return () => clearInterval(timer);
   }, []);
-
-  const handleResendOtp = async () => {
-    setCountdown(60);
-    setIsResendEnabled(false);
-    try {
-      const response = await axios.post(
-        "http://192.168.100.140:8080/api/v1/auth/resend-otp",
-        { email }
-      );
-      if (response.data.success) {
-        Toast.show({
-          type: "success",
-          text1: "OTP Resent",
-          text2: "A new OTP has been sent to your email.",
-        });
-      } else {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: response.data.message,
-        });
-      }
-    } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "An error occurred while resending OTP.",
-      });
-    }
-  };
 
   useEffect(() => {
     setOtp(inputValues.join(""));
@@ -128,6 +98,46 @@ export default function OTPVerification({ navigation }) {
     return `${start}${masked}${end}@${domainPart}`;
   };
 
+  const handleOtpSubmit = async () => {
+    if (!otp) {
+      Toast.show({
+        type: "info",
+        text1: "Info",
+        text2: "Please enter the OTP sent to your email.",
+      });
+      return;
+    }
+
+    setLoading(true); // Start loading spinner
+
+    try {
+      const response = await axios.post(
+        "http://192.168.100.175:8080/api/user/verify",
+        {
+          email,
+          otp,
+        }
+      );
+
+      if (response.status === 200) {
+        Toast.show({
+          type: "success",
+          text1: "Success",
+          text2: "Email verified successfully!",
+        });
+        navigation.navigate("Home");
+      }
+    } catch (err) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: err.response?.data?.error || "Internal server error",
+      });
+    } finally {
+      setLoading(false); // Stop loading spinner
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -163,21 +173,29 @@ export default function OTPVerification({ navigation }) {
           />
         ))}
       </View>
-      <View style={styles.resendContainer}>
-        <Text>Resend code in </Text>
-        <Text style={styles.countdownText}>{countdown} </Text>
-        <Text>s</Text>
-        {isResendEnabled && (
-          <TouchableOpacity onPress={handleResendOtp}>
-            <Text style={styles.resendText}> Resend Code</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Verify OTP</Text>
-        </TouchableOpacity>
-      </View>
+
+      {loading ? ( // Show spinner when loading
+        <ActivityIndicator size="large" color="#075856" />
+      ) : (
+        <>
+          <View style={styles.resendContainer}>
+            <Text>Resend code in </Text>
+            <Text style={styles.countdownText}>{countdown} </Text>
+            <Text>s</Text>
+            {isResendEnabled && (
+              <TouchableOpacity>
+                <Text style={styles.resendText}> Resend Code</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.button} onPress={handleOtpSubmit}>
+              <Text style={styles.buttonText}>Verify OTP</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
+
       <Toast />
     </View>
   );
@@ -271,5 +289,10 @@ const styles = StyleSheet.create({
   },
   resendText: {
     color: "#246BFD",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

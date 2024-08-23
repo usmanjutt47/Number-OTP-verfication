@@ -77,7 +77,10 @@ router.post("/verify", async function (req, res) {
 
     await userModel.findByIdAndUpdate(user._id, { otp: null });
 
-    return res.status(200).json({ message: "Email verified" });
+    return res.status(200).json({
+      userId: user._id.toString(),
+      message: "Email verified",
+    });
   } catch (err) {
     console.error("Error in VerifyOtpController:", err);
     return res.status(500).json({ error: "Internal server error" });

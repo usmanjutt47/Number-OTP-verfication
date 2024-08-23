@@ -13,6 +13,7 @@ import axios from "axios";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRoute } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { height, width } = Dimensions.get("window");
 
@@ -108,24 +109,40 @@ export default function OTPVerification({ navigation }) {
       return;
     }
 
-    setLoading(true); // Start loading spinner
+    setLoading(true);
 
     try {
       const response = await axios.post(
-        "http://192.168.100.175:8080/api/user/verify",
+        "http://192.168.10.6:8080/api/user/verify",
         {
           email,
           otp,
         }
       );
 
+
       if (response.status === 200) {
-        Toast.show({
-          type: "success",
-          text1: "Success",
-          text2: "Email verified successfully!",
-        });
-        navigation.navigate("Home");
+        const { userId, message } = response.data;
+
+        if (userId) {
+          // Store user ID in AsyncStorage
+          await AsyncStorage.setItem("userId", userId);
+          console.log("_id", userId);
+
+          Toast.show({
+            type: "success",
+            text1: "Success",
+            text2: message, // Use the message from the response
+          });
+
+          navigation.navigate("Home");
+        } else {
+          Toast.show({
+            type: "error",
+            text1: "Error",
+            text2: "User ID not received from the server.",
+          });
+        }
       }
     } catch (err) {
       Toast.show({

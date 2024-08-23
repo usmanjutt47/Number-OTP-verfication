@@ -29,9 +29,9 @@ export default function ReplyLetter() {
 
   const handleReply = async () => {
     try {
-      const userId = await AsyncStorage.getItem("userId");
+      const senderId = await AsyncStorage.getItem("userId");
 
-      if (!userId) {
+      if (!senderId) {
         Alert.alert("Error", "User ID not found");
         return;
       }
@@ -46,20 +46,17 @@ export default function ReplyLetter() {
         return;
       }
 
-      const response = await fetch(
-        "http://192.168.100.140:8080/api/v1/auth/reply",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: userId,
-            content: replyContent,
-            letterId: selectedItem._id,
-          }),
-        }
-      );
+      const response = await fetch("http://192.168.100.6:8080/api/reply/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          senderId: senderId,
+          content: replyContent,
+          letterId: selectedItem._id,
+        }),
+      });
 
       const result = await response.json();
 
@@ -75,7 +72,7 @@ export default function ReplyLetter() {
         );
         navigation.navigate("Home");
       } else {
-        Alert.alert("Error", `Error: ${result.message}`);
+        Alert.alert("Error", `Error: ${result.error || result.message}`);
       }
     } catch (error) {
       Alert.alert("Error", `Failed to send reply: ${error.message}`);

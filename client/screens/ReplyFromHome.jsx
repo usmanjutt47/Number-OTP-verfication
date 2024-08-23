@@ -12,7 +12,6 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
 
 const { width, height } = Dimensions.get("window");
 
@@ -25,13 +24,13 @@ export default function ReplyFromHome() {
   const route = useRoute();
   const [letters, setLetters] = useState([]);
 
-  const { letterId, letterContent } = route.params || {};
+  const { letterId } = route.params || {};
 
   const handleReply = async () => {
     try {
-      const userId = await AsyncStorage.getItem("userId");
+      const senderId = await AsyncStorage.getItem("userId");
 
-      if (!userId) {
+      if (!senderId) {
         Alert.alert("Error", "User ID not found");
         return;
       }
@@ -46,27 +45,23 @@ export default function ReplyFromHome() {
         return;
       }
 
-      const response = await fetch(
-        "http://192.168.100.140:8080/api/v1/auth/reply",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: userId,
-            content: replyContent,
-            letterId: letterId,
-          }),
-        }
-      );
+      const response = await fetch("http://192.168.100.6:8080/api/reply", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          senderId: senderId,
+          content: replyContent,
+          letterId: letterId,
+        }),
+      });
 
       const result = await response.json();
 
       if (response.ok) {
         Alert.alert("Success", "Reply sent successfully");
         setReplyContent("");
-        // Assuming you need to navigate back or refresh data
         navigation.navigate("Home");
       } else {
         Alert.alert("Error", `Error: ${result.message}`);

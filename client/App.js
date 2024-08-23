@@ -41,30 +41,7 @@ const App = () => {
     Inter_Bold: require("../client/assets/fonts/Inter_24pt-Bold.ttf"),
   });
 
-  const handleLogin = async () => {
-    const userId = "some_unique_user_id";
-    await AsyncStorage.setItem("userId", userId);
-    console.log("User ID saved:", userId);
-
-    const savedUserId = await AsyncStorage.getItem("userId");
-    console.log("Saved User ID:", savedUserId);
-  };
-
-  useEffect(() => {
-    const checkUser = async () => {
-      const userId = await AsyncStorage.getItem("userId");
-      console.log("User ID from AsyncStorage:", userId);
-      if (userId) {
-        setInitialRoute("Home");
-      } else {
-        setInitialRoute("OnBoarding");
-      }
-    };
-
-    checkUser();
-  }, []);
-
-  if (!loaded || initialRoute === null) {
+  if (!loaded) {
     return null;
   }
 
@@ -75,7 +52,7 @@ const App = () => {
     <StripeProvider publishableKey={PUBLISH_KEY}>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName={initialRoute}
+          initialRouteName="OnBoarding"
           screenOptions={{ headerShown: false }}
         >
           <Stack.Screen name="CustomKeyboard" component={CustomKeyboard} />

@@ -128,65 +128,6 @@ export default function OTPVerification({ navigation }) {
     return `${start}${masked}${end}@${domainPart}`;
   };
 
-  const handleOtpVerification = async () => {
-    if (!otp) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "OTP is required.",
-      });
-      return;
-    }
-
-    console.log("Sending OTP:", otp);
-
-    try {
-      const response = await axios.post(
-        "http://192.168.100.140:8080/api/v1/auth/verify-otp",
-        { email, otp }
-      );
-
-      if (response.data.success) {
-        Toast.show({
-          type: "success",
-          text1: "Success",
-          text2: "OTP verified successfully.",
-        });
-
-        // Assuming userId is returned in the response after successful verification
-        const userId = response.data.userId;
-
-        // Store userId in AsyncStorage
-        await AsyncStorage.setItem("userId", userId);
-        console.log("User ID saved:", userId);
-
-        // Navigate to Home screen after storing userId
-        setTimeout(() => {
-          navigation.navigate("Home");
-        }, 100);
-      } else {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: response.data.message,
-        });
-      }
-    } catch (error) {
-      if (error.response) {
-        console.error("Error response:", error.response.data);
-      } else if (error.request) {
-        console.error("Error request:", error.request);
-      } else {
-        console.error("Error message:", error.message);
-      }
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "An error occurred while verifying OTP.",
-      });
-    }
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -233,7 +174,7 @@ export default function OTPVerification({ navigation }) {
         )}
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={handleOtpVerification} style={styles.button}>
+        <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Verify OTP</Text>
         </TouchableOpacity>
       </View>

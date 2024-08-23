@@ -51,7 +51,6 @@ const formatDateTime = (dateString) => {
 
 export default function CustomImageCarousel() {
   const [letters, setLetters] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [replyContent, setReplyContent] = useState("");
@@ -59,83 +58,6 @@ export default function CustomImageCarousel() {
   const bottomSheetRef = useRef(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const navigation = useNavigation();
-
-  const handlePass = async (letterId) => {
-    try {
-      const userId = await AsyncStorage.getItem("userId");
-
-      if (!userId) {
-        ToastAndroid.show("User ID not found", ToastAndroid.SHORT);
-        return;
-      }
-
-      const response = await axios.post(
-        "http://192.168.100.140:8080/api/v1/auth/hideLetter",
-        { userId, letterId }
-      );
-
-      if (response.data.success) {
-        // Update the state to remove the passed letter
-        setLetters((prevLetters) =>
-          prevLetters.filter((letter) => letter._id !== letterId)
-        );
-        ToastAndroid.show("Letter passed successfully", ToastAndroid.SHORT);
-      } else {
-        ToastAndroid.show(
-          `Error: ${response.data.message}`,
-          ToastAndroid.SHORT
-        );
-      }
-    } catch (error) {
-      ToastAndroid.show(
-        `Failed to pass letter: ${error.message}`,
-        ToastAndroid.SHORT
-      );
-      console.log(`Failed to pass letter: ${error.message}`);
-    }
-  };
-
-  useEffect(() => {
-    const fetchLetters = async () => {
-      try {
-        const userId = await AsyncStorage.getItem("userId");
-
-        if (!userId) {
-          setError("User ID not found.");
-          setLoading(false);
-          return;
-        }
-
-        const response = await axios.get(
-          `http://192.168.100.140:8080/api/v1/auth/letters`,
-          { params: { userId } }
-        );
-
-        if (response.data.success) {
-          setLetters(response.data.letters);
-        } else {
-          setError("Failed to fetch letters.");
-        }
-      } catch (error) {
-        console.error("Error occurred:", error);
-        setError("An error occurred while fetching letters.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchLetters();
-  }, []);
-
-  if (loading) {
-    return (
-      <ActivityIndicator size="large" color="#fff" style={styles.centered} />
-    );
-  }
-
-  if (error) {
-    return <Text style={styles.centered}>{error}</Text>;
-  }
 
   const handleOpenBottomSheet = (item) => {
     navigation.navigate("ViewLetter", { letter: item });

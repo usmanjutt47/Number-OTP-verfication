@@ -1,90 +1,57 @@
+import React, { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TextInput,
   Pressable,
-  TouchableOpacity,
   ActivityIndicator,
   Dimensions,
 } from "react-native";
-import React, { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
+import axios from "axios";
 
 const { height, width } = Dimensions.get("window");
 
 export default function EmailVerification() {
   const navigation = useNavigation();
-
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const validateEmail = (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  };
-
-  const handelSendOTP = async () => {
-    if (!validateEmail(email)) {
+  const handleSubmit = async () => {
+    if (!email) {
       Toast.show({
-        type: "error",
-        text1: "Invalid Email",
-        text2: "Please enter a valid email address.",
+        type: "info",
+        text1: "Info",
+        text2: "Please enter your email address.",
       });
       return;
     }
 
     setLoading(true);
     try {
-      console.log("Sending OTP to:", email);
+      const response = await axios.post("http://192.168.10.3:8080/api/user/", {
+        email,
+      });
 
-      const response = await fetch(
-        "http://192.168.100.140:8080/api/v1/auth/send-otp",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("Response data:", data);
-
-      if (data.success) {
+      if (response.status === 200) {
         Toast.show({
           type: "success",
           text1: "Success",
-          text2: "OTP sent successfully. Please check your email.",
-          visibilityTime: 500,
+          text2: "OTP sent to your email address.",
         });
-        setEmail("");
-        setTimeout(() => {
-          navigation.navigate("OTPVerification", { email: email });
-        }, 500);
-      } else {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: data.message || "Failed to send OTP.",
-        });
+        setLoading(false);
+        navigation.navigate("OTPVerification");
       }
-    } catch (error) {
-      console.error("Error sending OTP:", error);
+    } catch (err) {
       Toast.show({
         type: "error",
         text1: "Error",
-        text2: "An error occurred while sending OTP.",
+        text2: err.response?.data?.error || "Internal server error",
       });
-    } finally {
       setLoading(false);
     }
   };
@@ -128,23 +95,21 @@ export default function EmailVerification() {
         </View>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          onPress={handelSendOTP}
+        <Pressable
           style={styles.sendButton}
+          onPress={handleSubmit}
           disabled={loading}
         >
           <Text style={styles.sendButtonText}>Send Now</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
+
       {loading && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator
-            size="large"
-            color="#075856"
-            style={{ marginTop: "25%" }}
-          />
+          <ActivityIndicator size="large" color="#075856" />
         </View>
       )}
+
       <Toast />
     </View>
   );
@@ -178,25 +143,12 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
   },
-  backArrowContainer: {
-    position: "absolute",
-    top: width * 0.08,
-    left: width * 0.02,
-    width: width * 0.1,
-    height: width * 0.1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F0F0F1",
-    borderRadius: width * 0.05,
-  },
   logo: {
-    fontFamily: "Kanit_Bold",
     fontSize: width * 0.12,
     marginBottom: height * 0.03,
     alignSelf: "center",
   },
   emailLable: {
-    fontFamily: "Outfit_Medium",
     fontSize: width * 0.05,
     marginBottom: height * 0.01,
     marginLeft: width * 0.03,
@@ -242,12 +194,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: width * 0.04,
     textAlign: "center",
-    fontFamily: "Outfit_Medium",
   },
   loadingContainer: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
   },
 });

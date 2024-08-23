@@ -26,6 +26,7 @@
     "pusher-js": "^8.4.0-rc2",
     "react": "18.2.0",
     "react-native": "^0.74.5",
+    "react-native-customizable-toast": "^0.2.1",
     "react-native-gesture-handler": "^2.18.1",
     "react-native-reanimated": "3.10.0",
     "react-native-responsive-dimensions": "^3.1.1",

@@ -326,12 +326,12 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     borderRadius: 100,
-    backgroundColor: "#E9E9E9",
+    backgroundColor: "#d9d9d9",
   },
   imageContainer: {
     width: 146.1,
     height: 146.1,
-    backgroundColor: "#E3E3E3",
+    backgroundColor: "#000",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 80,
@@ -340,9 +340,10 @@ const styles = StyleSheet.create({
     width: 56.07,
     height: 56.46,
     borderRadius: 100,
+    tintColor: "#fff",
   },
   headingsContainer: {
-    marginTop: "15%", // Adjust this value to move the container down
+    marginTop: "15%",
     alignItems: "center",
     width: "80%",
     alignSelf: "center",

@@ -153,4 +153,20 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+router.get("/all-excluding-creator/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is required" });
+    }
+
+    const letters = await Letter.find({ senderId: { $ne: userId } });
+
+    return res.status(200).json(letters);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

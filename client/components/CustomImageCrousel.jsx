@@ -51,20 +51,45 @@ const formatDateTime = (dateString) => {
 
 export default function CustomImageCarousel() {
   const [letters, setLetters] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [replyContent, setReplyContent] = useState("");
   const scrollX = new Animated.Value(0);
-  const bottomSheetRef = useRef(null);
-  const [isFavorite, setIsFavorite] = useState(false);
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const fetchLetters = async () => {
+      try {
+        const userId = await AsyncStorage.getItem("userId");
+        if (!userId) {
+          throw new Error("User ID not found in AsyncStorage");
+        }
+        const response = await axios.get(
+          `http://192.168.10.6:8080/api/letter/all-excluding-creator/${userId}`
+        );
+        setLetters(response.data);
+      } catch (err) {
+        setError(err.message);
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLetters();
+  }, []);
+
+  if (loading) {
+    return (
+      <ActivityIndicator size="large" color="#fff" style={styles.centered} />
+    );
+  }
+
+  if (error) {
+    return <Text style={styles.centered}>{error}</Text>;
+  }
 
   const handleOpenBottomSheet = (item) => {
     navigation.navigate("ViewLetter", { letter: item });
-  };
-
-  const handleReplyBottomSheetOpen = (item) => {
-    navigation.navigate("ReplyLetter", { selectedItem: item });
   };
 
   return (
@@ -172,19 +197,11 @@ export default function CustomImageCarousel() {
                     },
                   ]}
                 >
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                      handleReplyBottomSheetOpen(item);
-                    }}
-                  >
+                  <TouchableOpacity style={styles.button}>
                     <FontAwesome5 name="pen" size={20} style={styles.icon} />
                     <Text style={styles.buttonText}>Reply</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => handlePass(item._id)}
-                  >
+                  <TouchableOpacity style={styles.button}>
                     <Image
                       source={require("../assets/icons/pass.png")}
                       style={styles.imageIcon}
@@ -359,6 +376,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
   },
   flatList: {
-    flex: 1, // Ensure FlatList takes the remaining space
+    flex: 1,
   },
 });

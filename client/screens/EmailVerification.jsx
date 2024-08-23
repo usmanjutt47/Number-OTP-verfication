@@ -21,24 +21,26 @@ export default function EmailVerification() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSubmit = async () => {
-    if (!email) {
+    if (!email || !isValidEmail(email)) {
       Toast.show({
         type: "info",
         text1: "Info",
-        text2: "Please enter your email address.",
+        text2: "Please enter a valid email address.",
       });
       return;
     }
 
     setLoading(true);
     try {
-      const response = await axios.post(
-        "http://192.168.10.6:8080/api/user/",
-        {
-          email,
-        }
-      );
+      const response = await axios.post("http://192.168.10.6:8080/api/user/", {
+        email,
+      });
 
       if (response.status === 200) {
         Toast.show({
@@ -46,7 +48,6 @@ export default function EmailVerification() {
           text1: "Success",
           text2: "OTP sent to your email address.",
         });
-        setLoading(false);
         navigation.navigate("OTPVerification", { email });
         setEmail("");
       }
@@ -56,6 +57,7 @@ export default function EmailVerification() {
         text1: "Error",
         text2: err.response?.data?.error || "Internal server error",
       });
+    } finally {
       setLoading(false);
     }
   };

@@ -210,30 +210,6 @@ const ReplyCard = ({ reply }) => {
   );
 };
 
-// const NoReplyCard = () => (
-//   <View style={styles.card}>
-//     <View
-//       style={{
-//         height: responsiveHeight(300),
-//         width: responsiveWidth(350),
-//         backgroundColor: "#F5F5F5",
-//         borderRadius: 26.22,
-//         alignSelf: "center",
-//         justifyContent: "center",
-//         alignItems: "center",
-//       }}
-//     >
-//       <Text
-//         style={{
-//           fontSize: responsiveFontSize(18),
-//           fontFamily: "Outfit_Medium",
-//         }}
-//       >
-//         No Replies Available
-//       </Text>
-//     </View>
-//   </View>
-// );
 
 export default function Profile() {
   const [userId, setUserId] = useState(null);
@@ -242,57 +218,6 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   const scaleValue = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    const fetchUserId = async () => {
-      try {
-        const storedUserId = await AsyncStorage.getItem("userId");
-        if (storedUserId) {
-          setUserId(storedUserId);
-        } else {
-          console.error("No userId found in AsyncStorage");
-        }
-      } catch (error) {
-        console.error("Error retrieving userId:", error);
-      }
-    };
-
-    fetchUserId();
-  }, []);
-
-  useEffect(() => {
-    const fetchReplies = async () => {
-      if (!userId) return;
-
-      try {
-        console.log("Fetching replies for userId:", userId);
-        const response = await axios.get(
-          "http://192.168.100.140:8080/api/v1/auth/replies",
-          { params: { userId } }
-        );
-
-        if (response.status === 200) {
-          if (Array.isArray(response.data)) {
-            setReplies(response.data);
-          } else {
-            console.warn("Unexpected response structure:", response.data);
-            setReplies([]);
-          }
-        }
-      } catch (error) {
-        if (error.response && error.response.status === 404) {
-          setReplies([]);
-        } else {
-          setError(error.message);
-          console.error("Error fetching replies:", error);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchReplies();
-  }, [userId]);
 
   useEffect(() => {
     const scaleAnimation = Animated.loop(
@@ -320,10 +245,6 @@ export default function Profile() {
     navigation.navigate("WriteLetter");
   };
 
-  if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
-  }
-
   if (error) {
     return <Text>Error: {error}</Text>;
   }
@@ -335,19 +256,7 @@ export default function Profile() {
         <CustomTopNav />
       </View>
       <View style={styles.contentContainer}>
-        {replies.length === 0 ? (
-          <NoReply />
-        ) : (
-          <FlatList
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}
-            data={replies}
-            renderItem={({ item }) => <ReplyCard reply={item} />}
-            keyExtractor={(item) => item._id}
-            contentContainerStyle={styles.flatListContainer}
-          />
-        )}
-
+        <NoReply />
         <Pressable style={styles.pressable} onPress={handlePress}>
           <Entypo name="plus" size={40} color="white" />
         </Pressable>

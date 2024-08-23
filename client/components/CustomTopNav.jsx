@@ -165,7 +165,10 @@ export default function CustomTopNav() {
               <Pressable style={styles.cancelButton} onPress={handleCloseModal}>
                 <Text style={styles.cancelButtonText}>Discard</Text>
               </Pressable>
-              <Pressable style={styles.logoutButton}>
+              <Pressable
+                style={styles.logoutButton}
+                onPress={() => navigation.navigate("OnBoarding")}
+              >
                 <Text style={styles.logoutButtonText}>Logout</Text>
               </Pressable>
             </View>

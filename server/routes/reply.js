@@ -37,7 +37,7 @@ router.post("/", async (req, res) => {
       return res.json({ error: "Failed to send Pusher notification" });
     }
 
-    return res.json({ message: "Reply sent" });
+    return res.json({ message: "Reply sent", reply });
   } catch (err) {
     return res.json({ error: err.message });
   }

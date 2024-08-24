@@ -59,7 +59,7 @@ export default function CustomImageCarousel() {
           throw new Error("User ID not found in AsyncStorage");
         }
         const response = await axios.get(
-          `http://192.168.100.6:8080/api/letter/all-excluding-creator/${userId}`
+          `http://192.168.10.5:8080/api/letter/all-excluding-creator/${userId}`
         );
         setLetters(response.data);
       } catch (err) {

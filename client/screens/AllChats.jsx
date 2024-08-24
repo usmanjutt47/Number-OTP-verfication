@@ -8,11 +8,21 @@ import {
   FlatList,
   ActivityIndicator,
   Alert,
+  Dimensions,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Entypo } from "@expo/vector-icons";
+
+const { width, height } = Dimensions.get("window");
+
+const responsiveFontSize = (size) => (size * width) / 375;
+const responsiveIconSize = (size) => (size * width) / 375;
+const responsiveWidth = (size) => (size * width) / 375;
+const responsiveHeight = (size) => (size * height) / 812;
+const responsivePadding = (size) => (size * width) / 375;
 
 const AllChats = () => {
   const navigation = useNavigation();
@@ -119,12 +129,16 @@ const AllChats = () => {
           />
         ) : (
           <View style={styles.noChatsContainer}>
-            <Text style={styles.noChatsText}>
-              You have currently no chats.
-            </Text>
+            <Text style={styles.noChatsText}>You have currently no chats.</Text>
           </View>
         )}
       </View>
+      <Pressable
+        style={styles.pressable}
+        onPress={() => navigation.navigate("WriteLetter")}
+      >
+        <Entypo name="plus" size={40} color="white" />
+      </Pressable>
     </View>
   );
 };
@@ -225,6 +239,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#AAAAB4",
     textAlign: "center",
+  },
+  pressable: {
+    position: "absolute",
+    bottom: responsiveHeight(20),
+    right: responsiveWidth(20),
+    backgroundColor: "#075856",
+    borderRadius: 50,
+    width: responsiveWidth(60),
+    height: responsiveWidth(60),
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

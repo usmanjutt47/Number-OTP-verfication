@@ -28,13 +28,9 @@ export default function ReplyFromHome() {
 
   const handleReply = async () => {
     try {
-      const senderId = await AsyncStorage.getItem("userId");
+      const receiverId = await AsyncStorage.getItem("userId");
 
-      console.log("Sender ID:", senderId);
-      console.log("Reply Content:", replyContent);
-      console.log("Letter ID:", letterId);
-
-      if (!senderId) {
+      if (!receiverId) {
         Alert.alert("Error", "User ID not found");
         return;
       }
@@ -49,12 +45,11 @@ export default function ReplyFromHome() {
         return;
       }
 
-      const receiverId = route.params?.receiverId || null; // Fetch receiverId from route params
+      const senderId = route.params?.receiverId || null;
+      console.log("ReplyFromHome Receiver ID:", receiverId);
 
-      console.log("Receiver ID:", receiverId);
-
-      if (!receiverId) {
-        Alert.alert("Error", "Receiver ID not found");
+      if (!senderId) {
+        Alert.alert("Error", "Sender ID not found");
         return;
       }
 
@@ -64,10 +59,10 @@ export default function ReplyFromHome() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          senderId: senderId,
+          receiverId: receiverId,
           content: replyContent,
           letterId: letterId,
-          receiverId: receiverId, // Make sure this is sent
+          senderId: senderId,
         }),
       });
 

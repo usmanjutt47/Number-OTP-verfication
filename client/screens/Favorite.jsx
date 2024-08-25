@@ -89,8 +89,13 @@ export default function Favorite() {
 
   if (noFavorites) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.noFavoritesText}>No favorite letters found</Text>
+      <View style={{ flex: 1, backgroundColor: "#bcbaba" }}>
+        <View style={{ padding: "5%" }}>
+          <CustomTopNav />
+        </View>
+        <View style={styles.centered}>
+          <Text style={styles.noFavoritesText}>No favorite letters found</Text>
+        </View>
       </View>
     );
   }

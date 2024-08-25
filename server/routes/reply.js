@@ -9,27 +9,32 @@ router.post("/", async (req, res) => {
   try {
     const { senderId, content, letterId, receiverId } = req.body;
 
+    // Validate required fields
     if (!senderId || !content || !letterId || !receiverId) {
       return res.json({
         error: "Sender ID, content, letter ID, and receiver ID are required",
       });
     }
 
+    // Find the letter
     const letter = await Letter.findById(letterId);
     if (!letter) {
       return res.json({ error: "Letter not found" });
     }
 
+    // Find the sender
     const sender = await User.findById(senderId);
     if (!sender) {
       return res.json({ error: "Sender not found" });
     }
 
+    // Find the receiver
     const receiver = await User.findById(receiverId);
     if (!receiver) {
       return res.json({ error: "Receiver not found" });
     }
 
+    // Create the reply
     const reply = await Reply.create({
       senderId,
       content,
@@ -37,6 +42,10 @@ router.post("/", async (req, res) => {
       receiverId,
     });
 
+    // Update the letter to set hidden to true
+    await Letter.findByIdAndUpdate(letterId, { hidden: true });
+
+    // Trigger Pusher notification
     try {
       await pusherInstance.trigger("replies", "new-reply", {
         ...reply._doc,
@@ -48,7 +57,7 @@ router.post("/", async (req, res) => {
       return res.json({ error: "Failed to send Pusher notification" });
     }
 
-    return res.json({ message: "Reply sent", reply });
+    return res.json({ message: "Reply sent and letter hidden", reply });
   } catch (err) {
     return res.json({ error: err.message });
   }

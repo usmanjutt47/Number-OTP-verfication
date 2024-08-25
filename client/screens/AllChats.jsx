@@ -46,15 +46,12 @@ const AllChats = () => {
         const data = await response.json();
 
         if (response.ok) {
-          console.log("Replies fetched successfully:", data); // Success log
           setChats(data);
         } else {
           setError(data.error || "Failed to fetch replies");
-          console.error("Failed to fetch replies:", data.error); // Error log
         }
       } catch (err) {
         setError(err.message || "An unexpected error occurred");
-        console.error("Error occurred while fetching replies:", err.message); // Error log
       } finally {
         setLoading(false);
       }
@@ -76,8 +73,6 @@ const AllChats = () => {
   );
 
   const renderItem = ({ item }) => {
-    console.log("Sender ID:", item.sender?._id);
-
     return (
       <Pressable
         style={styles.chatContainer}

@@ -3,28 +3,26 @@ import {
   View,
   Text,
   Dimensions,
-  Image,
   Animated,
   ActivityIndicator,
   StyleSheet,
   Pressable,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import axios from "axios";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import Toast from "react-native-toast-message";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.9;
 const ITEM_HEIGHT = ITEM_WIDTH * 0.8;
 
 const responsiveFontSize = (size) => (size * width) / 375;
-const responsivePadding = (size) => (size * width) / 375;
-const responsiveMargin = (size) => (size * width) / 375;
 const responsiveHeight = (size) => (size * height) / 812;
-const responsiveWidth = (size) => (size * width) / 375;
+const responsiveWidth = (size) => (size * height) / 812;
+const responsiveMargin = (size) => (size * height) / 812;
 
 const formatDateTime = (dateString) => {
   const date = new Date(dateString);
@@ -36,6 +34,7 @@ const formatDateTime = (dateString) => {
   const period = hours >= 12 ? "PM" : "AM";
   const formattedHours = hours % 12 || 12;
   const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
   return {
     time: `${formattedHours}:${formattedMinutes} ${period}`,
     date: `${day.toString().padStart(2, "0")}.${month
@@ -51,27 +50,39 @@ export default function CustomImageCarousel() {
   const scrollX = new Animated.Value(0);
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const fetchLetters = async () => {
-      try {
-        const userId = await AsyncStorage.getItem("userId");
-        if (!userId) {
-          throw new Error("User ID not found in AsyncStorage");
-        }
-        const response = await axios.get(
-          `http://192.168.100.6:8080/api/letter/all-excluding-creator/${userId}`
-        );
-        setLetters(response.data);
-      } catch (err) {
-        setError(err.message);
-        console.log(err);
-      } finally {
-        setLoading(false);
+  const fetchLetters = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID not found in AsyncStorage");
       }
-    };
 
+      const response = await axios.get(
+        `http://192.168.100.6:8080/api/letter/all-excluding-creator/${userId}`
+      );
+
+      if (response.status === 200) {
+        setLetters(response.data);
+      } else {
+        throw new Error("Failed to fetch letters");
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchLetters();
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      fetchLetters();
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   if (loading) {
     return (

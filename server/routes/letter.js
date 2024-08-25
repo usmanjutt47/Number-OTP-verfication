@@ -180,7 +180,10 @@ router.get("/all-excluding-creator/:userId", async (req, res) => {
       return res.status(400).json({ error: "User ID is required" });
     }
 
-    const letters = await Letter.find({ senderId: { $ne: userId } });
+    const letters = await Letter.find({
+      senderId: { $ne: userId },
+      hidden: false,
+    });
 
     return res.status(200).json(letters);
   } catch (err) {

@@ -45,8 +45,9 @@ export default function ReplyLetter() {
         Alert.alert("Error", "No item selected or receiver ID missing");
         return;
       }
+      console.log("Sender ID from selected item:", selectedItem.senderId);
 
-      const response = await fetch("http://192.168.100.6:8080/api/reply/", {
+      const response = await fetch("http://192.168.100.6:8080/api/reply", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,7 +56,7 @@ export default function ReplyLetter() {
           senderId: senderId,
           content: replyContent,
           letterId: selectedItem._id,
-          receiverId: selectedItem.receiverId, // Add receiverId to the request body
+          receiverId: selectedItem.receiverId,
         }),
       });
 
@@ -67,13 +68,16 @@ export default function ReplyLetter() {
       if (response.ok) {
         Alert.alert("Success", "Reply sent successfully");
         setReplyContent("");
+
+        // Update local state to hide the letter
         setLetters((prevLetters) =>
           prevLetters.map((letter) =>
             letter._id === selectedItem._id
-              ? { ...letter, replied: true }
+              ? { ...letter, hidden: true }
               : letter
           )
         );
+
         navigation.navigate("Home");
       } else {
         Alert.alert("Error", `Error: ${result.error || result.message}`);

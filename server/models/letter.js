@@ -4,6 +4,7 @@ const schema = new mongoose.Schema(
   {
     senderId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     receiverId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    hidden: { type: Boolean, default: false },
     content: { type: String, required: true },
     title: { type: String, required: false },
     viewedId: { type: String, required: false },

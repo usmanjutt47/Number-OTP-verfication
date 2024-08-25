@@ -7,7 +7,6 @@ import {
   TextInput,
   FlatList,
   ActivityIndicator,
-  Alert,
   Dimensions,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
@@ -15,6 +14,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Entypo } from "@expo/vector-icons";
+import CustomTopNav from "../components/CustomTopNav";
 
 const { width, height } = Dimensions.get("window");
 
@@ -30,6 +30,43 @@ const AllChats = () => {
   const [chats, setChats] = useState([]);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserReplies = async () => {
+      try {
+        const userId = await AsyncStorage.getItem("userId");
+        if (!userId) {
+          throw new Error("User ID not found");
+        }
+
+        const response = await fetch(
+          `http://192.168.100.6:8080/api/reply/my-replies/${userId}`
+        );
+        const data = await response.json();
+
+        if (response.ok) {
+          console.log("Replies fetched successfully:", data); // Success log
+          setChats(data);
+        } else {
+          setError(data.error || "Failed to fetch replies");
+          console.error("Failed to fetch replies:", data.error); // Error log
+        }
+      } catch (err) {
+        setError(err.message || "An unexpected error occurred");
+        console.error("Error occurred while fetching replies:", err.message); // Error log
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserReplies();
+  }, []);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchUserReplies().finally(() => setRefreshing(false));
+  }, []);
 
   const filteredChats = chats.filter(
     (chat) =>
@@ -38,70 +75,60 @@ const AllChats = () => {
       chat.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const renderItem = ({ item }) => (
-    <Pressable
-      style={styles.chatContainer}
-      onPress={() =>
-        navigation.navigate("ChatDetail", {
-          chatId: item._id,
-          chatContent: item.content,
-          senderName: "Anonymous",
-          timestamp: new Date(item.createdAt).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          }),
-        })
-      }
-    >
-      <View style={styles.chatDetails}>
-        <View style={styles.chatContent}>
-          <Text
-            style={{
-              fontSize: 16,
-              fontFamily: "Outfit_Medium",
-              marginTop: 5,
-              marginBottom: 5,
-            }}
-          >
-            Anonymous
-          </Text>
-          <Text
-            style={styles.chatMessage}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {item.content}
-          </Text>
-        </View>
-        <View style={styles.chatRightSection}>
-          <Text style={styles.chatTime}>
-            {new Date(item.createdAt).toLocaleTimeString([], {
+  const renderItem = ({ item }) => {
+    console.log("Sender ID:", item.sender?._id);
+
+    return (
+      <Pressable
+        style={styles.chatContainer}
+        onPress={() =>
+          navigation.navigate("ChatDetail", {
+            chatId: item._id,
+            chatContent: item.content,
+            senderName: item.sender?.name || "Anonymous",
+            timestamp: new Date(item.createdAt).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
               hour12: true,
-            })}
-          </Text>
+            }),
+            originalLetterCreatorId: item.originalLetterCreatorId,
+          })
+        }
+      >
+        <View style={styles.chatDetails}>
+          <View style={styles.chatContent}>
+            <Text style={styles.chatName}>
+              {item.sender?.name || "Anonymous"}
+            </Text>
+            <Text
+              style={styles.chatMessage}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {item.content}
+            </Text>
+          </View>
+          <View style={styles.chatRightSection}>
+            <Text style={styles.chatTime}>
+              {new Date(item.createdAt).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })}
+            </Text>
+          </View>
         </View>
-      </View>
-    </Pressable>
-  );
+      </Pressable>
+    );
+  };
 
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
+      <View style={{ padding: "5%" }}>
+        <CustomTopNav />
+      </View>
       <View style={styles.contentContainer}>
-        <View style={styles.header}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-            accessible={true}
-            accessibilityLabel="Go back"
-          >
-            <Ionicons name="chevron-back" size={24} color="black" />
-          </Pressable>
-          <Text style={styles.heading}>All Chats</Text>
-        </View>
         <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
@@ -117,7 +144,9 @@ const AllChats = () => {
             style={styles.searchIcon}
           />
         </View>
-        {filteredChats.length > 0 ? (
+        {loading ? (
+          <ActivityIndicator size="large" color="#075856" />
+        ) : filteredChats.length > 0 ? (
           <FlatList
             data={filteredChats}
             renderItem={renderItem}
@@ -148,34 +177,16 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     height: "100%",
-    backgroundColor: "#fff",
+    backgroundColor: "#bcbaba",
   },
   contentContainer: {
     width: "90%",
     height: "100%",
   },
-  header: {
-    flexDirection: "row",
-    marginTop: "10%",
-    alignItems: "center",
-  },
-  backButton: {
-    width: 52,
-    height: 52,
-    borderRadius: 30,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#E0E0E0",
-  },
-  heading: {
-    fontFamily: "Outfit_Bold",
-    fontSize: 20,
-    marginLeft: "5%",
-  },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#e0e0e0",
     borderRadius: 25,
     paddingHorizontal: 10,
     borderColor: "#D6D6D6",
@@ -237,7 +248,7 @@ const styles = StyleSheet.create({
   noChatsText: {
     fontFamily: "Outfit_Regular",
     fontSize: 16,
-    color: "#AAAAB4",
+    color: "#fff",
     textAlign: "center",
   },
   pressable: {

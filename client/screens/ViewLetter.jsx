@@ -50,7 +50,7 @@ export default function ViewLetter() {
       }
 
       const response = await axios.put(
-        `http://192.168.10.5:8080/api/letter/toggle-favorite/${letter._id}`,
+        `http://192.168.100.6:8080/api/letter/toggle-favorite/${letter._id}`,
         {
           userId,
         }
@@ -72,7 +72,7 @@ export default function ViewLetter() {
   const handleReply = () => {
     navigation.navigate("ReplyFromHome", {
       letterId: letter._id,
-      letterContent: letter.content,
+      receiverId: letter.receiverId, // Make sure receiverId is passed here
     });
   };
 

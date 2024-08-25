@@ -30,6 +30,10 @@ export default function ReplyFromHome() {
     try {
       const senderId = await AsyncStorage.getItem("userId");
 
+      console.log("Sender ID:", senderId);
+      console.log("Reply Content:", replyContent);
+      console.log("Letter ID:", letterId);
+
       if (!senderId) {
         Alert.alert("Error", "User ID not found");
         return;
@@ -45,7 +49,16 @@ export default function ReplyFromHome() {
         return;
       }
 
-      const response = await fetch("http://192.168.10.5:8080/api/reply", {
+      const receiverId = route.params?.receiverId || null; // Fetch receiverId from route params
+
+      console.log("Receiver ID:", receiverId);
+
+      if (!receiverId) {
+        Alert.alert("Error", "Receiver ID not found");
+        return;
+      }
+
+      const response = await fetch("http://192.168.100.6:8080/api/reply", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -54,10 +67,14 @@ export default function ReplyFromHome() {
           senderId: senderId,
           content: replyContent,
           letterId: letterId,
+          receiverId: receiverId, // Make sure this is sent
         }),
       });
 
       const result = await response.json();
+
+      console.log("Response Status:", response.status);
+      console.log("API Response:", result);
 
       if (response.ok) {
         Alert.alert("Success", "Reply sent successfully");
@@ -67,6 +84,7 @@ export default function ReplyFromHome() {
         Alert.alert("Error", `Error: ${result.message}`);
       }
     } catch (error) {
+      console.error("Error occurred:", error);
       Alert.alert("Error", `Failed to send reply: ${error.message}`);
     }
   };

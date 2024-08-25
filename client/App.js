@@ -52,7 +52,7 @@ const App = () => {
     <StripeProvider publishableKey={PUBLISH_KEY}>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="Home"
+          initialRouteName="OnBoarding"
           screenOptions={{ headerShown: false }}
         >
           <Stack.Screen name="CustomKeyboard" component={CustomKeyboard} />

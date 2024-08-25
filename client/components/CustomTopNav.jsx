@@ -48,11 +48,11 @@ export default function CustomTopNav() {
   };
 
   const handleLogoutPress = () => {
-    setModalVisible(true); // Show the modal when the logout button is pressed
+    setModalVisible(true);
   };
 
   const handleCloseModal = () => {
-    setModalVisible(false); // Hide the modal when the close button is pressed
+    setModalVisible(false);
   };
 
   useEffect(() => {
@@ -88,10 +88,10 @@ export default function CustomTopNav() {
           style={[
             styles.button,
             activeScreen === "Favorite" && styles.activeButton,
-            modalVisible && styles.inactiveButton, // Disable button if modal is visible
+            modalVisible && styles.inactiveButton,
           ]}
           onPress={() => handlePress("Favorite")}
-          disabled={modalVisible} // Disable if modal is active
+          disabled={modalVisible}
         >
           <AntDesign name="staro" size={responsiveIconSize(24)} color="black" />
         </Pressable>
@@ -100,7 +100,7 @@ export default function CustomTopNav() {
           style={[
             styles.button,
             activeScreen === "AllChats" && styles.activeButton,
-            modalVisible && styles.inactiveButton, // Disable button if modal is visible
+            modalVisible && styles.inactiveButton,
           ]}
           onPress={() => handlePress("AllChats")}
           disabled={modalVisible} // Disable if modal is active
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     borderRadius: responsiveWidth(30),
   },
   inactiveButton: {
-    backgroundColor: "transparent", // Make inactive buttons transparent
+    backgroundColor: "transparent",
   },
   logout: {
     height: responsiveHeight(53),
@@ -222,15 +222,14 @@ const styles = StyleSheet.create({
     borderRadius: responsiveWidth(30),
   },
   activeLogoutButton: {
-    backgroundColor: "#f0f0f1", // Active logout button color
+    backgroundColor: "#f0f0f1",
   },
   inactiveLogoutButton: {
-    backgroundColor: "transparent", // Default logout button color
+    backgroundColor: "transparent",
   },
   activeButton: {
     backgroundColor: "#e0e0e0",
   },
-  // Modal styles
   modalOverlay: {
     flex: 1,
     justifyContent: "center",

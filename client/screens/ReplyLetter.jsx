@@ -41,12 +41,12 @@ export default function ReplyLetter() {
         return;
       }
 
-      if (!selectedItem || !selectedItem._id) {
-        Alert.alert("Error", "No item selected");
+      if (!selectedItem || !selectedItem._id || !selectedItem.receiverId) {
+        Alert.alert("Error", "No item selected or receiver ID missing");
         return;
       }
 
-      const response = await fetch("http://192.168.10.5:8080/api/reply/", {
+      const response = await fetch("http://192.168.100.6:8080/api/reply/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,10 +55,14 @@ export default function ReplyLetter() {
           senderId: senderId,
           content: replyContent,
           letterId: selectedItem._id,
+          receiverId: selectedItem.receiverId, // Add receiverId to the request body
         }),
       });
 
       const result = await response.json();
+
+      console.log("Response Status: ", response.status);
+      console.log("Result: ", result);
 
       if (response.ok) {
         Alert.alert("Success", "Reply sent successfully");
@@ -73,9 +77,11 @@ export default function ReplyLetter() {
         navigation.navigate("Home");
       } else {
         Alert.alert("Error", `Error: ${result.error || result.message}`);
+        console.error("Backend Error:", result);
       }
     } catch (error) {
       Alert.alert("Error", `Failed to send reply: ${error.message}`);
+      console.error("Catch Error:", error);
     }
   };
 

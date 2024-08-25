@@ -13,7 +13,8 @@ import pusher from "../utils/pusherClient"; // Adjust path as necessary
 
 const ChatDetail = () => {
   const route = useRoute();
-  const { chatId, chatContent, senderName, timestamp } = route.params;
+  const { chatId, chatContent, senderName, timestamp, originalSenderId } =
+    route.params;
 
   const [messages, setMessages] = useState([
     {
@@ -24,6 +25,27 @@ const ChatDetail = () => {
     },
   ]);
   const [messageText, setMessageText] = useState("");
+  const [originalSender, setOriginalSender] = useState(null);
+
+  useEffect(() => {
+    const fetchOriginalSender = async () => {
+      try {
+        const response = await fetch(
+          `http://192.168.100.6:8080/api/user/${originalSenderId}` // Replace with your endpoint
+        );
+        const senderData = await response.json();
+        if (response.ok) {
+          setOriginalSender(senderData);
+        } else {
+          console.error("Failed to fetch original sender details");
+        }
+      } catch (error) {
+        console.error("Error fetching original sender details:", error);
+      }
+    };
+
+    fetchOriginalSender();
+  }, [originalSenderId]);
 
   useEffect(() => {
     const channel = pusher.subscribe("chat-channel");
@@ -70,6 +92,12 @@ const ChatDetail = () => {
     <View style={styles.container}>
       <View>
         <Text style={styles.heading}>Chat Details</Text>
+        {originalSender && (
+          <View>
+            <Text>Original Sender Name: {originalSender.name}</Text>
+            <Text>Original Sender Email: {originalSender.email}</Text>
+          </View>
+        )}
       </View>
       <FlatList
         data={messages}

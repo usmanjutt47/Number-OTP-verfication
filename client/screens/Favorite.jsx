@@ -59,7 +59,7 @@ export default function Favorite() {
       try {
         const userId = await AsyncStorage.getItem("userId");
         const response = await axios.get(
-          `http://192.168.10.5:8080/api/letter/favorites/${userId}`
+          `http://192.168.100.6:8080/api/letter/favorites/${userId}`
         );
         if (response.data.favorites.length === 0) {
           setNoFavorites(true);
@@ -94,6 +94,10 @@ export default function Favorite() {
       </View>
     );
   }
+
+  const handleOpenBottomSheet = (item) => {
+    navigation.navigate("ViewLetter", { letter: item });
+  };
 
   return (
     <View style={{ flex: 1 }}>

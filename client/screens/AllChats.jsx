@@ -30,6 +30,7 @@ const AllChats = () => {
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [unreadCounts, setUnreadCounts] = useState(0);
 
   useEffect(() => {
     const fetchUserReplies = async () => {
@@ -39,8 +40,6 @@ const AllChats = () => {
           throw new Error("User ID not found");
         }
 
-        console.log("Fetching replies for user ID:", userId);
-
         const response = await fetch(
           `http://192.168.100.6:8080/api/reply/my-replies/${userId}`
         );
@@ -48,6 +47,12 @@ const AllChats = () => {
 
         if (response.ok) {
           setChats(data);
+          // Assuming the response includes unread counts for each chat
+          const counts = data.reduce((acc, chat) => {
+            acc[chat._id] = chat.unreadCount || 0;
+            return acc;
+          }, {});
+          setUnreadCounts(counts);
         } else {
           setError(data.error || "Failed to fetch replies");
           console.error("Error fetching replies:", data.error);
@@ -76,7 +81,6 @@ const AllChats = () => {
   );
 
   const handlePress = (item) => {
-    console.log("Navigating to chat detail for chat ID:", item._id);
 
     navigation.navigate("ChatDetail", {
       chatId: item._id,
@@ -96,7 +100,7 @@ const AllChats = () => {
     <Pressable style={styles.chatContainer} onPress={() => handlePress(item)}>
       <View style={styles.chatDetails}>
         <View style={styles.chatContent}>
-          <Text style={styles.chatName}>
+          <Text style={{ fontSize: 16, fontFamily: "Outfit_Medium" }}>
             {item.sender?.name || "Anonymous"}
           </Text>
           <Text
@@ -104,7 +108,7 @@ const AllChats = () => {
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {item.content}
+            New message 💬
           </Text>
         </View>
         <View style={styles.chatRightSection}>
@@ -115,6 +119,11 @@ const AllChats = () => {
               hour12: true,
             })}
           </Text>
+          {unreadCounts[item._id] > 0 && (
+            <Pressable style={styles.badge} onPress={() => handlePress(item)}>
+              <Text style={styles.badgeText}>{unreadCounts[item._id]}</Text>
+            </Pressable>
+          )}
         </View>
       </View>
     </Pressable>
@@ -218,24 +227,31 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginLeft: 10,
+    height: "100%",
+    width: "100%",
   },
   chatContent: {
     flex: 1,
+    alignSelf: "center",
+    // backgroundColor: "red",
+    height: "100%",
+    justifyContent: "center",
   },
   chatRightSection: {
     alignItems: "flex-end",
     justifyContent: "center",
+    marginRight: 20,
   },
   chatMessage: {
     fontFamily: "Outfit_Regular",
     fontSize: 14,
     color: "#AAAAB4",
+    alignItems: "center",
   },
   chatTime: {
     fontFamily: "Outfit_Regular",
     fontSize: 12,
     color: "#AAAAB4",
-    marginRight: 10,
   },
   noChatsContainer: {
     flex: 1,
@@ -259,6 +275,19 @@ const styles = StyleSheet.create({
     height: responsiveWidth(60),
     justifyContent: "center",
     alignItems: "center",
+  },
+  badge: {
+    height: 20,
+    width: 20,
+    backgroundColor: "#075856",
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  badgeText: {
+    color: "#fff",
+    fontSize: 12,
+    fontFamily: "Outfit_Regular",
   },
 });
 

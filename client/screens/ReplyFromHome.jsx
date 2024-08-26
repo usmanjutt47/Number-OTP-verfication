@@ -22,15 +22,15 @@ export default function ReplyFromHome() {
   const [replyContent, setReplyContent] = useState("");
   const navigation = useNavigation();
   const route = useRoute();
-  const [letters, setLetters] = useState([]);
 
-  const { letterId } = route.params || {};
+  // Extract parameters from route
+  const { letterId, letterSenderId } = route.params || {};
 
   const handleReply = async () => {
     try {
-      const receiverId = await AsyncStorage.getItem("userId");
+      const senderId = await AsyncStorage.getItem("userId");
 
-      if (!receiverId) {
+      if (!senderId) {
         Alert.alert("Error", "User ID not found");
         return;
       }
@@ -40,18 +40,18 @@ export default function ReplyFromHome() {
         return;
       }
 
-      if (!letterId) {
-        Alert.alert("Error", "No letter selected");
+      if (!letterId || !letterSenderId) {
+        Alert.alert("Error", "Letter ID or Sender ID is missing");
         return;
       }
 
-      const senderId = route.params?.receiverId || null;
-      console.log("ReplyFromHome Receiver ID:", receiverId);
-
-      if (!senderId) {
-        Alert.alert("Error", "Sender ID not found");
-        return;
-      }
+      console.log({
+        senderId,
+        content: replyContent,
+        letterId,
+        receiverId: letterSenderId, // Ensure this is the ID of the letter's sender
+        letterSenderId, // This might not be needed unless your API requires it
+      });
 
       const response = await fetch("http://192.168.100.6:8080/api/reply", {
         method: "POST",
@@ -59,29 +59,27 @@ export default function ReplyFromHome() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          receiverId: receiverId,
+          senderId: senderId, // Your ID here
           content: replyContent,
-          letterId: letterId,
-          senderId: senderId,
-          letterSenderId: letterSenderId,
+          letterId: letterId, // Letter ID
+          receiverId: letterSenderId, // Sender ID from the letter as receiverId
+          // Optionally include letterSenderId if needed by your server
         }),
       });
 
       const result = await response.json();
 
-      console.log("Response Status:", response.status);
-      console.log("API Response:", result);
-
       if (response.ok) {
         Alert.alert("Success", "Reply sent successfully");
-        setReplyContent("");
+        setReplyContent(""); // Clear the text input
         navigation.navigate("Home");
       } else {
-        Alert.alert("Error", `Error: ${result.message}`);
+        Alert.alert("Error", `Error: ${result.error || result.message}`);
+        console.error("Backend Error:", result);
       }
     } catch (error) {
-      console.error("Error occurred:", error);
       Alert.alert("Error", `Failed to send reply: ${error.message}`);
+      console.error("Catch Error:", error);
     }
   };
 
@@ -98,8 +96,8 @@ export default function ReplyFromHome() {
             value={replyContent}
             onChangeText={setReplyContent}
             placeholder="Type here..."
-            placeholderTextColor={"#000"}
-            cursorColor={"#000"}
+            placeholderTextColor="#000"
+            cursorColor="#000"
             style={styles.textInput}
           />
           <TouchableOpacity style={styles.sendButton} onPress={handleReply}>
@@ -138,17 +136,13 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
   },
-  letterContent: {
-    fontSize: responsiveFontSize(18),
-    marginBottom: responsiveHeight(10),
-    color: "#000",
-  },
   textInput: {
     fontFamily: "Outfit_Regular",
     fontSize: 18,
     paddingRight: 20,
-    width: "70%",
+    width: "100%", // Adjusted to full width
     textAlign: "justify",
+    marginBottom: responsiveHeight(20), // Add margin for better spacing
   },
   sendButton: {
     backgroundColor: "#075856",

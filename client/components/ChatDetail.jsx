@@ -56,7 +56,7 @@ const ChatDetail = () => {
     };
 
     fetchMessages();
-    const intervalId = setInterval(fetchMessages, 100);
+    const intervalId = setInterval(fetchMessages, 1000);
 
     console.log(`Subscribing to Pusher channel: chat-${chatId}`);
     const channel = pusher.subscribe(`chat-${chatId}`);

@@ -72,8 +72,10 @@ export default function ViewLetter() {
   const handleReply = () => {
     navigation.navigate("ReplyFromHome", {
       letterId: letter._id,
-      receiverId: letter.receiverId, // Make sure receiverId is passed here
+      letterSenderId: letter.senderId, // Make sure this is the correct ID for the sender
     });
+
+    console.log("ReplyFromHome", letter._id, letter.receiverId);
   };
 
   return (

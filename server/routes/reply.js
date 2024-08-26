@@ -4,6 +4,7 @@ const Reply = require("../models/Reply");
 const Letter = require("../models/letter");
 const User = require("../models/user");
 const pusherInstance = require("../utils/pusher");
+const Message = require("../models/messages");
 
 router.post("/", async (req, res) => {
   try {
@@ -40,6 +41,7 @@ router.post("/", async (req, res) => {
       content,
       letterId,
       receiverId,
+      letterSenderId: letter.senderId, // Store the original senderId from the letter
     });
 
     // Update the letter to set hidden to true
@@ -71,18 +73,25 @@ router.get("/my-replies/:userId", async (req, res) => {
       return res.status(400).json({ error: "User ID is required" });
     }
 
-    const repliesList = await Reply.find({ senderId: userId });
+    // Find all replies by the user
+    const repliesList = await Reply.find({ senderId: userId }).populate(
+      "letterId"
+    ); // Populate letterId to get letter details
 
     const replies = await Promise.all(
       repliesList.map(async (reply) => {
         const sender = await User.findById(reply.senderId);
 
+        console.log("Sender Details:", sender);
+
+        const letter = reply.letterId;
+        const letterSenderId = letter ? letter.senderId : null;
+
         const replyData = {
           ...reply._doc,
           sender,
+          letterSenderId,
         };
-
-        console.log("Reply Data:", replyData); // Log the reply data
 
         return replyData;
       })
@@ -142,23 +151,25 @@ router.get("/letter/:id", async (req, res) => {
 });
 
 router.post("/send-message", async (req, res) => {
-  const { senderId, letterId, content } = req.body;
-  console.log("Received data:", { senderId, letterId, content });
-
-  if (!senderId || !letterId || !content) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
-
   try {
-    const letter = new Letter({
+    const { senderId, receiverId, replyId, messageContent } = req.body;
+
+    if (!senderId || !receiverId || !replyId || !messageContent) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const message = new Message({
+      message: messageContent,
+      replyId,
       senderId,
-      receiverId: letterId,
-      content,
+      receiverId,
     });
-    await letter.save();
-    res.status(200).json(letter);
-  } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    await message.save();
+
+    res.status(201).json(message);
+  } catch (err) {
+    console.error("Error sending message:", err.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

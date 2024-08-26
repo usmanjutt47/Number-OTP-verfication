@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,12 +9,28 @@ import {
   Image,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
-import pusher from "../utils/pusherClient"; // Adjust path as necessary
+import Pusher from "pusher-js/react-native";
+import { getUserId } from "../utils/asyncStorage";
+
+// Pusher setup
+const pusher = new Pusher(
+  "pk_test_51PnyvfDw0HZ2rXEfHszzvJJfoiyLWKUpejcAP2xOWWkwj3e6eflY3zWFN8OK69FS9NLQPaoz2P1XcZ1XK3OVO79K00Avrtb4N6",
+  {
+    cluster: "us2",
+    encrypted: true,
+  }
+);
 
 const ChatDetail = () => {
   const route = useRoute();
-  const { chatId, chatContent, senderName, timestamp, originalSenderId } =
-    route.params;
+  const {
+    chatId,
+    chatContent,
+    senderName,
+    timestamp,
+    letterSenderId,
+    letterReceiverId,
+  } = route.params;
 
   const [messages, setMessages] = useState([
     {
@@ -25,64 +41,78 @@ const ChatDetail = () => {
     },
   ]);
   const [messageText, setMessageText] = useState("");
-  const [originalSender, setOriginalSender] = useState(null);
 
+  // Listen for new messages
   useEffect(() => {
-    const fetchOriginalSender = async () => {
-      try {
-        const response = await fetch(
-          `http://192.168.100.6:8080/api/user/${originalSenderId}` // Replace with your endpoint
-        );
-        const senderData = await response.json();
-        if (response.ok) {
-          setOriginalSender(senderData);
-        } else {
-          console.error("Failed to fetch original sender details");
-        }
-      } catch (error) {
-        console.error("Error fetching original sender details:", error);
+    const channel = pusher.subscribe("chat");
+
+    channel.bind("new-message", (data) => {
+      if (data.replyId === chatId) {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            id: data._id,
+            text: data.message,
+            sender: data.senderId,
+            timestamp: data.createdAt,
+          },
+        ]);
       }
-    };
-
-    fetchOriginalSender();
-  }, [originalSenderId]);
-
-  useEffect(() => {
-    const channel = pusher.subscribe("chat-channel");
-    channel.bind("message", (data) => {
-      setMessages((prevMessages) => [...prevMessages, data]);
     });
 
     return () => {
-      pusher.unsubscribe("chat-channel");
+      channel.unbind_all();
+      channel.unsubscribe();
     };
-  }, []);
+  }, [chatId]);
 
   const sendMessage = async () => {
     if (!messageText.trim()) return;
 
-    const newMessage = {
-      id: Date.now().toString(),
-      sender: "You",
-      text: messageText,
-      timestamp: new Date().toLocaleTimeString(),
-    };
-
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
-
     try {
-      await fetch("http://192.168.100.140:8080/api/v1/auth/send-message", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          channel: "chat-channel",
-          message: messageText,
-        }),
-      });
+      // Retrieve the logged-in user ID
+      const senderId = await getUserId();
+      if (!senderId) {
+        console.error("Sender ID not found");
+        return;
+      }
 
-      setMessageText("");
+      const response = await fetch(
+        "http://192.168.10.5:8080/api/reply/send-message",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            senderId: senderId, // Use the retrieved sender ID
+            receiverId: letterReceiverId,
+            replyId: chatId,
+            messageContent: messageText,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const responseData = await response.json();
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            id: responseData._id,
+            text: messageText,
+            sender: senderId,
+            timestamp: new Date().toLocaleTimeString(),
+          },
+        ]);
+        setMessageText("");
+        console.log("Message sent successfully!");
+      } else {
+        const errorText = await response.text();
+        console.error(
+          "Failed to send message. Server responded with:",
+          errorText
+        );
+      }
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -92,12 +122,10 @@ const ChatDetail = () => {
     <View style={styles.container}>
       <View>
         <Text style={styles.heading}>Chat Details</Text>
-        {originalSender && (
-          <View>
-            <Text>Original Sender Name: {originalSender.name}</Text>
-            <Text>Original Sender Email: {originalSender.email}</Text>
-          </View>
-        )}
+        <View>
+          <Text>Letter Sender ID: {letterSenderId}</Text>
+          <Text>Letter Receiver ID: {letterReceiverId}</Text>
+        </View>
       </View>
       <FlatList
         data={messages}
@@ -105,23 +133,25 @@ const ChatDetail = () => {
           <View
             style={[
               styles.messageContainer,
-              item.sender === "You" ? styles.messageYou : styles.messageOther,
+              item.sender === letterSenderId
+                ? styles.messageYou
+                : styles.messageOther,
             ]}
           >
             <Text
               style={[
                 styles.messageSender,
-                item.sender === "You"
+                item.sender === letterSenderId
                   ? styles.messageSenderYou
                   : styles.messageSenderOther,
               ]}
             >
-              {item.sender}
+              {item.sender === letterSenderId ? "You" : item.sender}
             </Text>
             <Text
               style={[
                 styles.messageText,
-                item.sender === "You"
+                item.sender === letterSenderId
                   ? styles.messageTextYou
                   : styles.messageTextOther,
               ]}
@@ -131,9 +161,10 @@ const ChatDetail = () => {
             <Text style={styles.messageTimestamp}>{item.timestamp}</Text>
           </View>
         )}
-        keyExtractor={(item) => item.id || Date.now().toString()} // Ensure id is a string
+        keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.messageList}
       />
+
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -141,9 +172,9 @@ const ChatDetail = () => {
           value={messageText}
           onChangeText={setMessageText}
         />
-        <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
+        <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
           <Image
-            source={require("../assets/icons/send.png")} // Replace with your image path
+            source={require("../assets/icons/send.png")}
             style={styles.image}
           />
         </TouchableOpacity>

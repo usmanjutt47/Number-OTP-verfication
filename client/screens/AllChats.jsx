@@ -41,7 +41,7 @@ const AllChats = () => {
         }
 
         const response = await fetch(
-          `http://192.168.100.6:8080/api/reply/my-replies/${userId}`
+          `http://192.168.10.5:8080/api/reply/my-replies/${userId}`
         );
         const data = await response.json();
 
@@ -72,23 +72,34 @@ const AllChats = () => {
       chat.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handlePress = (item) => {
+    const letterSenderId = item.letterSenderId;
+    const senderId = item.senderId;
+    const receiverId = item.receiverId; // Extract receiverId
+
+    console.log("Letter Sender ID:", letterSenderId);
+    console.log("Message Sender ID:", senderId);
+    console.log("Message Receiver ID:", receiverId); // Log receiverId
+
+    navigation.navigate("ChatDetail", {
+      chatId: item._id,
+      chatContent: item.content,
+      senderName: item.sender?.name || "Anonymous",
+      timestamp: new Date(item.createdAt).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      }),
+      letterSenderId,
+      letterReceiverId: receiverId, // Pass receiverId to ChatDetail
+    });
+  };
+
   const renderItem = ({ item }) => {
     return (
       <Pressable
         style={styles.chatContainer}
-        onPress={() =>
-          navigation.navigate("ChatDetail", {
-            chatId: item._id,
-            chatContent: item.content,
-            senderName: item.sender?.name || "Anonymous",
-            timestamp: new Date(item.createdAt).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: true,
-            }),
-            originalLetterCreatorId: item.originalLetterCreatorId,
-          })
-        }
+        onPress={() => handlePress(item)} // Use handlePress function
       >
         <View style={styles.chatDetails}>
           <View style={styles.chatContent}>

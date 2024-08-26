@@ -47,7 +47,7 @@ export default function ReplyLetter() {
       }
       console.log("Sender ID from selected item:", selectedItem.senderId);
 
-      const response = await fetch("http://192.168.100.6:8080/api/reply", {
+      const response = await fetch("http://192.168.10.5:8080/api/reply", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -57,6 +57,7 @@ export default function ReplyLetter() {
           content: replyContent,
           letterId: selectedItem._id,
           receiverId: selectedItem.receiverId,
+          letterSenderId: selectedItem.senderId,
         }),
       });
 

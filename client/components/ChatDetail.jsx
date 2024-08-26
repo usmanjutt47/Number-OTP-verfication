@@ -5,10 +5,9 @@ import {
   StyleSheet,
   FlatList,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   Image,
   Dimensions,
-  Pressable,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Pusher from "pusher-js/react-native";
@@ -16,30 +15,17 @@ import { getUserId } from "../utils/asyncStorage";
 import { Ionicons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
-const responsiveFontSize = (size) => (size * width) / 375;
 const responsiveHeight = (size) => (size * height) / 812;
-const responsiveWidth = (size) => (size * height) / 812;
-const responsiveMargin = (size) => (size * height) / 812;
+const responsiveWidth = (size) => (size * width) / 375;
 
-// Pusher setup
-const pusher = new Pusher(
-  "pk_test_51PnyvfDw0HZ2rXEfHszzvJJfoiyLWKUpejcAP2xOWWkwj3e6eflY3zWFN8OK69FS9NLQPaoz2P1XcZ1XK3OVO79K00Avrtb4N6",
-  {
-    cluster: "us2",
-    encrypted: true,
-  }
-);
+const pusher = new Pusher("1851485", {
+  cluster: "us2",
+  encrypted: true,
+});
 
 const ChatDetail = () => {
   const route = useRoute();
-  const {
-    chatId,
-    chatContent,
-    senderName,
-    timestamp,
-    letterSenderId,
-    letterReceiverId,
-  } = route.params;
+  const { chatId, letterSenderId, letterReceiverId } = route.params;
 
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
@@ -51,14 +37,18 @@ const ChatDetail = () => {
         const response = await fetch(
           `http://192.168.100.6:8080/api/reply/messages/${chatId}`
         );
-
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          const data = await response.json();
-          console.log("Fetched messages:", data); // Log messages to verify structure
-          setMessages(data);
+        if (response.ok) {
+          const initialMessages = await response.json();
+          setMessages(
+            initialMessages.map((msg) => ({
+              id: msg._id,
+              text: msg.message,
+              sender: msg.senderId,
+              timestamp: new Date(msg.createdAt).toLocaleTimeString(),
+            }))
+          );
         } else {
-          console.error("Expected JSON response, but got:", contentType);
+          console.error("Failed to fetch messages");
         }
       } catch (error) {
         console.error("Error fetching messages:", error);
@@ -164,16 +154,6 @@ const ChatDetail = () => {
           >
             <Text
               style={[
-                styles.messageSenderText,
-                item.sender === letterReceiverId
-                  ? styles.messageReceiverText
-                  : styles.messageSenderText,
-              ]}
-            >
-              {item.sender === letterReceiverId ? "You" : "Anonymous"}
-            </Text>
-            <Text
-              style={[
                 styles.messageText,
                 item.sender === letterReceiverId
                   ? styles.messageReceiverText
@@ -185,12 +165,11 @@ const ChatDetail = () => {
             <Text style={styles.messageTimestamp}>{item.timestamp}</Text>
           </View>
         )}
-        keyExtractor={(item) => {
-          return item.id ? item.id.toString() : Math.random().toString(); // Fallback if id is undefined
-        }}
+        keyExtractor={(item) =>
+          item.id ? item.id.toString() : Math.random().toString()
+        }
         contentContainerStyle={styles.messageList}
       />
-
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -217,8 +196,8 @@ const styles = StyleSheet.create({
   },
   header: {
     height: responsiveHeight(60),
-    marginTop: responsiveMargin(15),
-    marginBottom: responsiveMargin(15),
+    marginTop: 15,
+    marginBottom: 15,
   },
   backButton: {
     backgroundColor: "#F0F0F1",
@@ -238,25 +217,25 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   messageSender: {
-    backgroundColor: "#FEFEFE", // White background for sender's messages
-    alignSelf: "flex-start", // Sender's messages align to the left
+    backgroundColor: "#FEFEFE",
+    alignSelf: "flex-start",
     borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 0,
-  },
-  messageReceiver: {
-    backgroundColor: "#075856", // Green background for receiver's messages
-    alignSelf: "flex-end", // Receiver's messages align to the right
-    borderBottomLeftRadius: 0,
     borderBottomRightRadius: 20,
   },
-  messageSenderText: {
-    color: "#000", // Black text for sender's messages
-  },
-  messageReceiverText: {
-    color: "#fff",
+  messageReceiver: {
+    backgroundColor: "#075856",
+    alignSelf: "flex-end",
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
   },
   messageText: {
     fontSize: 16,
+  },
+  messageSenderText: {
+    color: "#000",
+  },
+  messageReceiverText: {
+    color: "#fff",
   },
   messageTimestamp: {
     fontSize: 12,
@@ -268,6 +247,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     borderRadius: 28,
+    marginTop: 10,
   },
   input: {
     flex: 1,
@@ -285,10 +265,10 @@ const styles = StyleSheet.create({
   sendImage: {
     height: responsiveHeight(20),
     width: responsiveWidth(20),
-    alignSelf: "center",
   },
   messageList: {
     flexGrow: 1,
+    justifyContent: "flex-end",
   },
 });
 

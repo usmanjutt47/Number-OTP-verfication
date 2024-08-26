@@ -75,29 +75,42 @@ router.get("/my-replies/:userId", async (req, res) => {
       return res.status(400).json({ error: "User ID is required" });
     }
 
+    // Find replies sent by the user
     const sentRepliesList = await Reply.find({ senderId: userId }).populate(
       "letterId"
     );
 
+    // Find replies received on letters sent by the user
     const receivedRepliesList = await Reply.find({
       receiverId: userId,
-    }).populate("letterId");
+    }).populate({
+      path: "letterId",
+      match: { senderId: userId }, // Ensure only letters sent by the user are considered
+    });
 
-    const allReplies = [...sentRepliesList, ...receivedRepliesList];
+    // Filter out null letters (if any) after population
+    const filteredReceivedReplies = receivedRepliesList.filter(
+      (reply) => reply.letterId
+    );
 
+    // Combine sent and received replies
+    const allReplies = [...sentRepliesList, ...filteredReceivedReplies];
+
+    // Sort replies based on creation date (assuming createdAt field exists)
+    allReplies.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+    // Prepare the final response with additional data
     const replies = await Promise.all(
       allReplies.map(async (reply) => {
         const sender = await User.findById(reply.senderId);
         const letter = reply.letterId;
         const letterSenderId = letter ? letter.senderId : null;
 
-        const replyData = {
+        return {
           ...reply._doc,
           sender,
           letterSenderId,
         };
-
-        return replyData;
       })
     );
 
@@ -155,6 +168,7 @@ router.get("/letter/:id", async (req, res) => {
 });
 
 router.post("/send-message", async (req, res) => {
+  console.log("Message received on server:", req.body);
   try {
     const { senderId, receiverId, replyId, messageContent } = req.body;
 
@@ -186,6 +200,7 @@ router.post("/send-message", async (req, res) => {
 });
 
 router.get("/messages/:replyId", async (req, res) => {
+  console.log("Fetching messages for replyId:", req.params.replyId);
   try {
     const { replyId } = req.params;
 

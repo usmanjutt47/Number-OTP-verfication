@@ -22,7 +22,6 @@ const responsiveFontSize = (size) => (size * width) / 375;
 const responsiveIconSize = (size) => (size * width) / 375;
 const responsiveWidth = (size) => (size * width) / 375;
 const responsiveHeight = (size) => (size * height) / 812;
-const responsivePadding = (size) => (size * width) / 375;
 
 const AllChats = () => {
   const navigation = useNavigation();
@@ -40,8 +39,10 @@ const AllChats = () => {
           throw new Error("User ID not found");
         }
 
+        console.log("Fetching replies for user ID:", userId);
+
         const response = await fetch(
-          `http://192.168.100.175:8080/api/reply/my-replies/${userId}`
+          `http://192.168.100.6:8080/api/reply/my-replies/${userId}`
         );
         const data = await response.json();
 
@@ -49,9 +50,11 @@ const AllChats = () => {
           setChats(data);
         } else {
           setError(data.error || "Failed to fetch replies");
+          console.error("Error fetching replies:", data.error);
         }
       } catch (err) {
         setError(err.message || "An unexpected error occurred");
+        console.error("Error occurred:", err.message);
       } finally {
         setLoading(false);
       }
@@ -73,13 +76,7 @@ const AllChats = () => {
   );
 
   const handlePress = (item) => {
-    const letterSenderId = item.letterSenderId;
-    const senderId = item.senderId;
-    const receiverId = item.receiverId; // Extract receiverId
-
-    console.log("Letter Sender ID:", letterSenderId);
-    console.log("Message Sender ID:", senderId);
-    console.log("Message Receiver ID:", receiverId); // Log receiverId
+    console.log("Navigating to chat detail for chat ID:", item._id);
 
     navigation.navigate("ChatDetail", {
       chatId: item._id,
@@ -90,43 +87,38 @@ const AllChats = () => {
         minute: "2-digit",
         hour12: true,
       }),
-      letterSenderId,
-      letterReceiverId: receiverId, // Pass receiverId to ChatDetail
+      letterSenderId: item.letterSenderId,
+      letterReceiverId: item.receiverId,
     });
   };
 
-  const renderItem = ({ item }) => {
-    return (
-      <Pressable
-        style={styles.chatContainer}
-        onPress={() => handlePress(item)} // Use handlePress function
-      >
-        <View style={styles.chatDetails}>
-          <View style={styles.chatContent}>
-            <Text style={styles.chatName}>
-              {item.sender?.name || "Anonymous"}
-            </Text>
-            <Text
-              style={styles.chatMessage}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {item.content}
-            </Text>
-          </View>
-          <View style={styles.chatRightSection}>
-            <Text style={styles.chatTime}>
-              {new Date(item.createdAt).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: true,
-              })}
-            </Text>
-          </View>
+  const renderItem = ({ item }) => (
+    <Pressable style={styles.chatContainer} onPress={() => handlePress(item)}>
+      <View style={styles.chatDetails}>
+        <View style={styles.chatContent}>
+          <Text style={styles.chatName}>
+            {item.sender?.name || "Anonymous"}
+          </Text>
+          <Text
+            style={styles.chatMessage}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {item.content}
+          </Text>
         </View>
-      </Pressable>
-    );
-  };
+        <View style={styles.chatRightSection}>
+          <Text style={styles.chatTime}>
+            {new Date(item.createdAt).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            })}
+          </Text>
+        </View>
+      </View>
+    </Pressable>
+  );
 
   return (
     <View style={styles.container}>
@@ -178,11 +170,11 @@ const AllChats = () => {
   );
 };
 
+// Add styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    height: "100%",
     backgroundColor: "#bcbaba",
   },
   contentContainer: {

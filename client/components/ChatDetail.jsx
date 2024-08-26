@@ -7,10 +7,22 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Dimensions,
+  Pressable,
 } from "react-native";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Pusher from "pusher-js/react-native";
 import { getUserId } from "../utils/asyncStorage";
+import { Ionicons } from "@expo/vector-icons";
+
+const { width, height } = Dimensions.get("window");
+const ITEM_WIDTH = width * 0.9;
+const ITEM_HEIGHT = ITEM_WIDTH * 0.8;
+
+const responsiveFontSize = (size) => (size * width) / 375;
+const responsiveHeight = (size) => (size * height) / 812;
+const responsiveWidth = (size) => (size * height) / 812;
+const responsiveMargin = (size) => (size * height) / 812;
 
 // Pusher setup
 const pusher = new Pusher(
@@ -41,6 +53,7 @@ const ChatDetail = () => {
     },
   ]);
   const [messageText, setMessageText] = useState("");
+  const navigation = useNavigation();
 
   // Listen for new messages
   useEffect(() => {
@@ -70,7 +83,6 @@ const ChatDetail = () => {
     if (!messageText.trim()) return;
 
     try {
-      // Retrieve the logged-in user ID
       const senderId = await getUserId();
       if (!senderId) {
         console.error("Sender ID not found");
@@ -85,7 +97,7 @@ const ChatDetail = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            senderId: senderId, // Use the retrieved sender ID
+            senderId: senderId,
             receiverId: letterReceiverId,
             replyId: chatId,
             messageContent: messageText,
@@ -120,12 +132,30 @@ const ChatDetail = () => {
 
   return (
     <View style={styles.container}>
-      <View>
-        <Text style={styles.heading}>Chat Details</Text>
-        <View>
-          <Text>Letter Sender ID: {letterSenderId}</Text>
-          <Text>Letter Receiver ID: {letterReceiverId}</Text>
-        </View>
+      <View
+        style={{
+          height: responsiveHeight(60),
+          marginTop: responsiveMargin(15),
+          marginBottom: responsiveMargin(15),
+        }}
+      >
+        <Pressable
+          style={{
+            backgroundColor: "#F0F0F1",
+            height: responsiveHeight(52),
+            width: responsiveWidth(52),
+            justifyContent: "center",
+            borderRadius: 41,
+          }}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons
+            name="chevron-back"
+            size={24}
+            color="black"
+            style={{ alignSelf: "center" }}
+          />
+        </Pressable>
       </View>
       <FlatList
         data={messages}
@@ -133,27 +163,27 @@ const ChatDetail = () => {
           <View
             style={[
               styles.messageContainer,
-              item.sender === letterSenderId
-                ? styles.messageYou
-                : styles.messageOther,
+              item.sender === letterReceiverId
+                ? styles.messageReceiver
+                : styles.messageSender,
             ]}
           >
             <Text
               style={[
-                styles.messageSender,
-                item.sender === letterSenderId
-                  ? styles.messageSenderYou
-                  : styles.messageSenderOther,
+                styles.messageSenderText,
+                item.sender === letterReceiverId
+                  ? styles.messageReceiverText
+                  : styles.messageSenderText,
               ]}
             >
-              {item.sender === letterSenderId ? "You" : item.sender}
+              {item.sender === letterReceiverId ? "You" : "Anonymous"}
             </Text>
             <Text
               style={[
                 styles.messageText,
-                item.sender === letterSenderId
-                  ? styles.messageTextYou
-                  : styles.messageTextOther,
+                item.sender === letterReceiverId
+                  ? styles.messageReceiverText
+                  : styles.messageSenderText,
               ]}
             >
               {item.text}
@@ -172,12 +202,24 @@ const ChatDetail = () => {
           value={messageText}
           onChangeText={setMessageText}
         />
-        <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+        <Pressable
+          style={{
+            position: "absolute",
+            justifyContent: "center",
+            right: responsiveMargin(30),
+            bottom: responsiveMargin(17),
+          }}
+          onPress={sendMessage}
+        >
           <Image
             source={require("../assets/icons/send.png")}
-            style={styles.image}
+            style={{
+              height: responsiveHeight(20),
+              width: responsiveWidth(20),
+              alignSelf: "center",
+            }}
           />
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );
@@ -198,47 +240,33 @@ const styles = StyleSheet.create({
   messageContainer: {
     padding: 10,
     borderRadius: 20,
-    borderBottomLeftRadius: 0,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
     marginBottom: 10,
     maxWidth: "80%",
-    alignSelf: "flex-start",
-    paddingTop: 15,
-    elevation: 3,
-    backgroundColor: "#FEFEFE",
-    marginLeft: 5,
-    flexDirection: "column",
-  },
-  messageYou: {
-    backgroundColor: "#075856",
-    alignSelf: "flex-end",
-  },
-  messageOther: {
     elevation: 2,
-    backgroundColor: "#FEFEFE",
+    marginLeft: responsiveMargin(5),
   },
   messageSender: {
-    fontFamily: "Outfit_Bold",
-    marginBottom: 5,
-    color: "#075856",
+    backgroundColor: "#FEFEFE", // White background for sender's messages
+    alignSelf: "flex-start", // Sender's messages align to the left
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 0,
   },
-  messageSenderYou: {
+  messageReceiver: {
+    backgroundColor: "#075856", // Green background for receiver's messages
+    alignSelf: "flex-end", // Receiver's messages align to the right
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 20,
+  },
+  messageSenderText: {
+    color: "#000", // Black text for sender's messages
+  },
+  messageReceiverText: {
     color: "#fff",
-  },
-  messageSenderOther: {
-    color: "#075856",
-    fontSize: 16,
-    fontFamily: "Outfit_Bold",
   },
   messageText: {
     fontSize: 16,
-  },
-  messageTextYou: {
-    color: "#fff",
-  },
-  messageTextOther: {
-    color: "#000",
-    fontSize: 16,
-    fontFamily: "Outfit_Regular",
   },
   messageTimestamp: {
     fontSize: 12,
@@ -248,22 +276,18 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    position: "absolute",
-    bottom: 20,
-    width: "100%",
-    padding: 10,
-    borderTopWidth: 1,
-    borderTopColor: "#ddd",
+    justifyContent: "space-between",
+    // backgroundColor: "#fff",
+    borderRadius: 28,
   },
   input: {
     flex: 1,
-    borderColor: "#ddd",
-    borderWidth: 1,
-    borderRadius: 20,
-    padding: 10,
+    borderRadius: 28,
     marginRight: 10,
+    height: responsiveHeight(55),
+    paddingLeft: 10,
+    elevation: 2,
+    backgroundColor: "#fff",
   },
   sendButton: {
     backgroundColor: "#075856",

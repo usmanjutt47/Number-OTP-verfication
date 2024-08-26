@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const mailer = require("../utils/mailer");
 const userModel = require("../models/user");
 const letterModel = require("../models/letter");
 const Letter = require("../models/letter");

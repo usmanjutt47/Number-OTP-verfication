@@ -20,7 +20,7 @@
     "express": "^4.19.2",
     "express-session": "^1.18.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.5.3",
+    "mongoose": "^8.5.4",
     "morgan": "^1.10.0",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.14",
@@ -31,7 +31,7 @@
     "pusher": "^5.2.0",
     "socket.io": "^4.7.5",
     "stripe": "^16.8.0",
-    "twilio": "^5.2.2",
+    "twilio": "^5.2.3",
     "uuid": "^10.0.0",
     "yarn": "^1.22.22"
   },

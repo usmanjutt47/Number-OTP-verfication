@@ -184,13 +184,17 @@ router.post("/send-message", async (req, res) => {
     });
     await message.save();
 
-    pusherInstance.trigger("chat", "message", {
+    console.log(`Triggering Pusher event for chat-${replyId}`);
+    pusherInstance.trigger(`chat-${replyId}`, "message", {
+      _id: message._id,
       senderId,
       receiverId,
       replyId,
       messageContent,
       createdAt: message.createdAt,
     });
+
+    console.log("Pusher event triggered successfully");
 
     res.status(201).json(message);
   } catch (err) {

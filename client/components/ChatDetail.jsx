@@ -56,26 +56,33 @@ const ChatDetail = () => {
     };
 
     fetchMessages();
+    const intervalId = setInterval(fetchMessages, 100);
 
-    const channel = pusher.subscribe("chat");
+    console.log(`Subscribing to Pusher channel: chat-${chatId}`);
+    const channel = pusher.subscribe(`chat-${chatId}`);
 
     channel.bind("message", (data) => {
-      if (data.replyId === chatId) {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            id: data._id,
-            text: data.messageContent,
-            sender: data.senderId,
-            timestamp: new Date(data.createdAt).toLocaleTimeString(),
-          },
-        ]);
-      }
+      console.log("Received Pusher event:", data);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          id: data._id,
+          text: data.messageContent,
+          sender: data.senderId,
+          timestamp: new Date(data.createdAt).toLocaleTimeString(),
+        },
+      ]);
+    });
+
+    channel.bind("pusher:subscription_succeeded", () => {
+      console.log(`Successfully subscribed to channel chat-${chatId}`);
     });
 
     return () => {
+      console.log(`Unsubscribing from channel chat-${chatId}`);
       channel.unbind_all();
       channel.unsubscribe();
+      return () => clearInterval(intervalId);
     };
   }, [chatId]);
 

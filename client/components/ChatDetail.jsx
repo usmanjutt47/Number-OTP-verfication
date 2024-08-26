@@ -90,7 +90,7 @@ const ChatDetail = () => {
       }
 
       const response = await fetch(
-        "http://192.168.10.5:8080/api/reply/send-message",
+        "http://192.168.100.175:8080/api/reply/send-message",
         {
           method: "POST",
           headers: {

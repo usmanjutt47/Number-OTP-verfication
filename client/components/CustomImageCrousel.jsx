@@ -58,7 +58,7 @@ export default function CustomImageCarousel() {
       }
 
       const response = await axios.get(
-        `http://192.168.100.175:8080/api/letter/all-excluding-creator/${userId}`
+        `http://192.168.100.6:8080/api/letter/all-excluding-creator/${userId}`
       );
 
       if (response.status === 200) {
@@ -205,9 +205,12 @@ export default function CustomImageCarousel() {
                 >
                   <TouchableOpacity
                     style={styles.button}
-                    onPress={() =>
-                      navigation.navigate("ReplyLetter", { selectedItem: item })
-                    }
+                    onPress={() => {
+                      // console.log("Navigating with item:", item); // Log the item being passed
+                      navigation.navigate("ReplyLetter", {
+                        selectedItem: item,
+                      });
+                    }}
                   >
                     <FontAwesome5 name="pen" size={20} style={styles.icon} />
                     <Text style={styles.buttonText}>Reply</Text>

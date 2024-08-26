@@ -16,9 +16,6 @@ import { getUserId } from "../utils/asyncStorage";
 import { Ionicons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
-const ITEM_WIDTH = width * 0.9;
-const ITEM_HEIGHT = ITEM_WIDTH * 0.8;
-
 const responsiveFontSize = (size) => (size * width) / 375;
 const responsiveHeight = (size) => (size * height) / 812;
 const responsiveWidth = (size) => (size * height) / 812;
@@ -44,30 +41,43 @@ const ChatDetail = () => {
     letterReceiverId,
   } = route.params;
 
-  const [messages, setMessages] = useState([
-    {
-      id: chatId || Date.now(),
-      text: chatContent || "",
-      sender: senderName || "You",
-      timestamp: timestamp || new Date().toLocaleTimeString(),
-    },
-  ]);
+  const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
   const navigation = useNavigation();
 
-  // Listen for new messages
   useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const response = await fetch(
+          `http://192.168.100.6:8080/api/reply/messages/${chatId}`
+        );
+
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const data = await response.json();
+          console.log("Fetched messages:", data); // Log messages to verify structure
+          setMessages(data);
+        } else {
+          console.error("Expected JSON response, but got:", contentType);
+        }
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
+
+    fetchMessages();
+
     const channel = pusher.subscribe("chat");
 
-    channel.bind("new-message", (data) => {
+    channel.bind("message", (data) => {
       if (data.replyId === chatId) {
         setMessages((prevMessages) => [
           ...prevMessages,
           {
             id: data._id,
-            text: data.message,
+            text: data.messageContent,
             sender: data.senderId,
-            timestamp: data.createdAt,
+            timestamp: new Date(data.createdAt).toLocaleTimeString(),
           },
         ]);
       }
@@ -90,14 +100,14 @@ const ChatDetail = () => {
       }
 
       const response = await fetch(
-        "http://192.168.100.175:8080/api/reply/send-message",
+        "http://192.168.100.6:8080/api/reply/send-message",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            senderId: senderId,
+            senderId,
             receiverId: letterReceiverId,
             replyId: chatId,
             messageContent: messageText,
@@ -117,13 +127,9 @@ const ChatDetail = () => {
           },
         ]);
         setMessageText("");
-        console.log("Message sent successfully!");
       } else {
         const errorText = await response.text();
-        console.error(
-          "Failed to send message. Server responded with:",
-          errorText
-        );
+        console.error("Failed to send message:", errorText);
       }
     } catch (error) {
       console.error("Error sending message:", error);
@@ -132,28 +138,16 @@ const ChatDetail = () => {
 
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          height: responsiveHeight(60),
-          marginTop: responsiveMargin(15),
-          marginBottom: responsiveMargin(15),
-        }}
-      >
+      <View style={styles.header}>
         <Pressable
-          style={{
-            backgroundColor: "#F0F0F1",
-            height: responsiveHeight(52),
-            width: responsiveWidth(52),
-            justifyContent: "center",
-            borderRadius: 41,
-          }}
+          style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
           <Ionicons
             name="chevron-back"
             size={24}
             color="black"
-            style={{ alignSelf: "center" }}
+            style={styles.backIcon}
           />
         </Pressable>
       </View>
@@ -191,7 +185,9 @@ const ChatDetail = () => {
             <Text style={styles.messageTimestamp}>{item.timestamp}</Text>
           </View>
         )}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => {
+          return item.id ? item.id.toString() : Math.random().toString(); // Fallback if id is undefined
+        }}
         contentContainerStyle={styles.messageList}
       />
 
@@ -202,22 +198,10 @@ const ChatDetail = () => {
           value={messageText}
           onChangeText={setMessageText}
         />
-        <Pressable
-          style={{
-            position: "absolute",
-            justifyContent: "center",
-            right: responsiveMargin(30),
-            bottom: responsiveMargin(17),
-          }}
-          onPress={sendMessage}
-        >
+        <Pressable style={styles.sendButton} onPress={sendMessage}>
           <Image
             source={require("../assets/icons/send.png")}
-            style={{
-              height: responsiveHeight(20),
-              width: responsiveWidth(20),
-              alignSelf: "center",
-            }}
+            style={styles.sendImage}
           />
         </Pressable>
       </View>
@@ -231,21 +215,27 @@ const styles = StyleSheet.create({
     padding: 15,
     backgroundColor: "#fff",
   },
-  heading: {
-    marginTop: "8%",
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: "5%",
+  header: {
+    height: responsiveHeight(60),
+    marginTop: responsiveMargin(15),
+    marginBottom: responsiveMargin(15),
+  },
+  backButton: {
+    backgroundColor: "#F0F0F1",
+    height: responsiveHeight(52),
+    width: responsiveWidth(52),
+    justifyContent: "center",
+    borderRadius: 41,
+  },
+  backIcon: {
+    alignSelf: "center",
   },
   messageContainer: {
     padding: 10,
     borderRadius: 20,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
     marginBottom: 10,
     maxWidth: "80%",
     elevation: 2,
-    marginLeft: responsiveMargin(5),
   },
   messageSender: {
     backgroundColor: "#FEFEFE", // White background for sender's messages
@@ -277,7 +267,6 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    // backgroundColor: "#fff",
     borderRadius: 28,
   },
   input: {
@@ -290,13 +279,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   sendButton: {
-    backgroundColor: "#075856",
-    padding: 10,
-    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  image: {
-    width: 24,
-    height: 24,
+  sendImage: {
+    height: responsiveHeight(20),
+    width: responsiveWidth(20),
+    alignSelf: "center",
   },
   messageList: {
     flexGrow: 1,

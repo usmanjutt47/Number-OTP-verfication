@@ -10,29 +10,27 @@ router.post("/", async (req, res) => {
   try {
     const { senderId, content, letterId, receiverId } = req.body;
 
-    // Validate required fields
+    // Validate request data
     if (!senderId || !content || !letterId || !receiverId) {
-      return res.json({
+      return res.status(400).json({
         error: "Sender ID, content, letter ID, and receiver ID are required",
       });
     }
 
-    // Find the letter
+    // Find the letter and users
     const letter = await Letter.findById(letterId);
     if (!letter) {
-      return res.json({ error: "Letter not found" });
+      return res.status(404).json({ error: "Letter not found" });
     }
 
-    // Find the sender
     const sender = await User.findById(senderId);
     if (!sender) {
-      return res.json({ error: "Sender not found" });
+      return res.status(404).json({ error: "Sender not found" });
     }
 
-    // Find the receiver
     const receiver = await User.findById(receiverId);
     if (!receiver) {
-      return res.json({ error: "Receiver not found" });
+      return res.status(404).json({ error: "Receiver not found" });
     }
 
     // Create the reply
@@ -41,10 +39,10 @@ router.post("/", async (req, res) => {
       content,
       letterId,
       receiverId,
-      letterSenderId: letter.senderId, // Store the original senderId from the letter
+      letterSenderId: letter.senderId, // Store the original sender ID from the letter
     });
 
-    // Update the letter to set hidden to true
+    // Update the letter to hide it
     await Letter.findByIdAndUpdate(letterId, { hidden: true });
 
     // Trigger Pusher notification
@@ -56,12 +54,16 @@ router.post("/", async (req, res) => {
       });
     } catch (pusherError) {
       console.error("Pusher error:", pusherError);
-      return res.json({ error: "Failed to send Pusher notification" });
+      return res
+        .status(500)
+        .json({ error: "Failed to send Pusher notification" });
     }
 
+    // Return the response
     return res.json({ message: "Reply sent and letter hidden", reply });
   } catch (err) {
-    return res.json({ error: err.message });
+    console.error("Error sending reply:", err.message);
+    return res.status(500).json({ error: err.message });
   }
 });
 
@@ -73,17 +75,19 @@ router.get("/my-replies/:userId", async (req, res) => {
       return res.status(400).json({ error: "User ID is required" });
     }
 
-    // Find all replies by the user
-    const repliesList = await Reply.find({ senderId: userId }).populate(
+    const sentRepliesList = await Reply.find({ senderId: userId }).populate(
       "letterId"
-    ); // Populate letterId to get letter details
+    );
+
+    const receivedRepliesList = await Reply.find({
+      receiverId: userId,
+    }).populate("letterId");
+
+    const allReplies = [...sentRepliesList, ...receivedRepliesList];
 
     const replies = await Promise.all(
-      repliesList.map(async (reply) => {
+      allReplies.map(async (reply) => {
         const sender = await User.findById(reply.senderId);
-
-        console.log("Sender Details:", sender);
-
         const letter = reply.letterId;
         const letterSenderId = letter ? letter.senderId : null;
 
@@ -166,9 +170,30 @@ router.post("/send-message", async (req, res) => {
     });
     await message.save();
 
+    pusherInstance.trigger("chat", "message", {
+      senderId,
+      receiverId,
+      replyId,
+      messageContent,
+      createdAt: message.createdAt,
+    });
+
     res.status(201).json(message);
   } catch (err) {
     console.error("Error sending message:", err.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/messages/:replyId", async (req, res) => {
+  try {
+    const { replyId } = req.params;
+
+    const messages = await Message.find({ replyId }).sort({ createdAt: 1 });
+
+    res.status(200).json(messages);
+  } catch (err) {
+    console.error("Error retrieving messages:", err.message);
     res.status(500).json({ error: "Internal server error" });
   }
 });

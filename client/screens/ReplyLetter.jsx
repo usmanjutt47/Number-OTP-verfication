@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -41,30 +41,31 @@ export default function ReplyLetter() {
         return;
       }
 
-      if (!selectedItem || !selectedItem._id || !selectedItem.receiverId) {
-        Alert.alert("Error", "No item selected or receiver ID missing");
+      if (
+        !selectedItem ||
+        !selectedItem._id ||
+        !selectedItem.receiverId ||
+        !selectedItem.senderId
+      ) {
+        Alert.alert("Error", "No item selected or missing required IDs");
         return;
       }
-      console.log("Sender ID from selected item:", selectedItem.senderId);
 
-      const response = await fetch("http://192.168.100.175:8080/api/reply", {
+      const response = await fetch("http://192.168.100.6:8080/api/reply", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          senderId: senderId,
+          senderId: senderId, // Apni ID yahan bheji ja rahi hai
           content: replyContent,
-          letterId: selectedItem._id,
-          receiverId: selectedItem.receiverId,
+          letterId: selectedItem._id, // Letter ki ID
+          receiverId: selectedItem.senderId, // Yahan letter bhejne wale ki ID save hogi
           letterSenderId: selectedItem.senderId,
         }),
       });
 
       const result = await response.json();
-
-      console.log("Response Status: ", response.status);
-      console.log("Result: ", result);
 
       if (response.ok) {
         Alert.alert("Success", "Reply sent successfully");

@@ -23,6 +23,14 @@ const responsiveIconSize = (size) => (size * width) / 375;
 const responsiveWidth = (size) => (size * width) / 375;
 const responsiveHeight = (size) => (size * height) / 812;
 
+const formatTime = (dateString) => {
+  return new Date(dateString).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+
 const AllChats = () => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
@@ -84,11 +92,8 @@ const AllChats = () => {
       chatId: item._id,
       chatContent: item.content,
       senderName: item.sender?.name || "Anonymous",
-      timestamp: new Date(item.createdAt).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      }),
+      chatContent: item.latestReply || item.content || "No content",
+      timestamp: item.createdAt,
       letterSenderId: item.letterSenderId,
       letterReceiverId: item.receiverId,
     });
@@ -106,17 +111,11 @@ const AllChats = () => {
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            New message 💬
+            <Text>{item.content} 💬</Text>
           </Text>
         </View>
         <View style={styles.chatRightSection}>
-          <Text style={styles.chatTime}>
-            {new Date(item.createdAt).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: true,
-            })}
-          </Text>
+          <Text style={styles.chatTime}>{formatTime(item.createdAt)}</Text>
           {unreadCounts[item._id] > 0 && (
             <Pressable style={styles.badge} onPress={() => handlePress(item)}>
               <Text style={styles.badgeText}>{unreadCounts[item._id]}</Text>

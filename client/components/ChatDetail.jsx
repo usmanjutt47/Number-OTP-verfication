@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -25,11 +25,32 @@ const pusher = new Pusher("1851485", {
 
 const ChatDetail = () => {
   const route = useRoute();
-  const { chatId, letterSenderId, letterReceiverId } = route.params;
+  const { chatId, letterSenderId, letterReceiverId, chatContent, timestamp } =
+    route.params;
+
+  const formatTime = (dateString) => {
+    return new Date(dateString).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
 
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
+  const [userId, setUserId] = useState(null);
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const navigation = useNavigation();
+
+  const flatListRef = useRef(null);
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const id = await getUserId();
+      setUserId(id);
+    };
+    fetchUserId();
+  }, []);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -39,14 +60,20 @@ const ChatDetail = () => {
         );
         if (response.ok) {
           const initialMessages = await response.json();
-          setMessages(
-            initialMessages.map((msg) => ({
+          setMessages([
+            {
+              id: "initial",
+              text: chatContent,
+              sender: letterSenderId,
+              timestamp: formatTime(timestamp),
+            },
+            ...initialMessages.map((msg) => ({
               id: msg._id,
               text: msg.message,
               sender: msg.senderId,
-              timestamp: new Date(msg.createdAt).toLocaleTimeString(),
-            }))
-          );
+              timestamp: formatTime(msg.createdAt),
+            })),
+          ]);
         } else {
           console.error("Failed to fetch messages");
         }
@@ -59,37 +86,40 @@ const ChatDetail = () => {
     const intervalId = setInterval(fetchMessages, 1000);
 
     const channel = pusher.subscribe(`chat-${chatId}`);
-
     channel.bind("message", (data) => {
-      console.log("Received Pusher event:", data);
       setMessages((prevMessages) => [
         ...prevMessages,
         {
           id: data._id,
           text: data.messageContent,
           sender: data.senderId,
-          timestamp: new Date(data.createdAt).toLocaleTimeString(),
+          timestamp: formatTime(data.createdAt),
         },
       ]);
+      setShouldAutoScroll(true);
     });
 
     channel.bind("pusher:subscription_succeeded", () => {});
 
     return () => {
-      console.log(`Unsubscribing from channel chat-${chatId}`);
       channel.unbind_all();
       channel.unsubscribe();
-      return () => clearInterval(intervalId);
+      clearInterval(intervalId);
     };
   }, [chatId]);
+
+  useEffect(() => {
+    if (shouldAutoScroll && flatListRef.current) {
+      flatListRef.current.scrollToEnd({ animated: true });
+    }
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!messageText.trim()) return;
 
     try {
-      const senderId = await getUserId();
-      if (!senderId) {
-        console.error("Sender ID not found");
+      if (!userId) {
+        console.error("User ID not found");
         return;
       }
 
@@ -101,7 +131,7 @@ const ChatDetail = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            senderId,
+            senderId: userId,
             receiverId: letterReceiverId,
             replyId: chatId,
             messageContent: messageText,
@@ -116,11 +146,12 @@ const ChatDetail = () => {
           {
             id: responseData._id,
             text: messageText,
-            sender: senderId,
-            timestamp: new Date().toLocaleTimeString(),
+            sender: userId,
+            timestamp: formatTime(new Date()),
           },
         ]);
         setMessageText("");
+        setShouldAutoScroll(true);
       } else {
         const errorText = await response.text();
         console.error("Failed to send message:", errorText);
@@ -128,6 +159,17 @@ const ChatDetail = () => {
     } catch (error) {
       console.error("Error sending message:", error);
     }
+  };
+
+  const isSender = (senderId) => senderId === userId;
+
+  const handleScroll = () => {
+    setShouldAutoScroll(false);
+  };
+
+  // Function to get the count of messages
+  const getMessageCount = () => {
+    return messages.length;
   };
 
   return (
@@ -144,24 +186,30 @@ const ChatDetail = () => {
             style={styles.backIcon}
           />
         </Pressable>
+        <Text
+          style={{ color: "#000", fontFamily: "Outfit_Bold", fontSize: 20 }}
+        >
+          Anonymous
+        </Text>
       </View>
       <FlatList
+        ref={flatListRef}
         data={messages}
         renderItem={({ item }) => (
           <View
             style={[
               styles.messageContainer,
-              item.sender === letterReceiverId
-                ? styles.messageReceiver
-                : styles.messageSender,
+              isSender(item.sender)
+                ? styles.messageSender
+                : styles.messageReceiver,
             ]}
           >
             <Text
               style={[
                 styles.messageText,
-                item.sender === letterReceiverId
-                  ? styles.messageReceiverText
-                  : styles.messageSenderText,
+                isSender(item.sender)
+                  ? styles.messageSenderText
+                  : styles.messageReceiverText,
               ]}
             >
               {item.text}
@@ -169,10 +217,9 @@ const ChatDetail = () => {
             <Text style={styles.messageTimestamp}>{item.timestamp}</Text>
           </View>
         )}
-        keyExtractor={(item) =>
-          item.id ? item.id.toString() : Math.random().toString()
-        }
+        keyExtractor={(item) => item.id}
         contentContainerStyle={styles.messageList}
+        onScrollBeginDrag={handleScroll}
       />
       <View style={styles.inputContainer}>
         <TextInput
@@ -202,6 +249,10 @@ const styles = StyleSheet.create({
     height: responsiveHeight(60),
     marginTop: 15,
     marginBottom: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    width: "60%",
+    justifyContent: "space-between",
   },
   backButton: {
     backgroundColor: "#F0F0F1",
@@ -209,6 +260,7 @@ const styles = StyleSheet.create({
     width: responsiveWidth(52),
     justifyContent: "center",
     borderRadius: 41,
+    alignSelf: "center",
   },
   backIcon: {
     alignSelf: "center",
@@ -248,36 +300,37 @@ const styles = StyleSheet.create({
     marginTop: 5,
     alignSelf: "flex-end",
   },
+  messageCount: {
+    fontSize: 12,
+    color: "#888",
+    alignSelf: "flex-end",
+  },
   inputContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     borderRadius: 28,
     marginTop: 10,
+    width: "100%",
   },
   input: {
     flex: 1,
     borderRadius: 28,
     marginRight: 10,
-    height: responsiveHeight(55),
-    paddingLeft: 10,
-    elevation: 2,
-    backgroundColor: "#fff",
-    width: 10,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    padding: 10,
   },
   sendButton: {
     justifyContent: "center",
     alignItems: "center",
-    position: "absolute",
-    right: 20,
-    bottom: 15,
+    backgroundColor: "#F0F0F1",
+    height: responsiveHeight(45),
+    width: responsiveWidth(45),
+    borderRadius: 30,
   },
   sendImage: {
-    height: responsiveHeight(20),
-    width: responsiveWidth(20),
-  },
-  messageList: {
-    flexGrow: 1,
-    justifyContent: "flex-end",
+    width: 20,
+    height: 20,
   },
 });
 

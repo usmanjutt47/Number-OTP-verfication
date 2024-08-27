@@ -215,6 +215,12 @@ const ChatDetail = () => {
               {item.text}
             </Text>
             <Text style={styles.messageTimestamp}>{item.timestamp}</Text>
+            {/* Display the message count below the timestamp */}
+            {item.id === "initial" && (
+              <Text style={styles.messageCount}>
+                {getMessageCount()} messages
+              </Text>
+            )}
           </View>
         )}
         keyExtractor={(item) => item.id}
@@ -228,12 +234,14 @@ const ChatDetail = () => {
           value={messageText}
           onChangeText={setMessageText}
         />
-        <Pressable style={styles.sendButton} onPress={sendMessage}>
-          <Image
-            source={require("../assets/icons/send.png")}
-            style={styles.sendImage}
-          />
-        </Pressable>
+        {messageText.trim().length > 0 && (
+          <Pressable style={styles.sendButton} onPress={sendMessage}>
+            <Image
+              source={require("../assets/icons/send.png")}
+              style={styles.sendImage}
+            />
+          </Pressable>
+        )}
       </View>
     </View>
   );

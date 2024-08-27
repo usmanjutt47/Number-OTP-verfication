@@ -30,41 +30,40 @@ const AllChats = () => {
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [unreadCounts, setUnreadCounts] = useState(0);
+  const [unreadCounts, setUnreadCounts] = useState({});
+
+  const fetchUserReplies = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID not found");
+      }
+
+      const response = await fetch(
+        `http://192.168.100.175:8080/api/reply/my-replies/${userId}`
+      );
+      const data = await response.json();
+
+      if (response.ok) {
+        setChats(data);
+        const counts = data.reduce((acc, chat) => {
+          acc[chat._id] = chat.unreadCount || 0;
+          return acc;
+        }, {});
+        setUnreadCounts(counts);
+      } else {
+        setError(data.error || "Failed to fetch replies");
+        console.error("Error fetching replies:", data.error);
+      }
+    } catch (err) {
+      setError(err.message || "An unexpected error occurred");
+      console.error("Error occurred:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchUserReplies = async () => {
-      try {
-        const userId = await AsyncStorage.getItem("userId");
-        if (!userId) {
-          throw new Error("User ID not found");
-        }
-
-        const response = await fetch(
-          `http://192.168.100.175:8080/api/reply/my-replies/${userId}`
-        );
-        const data = await response.json();
-
-        if (response.ok) {
-          setChats(data);
-          // Assuming the response includes unread counts for each chat
-          const counts = data.reduce((acc, chat) => {
-            acc[chat._id] = chat.unreadCount || 0;
-            return acc;
-          }, {});
-          setUnreadCounts(counts);
-        } else {
-          setError(data.error || "Failed to fetch replies");
-          console.error("Error fetching replies:", data.error);
-        }
-      } catch (err) {
-        setError(err.message || "An unexpected error occurred");
-        console.error("Error occurred:", err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUserReplies();
   }, []);
 
@@ -81,7 +80,6 @@ const AllChats = () => {
   );
 
   const handlePress = (item) => {
-
     navigation.navigate("ChatDetail", {
       chatId: item._id,
       chatContent: item.content,
@@ -179,7 +177,6 @@ const AllChats = () => {
   );
 };
 
-// Add styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -233,7 +230,6 @@ const styles = StyleSheet.create({
   chatContent: {
     flex: 1,
     alignSelf: "center",
-    // backgroundColor: "red",
     height: "100%",
     justifyContent: "center",
   },

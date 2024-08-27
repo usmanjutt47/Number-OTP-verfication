@@ -327,6 +327,9 @@ const styles = StyleSheet.create({
     height: responsiveHeight(45),
     width: responsiveWidth(45),
     borderRadius: 30,
+    position: "absolute",
+    right: 13,
+    top: 2,
   },
   sendImage: {
     width: 20,

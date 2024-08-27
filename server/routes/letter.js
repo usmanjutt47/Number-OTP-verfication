@@ -171,6 +171,30 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+router.post("/hide-letter/:letterId", async (req, res) => {
+  try {
+    const { letterId } = req.params;
+
+    if (!letterId) {
+      return res.status(400).json({ error: "Letter ID is required" });
+    }
+
+    const updatedLetter = await Letter.findByIdAndUpdate(
+      letterId,
+      { hidden: true },
+      { new: true }
+    );
+
+    if (!updatedLetter) {
+      return res.status(404).json({ error: "Letter not found" });
+    }
+
+    return res.status(200).json(updatedLetter);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 router.get("/all-excluding-creator/:userId", async (req, res) => {
   try {
     const { userId } = req.params;

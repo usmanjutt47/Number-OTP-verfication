@@ -9,6 +9,7 @@ import {
   Pressable,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -93,6 +94,28 @@ export default function CustomImageCarousel() {
   if (error) {
     return <Text style={styles.centered}>{error}</Text>;
   }
+
+  const handleHideLetter = async (letterId) => {
+    try {
+      // Convert `letterId` to a string if necessary
+      const response = await axios.post(
+        `http://192.168.100.175:8080/api/letter/hide-letter/${String(letterId)}`
+      );
+
+      if (response.status === 200) {
+        Alert.alert("Success", "Letter has been hidden.");
+        fetchLetters(); // Refresh the list to reflect the change
+      } else {
+        Alert.alert("Error", "Failed to hide the letter.");
+      }
+    } catch (err) {
+      console.error("Error hiding letter:", err.response?.data || err.message);
+      Alert.alert(
+        "Error",
+        err.response?.data?.message || "An unexpected error occurred."
+      );
+    }
+  };
 
   const handleOpenBottomSheet = (item) => {
     navigation.navigate("ViewLetter", { letter: item });
@@ -214,7 +237,10 @@ export default function CustomImageCarousel() {
                     <FontAwesome5 name="pen" size={20} style={styles.icon} />
                     <Text style={styles.buttonText}>Reply</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.button}>
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => handleHideLetter(item._id)}
+                  >
                     <Image
                       source={require("../assets/icons/pass.png")}
                       style={styles.imageIcon}

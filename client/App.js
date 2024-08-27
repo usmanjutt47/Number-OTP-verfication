@@ -26,6 +26,24 @@ const Stack = createStackNavigator();
 const App = () => {
   const [initialRoute, setInitialRoute] = useState(null);
 
+  useEffect(() => {
+    const checkUserId = async () => {
+      try {
+        const userId = await AsyncStorage.getItem("userId");
+        if (userId) {
+          setInitialRoute("Home");
+        } else {
+          setInitialRoute("OnBoarding");
+        }
+      } catch (error) {
+        console.error("Error reading userId from AsyncStorage:", error);
+        setInitialRoute("OnBoarding"); // Error handling case
+      }
+    };
+
+    checkUserId();
+  }, []);
+
   const [loaded] = useFonts({
     Outfit_Black: require("../client/assets/fonts/Outfit-Black.ttf"),
     Outfit_Bold: require("../client/assets/fonts/Outfit-Bold.ttf"),
@@ -41,7 +59,7 @@ const App = () => {
     Inter_Bold: require("../client/assets/fonts/Inter_24pt-Bold.ttf"),
   });
 
-  if (!loaded) {
+  if (!loaded || initialRoute === null) {
     return null;
   }
 
@@ -52,7 +70,7 @@ const App = () => {
     <StripeProvider publishableKey={PUBLISH_KEY}>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="OnBoarding"
+          initialRouteName={initialRoute}
           screenOptions={{ headerShown: false }}
         >
           <Stack.Screen name="CustomKeyboard" component={CustomKeyboard} />

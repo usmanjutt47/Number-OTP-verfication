@@ -92,7 +92,7 @@ export default function EmailVerification() {
           />
           <TextInput
             style={styles.emailInput}
-            placeholder="Enter your email"
+            placeholder="example@gmail.com"
             placeholderTextColor={"#434343"}
             keyboardType="email-address"
             value={email}

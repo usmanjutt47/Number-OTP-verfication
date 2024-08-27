@@ -113,13 +113,12 @@ export default function OTPVerification({ navigation }) {
 
     try {
       const response = await axios.post(
-        "http://192.168.100.6:8080/api/user/verify",
+        "http://192.168.100.175:8080/api/user/verify",
         {
           email,
           otp,
         }
       );
-
 
       if (response.status === 200) {
         const { userId, message } = response.data;
@@ -152,6 +151,44 @@ export default function OTPVerification({ navigation }) {
       });
     } finally {
       setLoading(false); // Stop loading spinner
+    }
+  };
+  const handleSubmit = async () => {
+    if (!email || !isValidEmail(email)) {
+      Toast.show({
+        type: "info",
+        text1: "Info",
+        text2: "Please enter a valid email address.",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "http://192.168.100.175:8080/api/user/",
+        {
+          email,
+        }
+      );
+
+      if (response.status === 200) {
+        Toast.show({
+          type: "success",
+          text1: "Success",
+          text2: "OTP sent to your email address.",
+        });
+        navigation.navigate("OTPVerification", { email });
+        setEmail("");
+      }
+    } catch (err) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: err.response?.data?.error || "Internal server error",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -200,7 +237,7 @@ export default function OTPVerification({ navigation }) {
             <Text style={styles.countdownText}>{countdown} </Text>
             <Text>s</Text>
             {isResendEnabled && (
-              <TouchableOpacity>
+              <TouchableOpacity onPress={handleSubmit}>
                 <Text style={styles.resendText}> Resend Code</Text>
               </TouchableOpacity>
             )}

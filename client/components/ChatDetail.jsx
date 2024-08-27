@@ -35,7 +35,7 @@ const ChatDetail = () => {
     const fetchMessages = async () => {
       try {
         const response = await fetch(
-          `http://192.168.100.6:8080/api/reply/messages/${chatId}`
+          `http://192.168.100.175:8080/api/reply/messages/${chatId}`
         );
         if (response.ok) {
           const initialMessages = await response.json();
@@ -58,7 +58,6 @@ const ChatDetail = () => {
     fetchMessages();
     const intervalId = setInterval(fetchMessages, 1000);
 
-    console.log(`Subscribing to Pusher channel: chat-${chatId}`);
     const channel = pusher.subscribe(`chat-${chatId}`);
 
     channel.bind("message", (data) => {
@@ -74,9 +73,7 @@ const ChatDetail = () => {
       ]);
     });
 
-    channel.bind("pusher:subscription_succeeded", () => {
-      console.log(`Successfully subscribed to channel chat-${chatId}`);
-    });
+    channel.bind("pusher:subscription_succeeded", () => {});
 
     return () => {
       console.log(`Unsubscribing from channel chat-${chatId}`);
@@ -97,7 +94,7 @@ const ChatDetail = () => {
       }
 
       const response = await fetch(
-        "http://192.168.100.6:8080/api/reply/send-message",
+        "http://192.168.100.175:8080/api/reply/send-message",
         {
           method: "POST",
           headers: {
@@ -224,25 +221,26 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   messageSender: {
-    backgroundColor: "#FEFEFE",
-    alignSelf: "flex-start",
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-  },
-  messageReceiver: {
     backgroundColor: "#075856",
     alignSelf: "flex-end",
     borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 0,
+  },
+  messageReceiver: {
+    backgroundColor: "#FEFEFE",
+    alignSelf: "flex-start",
+    borderBottomLeftRadius: 0,
     borderBottomRightRadius: 20,
+    marginLeft: 5,
   },
   messageText: {
     fontSize: 16,
   },
   messageSenderText: {
-    color: "#000",
+    color: "#fff",
   },
   messageReceiverText: {
-    color: "#fff",
+    color: "#000",
   },
   messageTimestamp: {
     fontSize: 12,
@@ -264,10 +262,14 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     elevation: 2,
     backgroundColor: "#fff",
+    width: 10,
   },
   sendButton: {
     justifyContent: "center",
     alignItems: "center",
+    position: "absolute",
+    right: 20,
+    bottom: 15,
   },
   sendImage: {
     height: responsiveHeight(20),

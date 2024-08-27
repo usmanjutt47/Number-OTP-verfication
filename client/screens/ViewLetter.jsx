@@ -50,7 +50,7 @@ export default function ViewLetter() {
       }
 
       const response = await axios.put(
-        `http://192.168.100.6:8080/api/letter/toggle-favorite/${letter._id}`,
+        `http://192.168.100.175:8080/api/letter/toggle-favorite/${letter._id}`,
         {
           userId,
         }

@@ -133,21 +133,6 @@ const AllChats = () => {
         <CustomTopNav />
       </View>
       <View style={styles.contentContainer}>
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search message..."
-            placeholderTextColor="#AAAAB4"
-            onChangeText={(text) => setSearchQuery(text)}
-            value={searchQuery}
-          />
-          <Ionicons
-            name="search-outline"
-            size={24}
-            color="black"
-            style={styles.searchIcon}
-          />
-        </View>
         {loading ? (
           <ActivityIndicator size="large" color="#075856" />
         ) : filteredChats.length > 0 ? (

@@ -150,25 +150,23 @@ export default function OTPVerification({ navigation }) {
         text2: err.response?.data?.error || "Internal server error",
       });
     } finally {
-      setLoading(false); // Stop loading spinner
+      setLoading(false);
     }
   };
-  const handleSubmit = async () => {
-    if (!email || !isValidEmail(email)) {
-      Toast.show({
-        type: "info",
-        text1: "Info",
-        text2: "Please enter a valid email address.",
-      });
-      return;
-    }
 
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // OTPVerification Component
+  const handleSubmit = async () => {
     setLoading(true);
     try {
       const response = await axios.post(
         "http://192.168.100.175:8080/api/user/",
         {
-          email,
+          email, // use the email from the route parameters
         }
       );
 
@@ -178,8 +176,7 @@ export default function OTPVerification({ navigation }) {
           text1: "Success",
           text2: "OTP sent to your email address.",
         });
-        navigation.navigate("OTPVerification", { email });
-        setEmail("");
+        // Navigate back to this same screen (if needed)
       }
     } catch (err) {
       Toast.show({

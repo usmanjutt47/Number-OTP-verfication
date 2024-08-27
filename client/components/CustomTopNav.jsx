@@ -147,7 +147,11 @@ export default function CustomTopNav() {
                 style={[styles.circle, { transform: [{ scale: scaleValue }] }]}
               />
               <View style={styles.imageContainer}>
-                <MaterialCommunityIcons name="logout" size={24} color="#fff" />
+                <MaterialCommunityIcons
+                  name="logout"
+                  size={24}
+                  color="#075856"
+                />
               </View>
             </View>
             <Text style={styles.modalHeading}>Logout</Text>
@@ -159,7 +163,7 @@ export default function CustomTopNav() {
                 alignItems: "center",
                 width: "90%",
                 position: "absolute",
-                bottom: "10%",
+                bottom: "5%",
               }}
             >
               <Pressable style={styles.cancelButton} onPress={handleCloseModal}>
@@ -235,7 +239,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#bcbaba",
-    marginTop: "15%",
+    marginTop: responsivePadding(65),
     height: "100%",
     width: "100%",
   },
@@ -248,30 +252,30 @@ const styles = StyleSheet.create({
   },
   modalHeading: {
     fontFamily: "Inter_Bold",
-    fontSize: 24,
-    marginTop: "7%",
+    fontSize: responsiveFontSize(22),
+    marginTop: responsivePadding(40),
   },
   modalText: {
     fontFamily: "Outfit_Regular",
     fontSize: 16,
   },
   cancelButton: {
-    backgroundColor: "#EAEAEA",
-    width: 152,
-    height: 52,
+    backgroundColor: "#075856",
+    width: responsiveWidth(148),
+    height: responsiveHeight(52),
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 41,
   },
   cancelButtonText: {
-    color: "black",
+    color: "#fff",
     fontSize: 16,
     fontFamily: "Outfit_Regular",
   },
   logoutButton: {
     backgroundColor: "#D42222",
-    width: 152,
-    height: 52,
+    width: responsiveWidth(148),
+    height: responsiveHeight(52),
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 41,
@@ -292,12 +296,12 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 100,
-    backgroundColor: "#d9d9d9",
+    backgroundColor: "#e9e9e9",
   },
   imageContainer: {
     width: 70,
     height: 70,
-    backgroundColor: "black",
+    backgroundColor: "#e2e2e2",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 100,

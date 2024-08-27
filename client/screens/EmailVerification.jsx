@@ -38,9 +38,12 @@ export default function EmailVerification() {
 
     setLoading(true);
     try {
-      const response = await axios.post("http://192.168.10.5:8080/api/user/", {
-        email,
-      });
+      const response = await axios.post(
+        "http://192.168.100.140:8080/api/user/",
+        {
+          email,
+        }
+      );
 
       if (response.status === 200) {
         Toast.show({

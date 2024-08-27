@@ -254,8 +254,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   header: {
-    height: responsiveHeight(60),
-    marginTop: 15,
+    height: responsiveHeight(30),
+    marginTop: 25,
     marginBottom: 15,
     flexDirection: "row",
     alignItems: "center",

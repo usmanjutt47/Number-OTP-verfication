@@ -71,7 +71,7 @@ const ChatDetail = () => {
               text: msg.message,
               sender: msg.senderId,
               timestamp: formatTime(msg.createdAt),
-              read: false, // Add this field
+              read: false,
             })),
           ]);
         } else {
@@ -94,7 +94,7 @@ const ChatDetail = () => {
           text: data.messageContent,
           sender: data.senderId,
           timestamp: formatTime(data.createdAt),
-          read: false, // Add this field
+          read: false,
         },
       ]);
       setShouldAutoScroll(true);

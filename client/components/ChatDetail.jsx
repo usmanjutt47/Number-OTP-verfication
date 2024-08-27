@@ -41,7 +41,6 @@ const ChatDetail = () => {
   const [userId, setUserId] = useState(null);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const navigation = useNavigation();
-
   const flatListRef = useRef(null);
 
   useEffect(() => {
@@ -72,6 +71,7 @@ const ChatDetail = () => {
               text: msg.message,
               sender: msg.senderId,
               timestamp: formatTime(msg.createdAt),
+              read: false, // Add this field
             })),
           ]);
         } else {
@@ -94,6 +94,7 @@ const ChatDetail = () => {
           text: data.messageContent,
           sender: data.senderId,
           timestamp: formatTime(data.createdAt),
+          read: false, // Add this field
         },
       ]);
       setShouldAutoScroll(true);
@@ -148,6 +149,7 @@ const ChatDetail = () => {
             text: messageText,
             sender: userId,
             timestamp: formatTime(new Date()),
+            read: false,
           },
         ]);
         setMessageText("");
@@ -161,15 +163,32 @@ const ChatDetail = () => {
     }
   };
 
+  const markMessagesAsRead = () => {
+    setMessages((prevMessages) =>
+      prevMessages.map((msg) =>
+        msg.sender !== userId ? { ...msg, read: true } : msg
+      )
+    );
+  };
+
+  useEffect(() => {
+    markMessagesAsRead();
+  }, []);
+
   const isSender = (senderId) => senderId === userId;
 
   const handleScroll = () => {
     setShouldAutoScroll(false);
   };
 
-  // Function to get the count of messages
-  const getMessageCount = () => {
-    return messages.length;
+  const renderMessageHeader = (senderId) => {
+    return isSender(senderId) ? (
+      <Text style={[styles.messageHeader, { color: "#fff" }]}>You</Text>
+    ) : (
+      <Text style={[styles.messageHeader, { color: "#075856" }]}>
+        Anonymous
+      </Text>
+    );
   };
 
   return (
@@ -204,6 +223,7 @@ const ChatDetail = () => {
                 : styles.messageReceiver,
             ]}
           >
+            {renderMessageHeader(item.sender)}
             <Text
               style={[
                 styles.messageText,
@@ -215,12 +235,6 @@ const ChatDetail = () => {
               {item.text}
             </Text>
             <Text style={styles.messageTimestamp}>{item.timestamp}</Text>
-            {/* Display the message count below the timestamp */}
-            {item.id === "initial" && (
-              <Text style={styles.messageCount}>
-                {getMessageCount()} messages
-              </Text>
-            )}
           </View>
         )}
         keyExtractor={(item) => item.id}
@@ -298,9 +312,13 @@ const styles = StyleSheet.create({
   },
   messageSenderText: {
     color: "#fff",
+    fontSize: 16,
+    fontFamily: "Outfit_Regular",
   },
   messageReceiverText: {
     color: "#000",
+    fontSize: 16,
+    fontFamily: "Outfit_Regular",
   },
   messageTimestamp: {
     fontSize: 12,
@@ -308,10 +326,10 @@ const styles = StyleSheet.create({
     marginTop: 5,
     alignSelf: "flex-end",
   },
-  messageCount: {
-    fontSize: 12,
-    color: "#888",
-    alignSelf: "flex-end",
+  messageHeader: {
+    fontSize: 16,
+    fontFamily: "Outfit_Semi_Bold",
+    marginBottom: 5,
   },
   inputContainer: {
     flexDirection: "row",

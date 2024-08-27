@@ -47,6 +47,16 @@ export default function OTPVerification({ navigation }) {
     setOtp(inputValues.join(""));
   }, [inputValues]);
 
+  const formatEmail = (email) => {
+    if (!email) return "";
+    const [localPart, domainPart] = email.split("@");
+    if (!localPart || !domainPart) return "";
+    const start = localPart.slice(0, 2);
+    const end = localPart.slice(-2);
+    const masked = "*".repeat(localPart.length - 1);
+    return `${start}${masked}${end}@${domainPart}`;
+  };
+
   const handleTextChange = (text, index) => {
     const newInputValues = [...inputValues];
     newInputValues[index] = text;
@@ -89,16 +99,6 @@ export default function OTPVerification({ navigation }) {
     clearInterval(timerRef.current);
   };
 
-  const formatEmail = (email) => {
-    if (!email) return "";
-    const [localPart, domainPart] = email.split("@");
-    if (!localPart || !domainPart) return "";
-    const start = localPart.slice(0, 2);
-    const end = localPart.slice(-2);
-    const masked = "*".repeat(localPart.length - 4);
-    return `${start}${masked}${end}@${domainPart}`;
-  };
-
   const handleOtpSubmit = async () => {
     if (!otp) {
       Toast.show({
@@ -113,7 +113,7 @@ export default function OTPVerification({ navigation }) {
 
     try {
       const response = await axios.post(
-        "http://192.168.100.175:8080/api/user/verify",
+        "http://192.168.10.5:8080/api/user/verify",
         {
           email,
           otp,
@@ -154,21 +154,12 @@ export default function OTPVerification({ navigation }) {
     }
   };
 
-  const isValidEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  // OTPVerification Component
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const response = await axios.post(
-        "http://192.168.100.175:8080/api/user/",
-        {
-          email, // use the email from the route parameters
-        }
-      );
+      const response = await axios.post("http://192.168.10.5:8080/api/user/", {
+        email,
+      });
 
       if (response.status === 200) {
         Toast.show({
@@ -176,7 +167,6 @@ export default function OTPVerification({ navigation }) {
           text1: "Success",
           text2: "OTP sent to your email address.",
         });
-        // Navigate back to this same screen (if needed)
       }
     } catch (err) {
       Toast.show({
@@ -225,7 +215,7 @@ export default function OTPVerification({ navigation }) {
         ))}
       </View>
 
-      {loading ? ( // Show spinner when loading
+      {loading ? (
         <ActivityIndicator size="large" color="#075856" />
       ) : (
         <>
@@ -266,7 +256,7 @@ const styles = StyleSheet.create({
   backButton: {
     height: 52,
     width: 52,
-    backgroundColor: "#d9d9d9",
+    backgroundColor: "#f3f3f3",
     borderRadius: 26,
     justifyContent: "center",
     alignItems: "center",
@@ -300,8 +290,8 @@ const styles = StyleSheet.create({
     marginVertical: height * 0.05,
   },
   input: {
-    backgroundColor: "#D9D9D9",
-    borderRadius: 12,
+    backgroundColor: "#f7f7f7",
+    borderRadius: 19,
     fontSize: width * 0.1,
     textAlign: "center",
     width: width * 0.2,
@@ -310,18 +300,18 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     alignItems: "center",
-    marginTop: height * 0.05,
+    marginTop: height * 0.06,
     paddingHorizontal: width * 0.05,
     paddingBottom: height * 0.05,
     position: "absolute",
-    bottom: height * 0.01,
+    bottom: 0,
   },
   button: {
     backgroundColor: "#075856",
     height: height * 0.07,
     width: width * 0.9,
     justifyContent: "center",
-    borderRadius: 24,
+    borderRadius: 44,
     bottom: height * 0.01,
   },
   buttonText: {
@@ -333,13 +323,12 @@ const styles = StyleSheet.create({
   resendContainer: {
     flexDirection: "row",
     alignSelf: "center",
-    marginTop: 20,
   },
   countdownText: {
-    color: "#246BFD",
+    color: "#075856",
   },
   resendText: {
-    color: "#246BFD",
+    color: "#075856",
   },
   loadingContainer: {
     flex: 1,

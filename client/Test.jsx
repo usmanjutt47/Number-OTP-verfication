@@ -22,7 +22,7 @@ const Test = () => {
 
     try {
       const response = await axios.post(
-        "http://192.168.100.175:8080/api/v1/auth/verify-otp",
+        "http://192.168.10.5:8080/api/v1/auth/verify-otp",
         { email, otp }
       );
 

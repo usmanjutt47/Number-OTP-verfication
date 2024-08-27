@@ -14,7 +14,6 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -54,16 +53,6 @@ export default function CustomTopNav() {
 
   const handleCloseModal = () => {
     setModalVisible(false);
-  };
-
-  const handleConfirmLogout = async () => {
-    try {
-      await AsyncStorage.removeItem("userId");
-      navigation.navigate("OnBoarding");
-      setModalVisible(false);
-    } catch (error) {
-      console.error("Error removing userId from AsyncStorage:", error);
-    }
   };
 
   useEffect(() => {
@@ -178,7 +167,7 @@ export default function CustomTopNav() {
               </Pressable>
               <Pressable
                 style={styles.logoutButton}
-                onPress={handleConfirmLogout}
+                onPress={() => navigation.navigate("OnBoarding")}
               >
                 <Text style={styles.logoutButtonText}>Logout</Text>
               </Pressable>

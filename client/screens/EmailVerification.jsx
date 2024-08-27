@@ -38,7 +38,7 @@ export default function EmailVerification() {
 
     setLoading(true);
     try {
-      const response = await axios.post("http://192.168.100.175:8080/api/user/", {
+      const response = await axios.post("http://192.168.10.5:8080/api/user/", {
         email,
       });
 
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   backButton: {
     height: 52,
     width: 52,
-    backgroundColor: "#d9d9d9",
+    backgroundColor: "#f7f7f7",
     borderRadius: 26,
     justifyContent: "center",
     alignItems: "center",
@@ -155,14 +155,14 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   emailLable: {
-    fontSize: width * 0.05,
+    fontSize: width * 0.04,
     marginBottom: height * 0.01,
     marginLeft: width * 0.03,
     alignSelf: "flex-start",
   },
   emailInputContainer: {
     position: "relative",
-    height: height * 0.08,
+    height: height * 0.07,
     marginBottom: height * 0.03,
   },
   mailIcon: {

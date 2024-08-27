@@ -40,7 +40,7 @@ export default function WriteLetter() {
     }
 
     try {
-      const response = await fetch("http://192.168.100.175:8080/api/letter/", {
+      const response = await fetch("http://192.168.10.5:8080/api/letter/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

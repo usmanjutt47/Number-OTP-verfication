@@ -117,12 +117,20 @@ export default function CustomTopNav() {
             modalVisible && styles.inactiveButton,
           ]}
           onPress={() => handlePress("AllChats")}
-          disabled={modalVisible} // Disable if modal is active
+          disabled={modalVisible}
         >
-          <AntDesign
-            name="inbox"
-            size={responsiveIconSize(24)}
-            color="#4A4A4A"
+          <Image
+            source={
+              activeScreen === "AllChats"
+                ? require("../assets/icons/fillInbox.png")
+                : require("../assets/icons/inbox.png")
+            }
+            style={{
+              height: 22,
+              width: 22,
+              tintColor: "#4A4A4A",
+              resizeMode: "contain",
+            }}
           />
         </Pressable>
 

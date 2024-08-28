@@ -43,6 +43,7 @@ export default function CustomTopNav() {
   const activeScreen = route.name;
   const [modalVisible, setModalVisible] = useState(false);
   const scaleValue = useRef(new Animated.Value(1)).current;
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const handlePress = (screen) => {
     navigation.navigate(screen);
@@ -94,10 +95,18 @@ export default function CustomTopNav() {
           onPress={() => handlePress("Favorite")}
           disabled={modalVisible}
         >
-          <AntDesign
-            name="staro"
-            size={responsiveIconSize(24)}
-            color="#4A4A4A"
+          <Image
+            source={
+              activeScreen === "Favorite"
+                ? require("../assets/icons/fillFav.png")
+                : require("../assets/icons/fav.png")
+            }
+            style={{
+              height: 22,
+              width: 22,
+              tintColor: "#4A4A4A",
+              resizeMode: "contain",
+            }}
           />
         </Pressable>
 

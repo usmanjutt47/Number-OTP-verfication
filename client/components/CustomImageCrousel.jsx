@@ -513,7 +513,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   imageWrapper: {
-    marginTop: "6%",
+    marginTop: responsiveMargin(15),
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",

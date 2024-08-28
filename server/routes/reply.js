@@ -8,17 +8,10 @@ const Message = require("../models/messages");
 
 router.post("/", async (req, res) => {
   try {
-    const { senderId, content, letterId, receiverId } = req.body;
+    const { senderId, content, letterId, letterSenderId } = req.body;
 
-    if (!senderId || !content || !letterId || !receiverId) {
-      return res.status(400).json({
-        error: "Sender ID, content, letter ID, and receiver ID are required",
-      });
-    }
-
-    const letter = await Letter.findById(letterId);
-    if (!letter) {
-      return res.status(404).json({ error: "Letter not found" });
+    if (!senderId || !content || !letterId || !letterSenderId) {
+      return res.status(400).json({ error: "Required fields missing" });
     }
 
     const sender = await User.findById(senderId);
@@ -26,42 +19,22 @@ router.post("/", async (req, res) => {
       return res.status(404).json({ error: "Sender not found" });
     }
 
-    const receiver = await User.findById(receiverId);
-    if (!receiver) {
-      return res.status(404).json({ error: "Receiver not found" });
+    const letter = await Letter.findById(letterId);
+    if (!letter) {
+      return res.status(404).json({ error: "Letter not found" });
     }
 
-    // Create the reply
     const reply = await Reply.create({
       senderId,
       content,
       letterId,
-      receiverId,
-      letterSenderId: letter.senderId,
+      letterSenderId,
     });
 
-    // Update the letter to hide it
-    await Letter.findByIdAndUpdate(letterId, { hidden: true });
-
-    // Trigger Pusher notification
-    try {
-      await pusherInstance.trigger("replies", "new-reply", {
-        ...reply._doc,
-        sender,
-        receiver,
-      });
-    } catch (pusherError) {
-      console.error("Pusher error:", pusherError);
-      return res
-        .status(500)
-        .json({ error: "Failed to send Pusher notification" });
-    }
-
-    // Return the response
-    return res.json({ message: "Reply sent and letter hidden", reply });
+    return res.status(201).json({ message: "Reply created", reply });
   } catch (err) {
-    console.error("Error sending reply:", err.message);
-    return res.status(500).json({ error: err.message });
+    console.error("Error in reply route:", err);
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -73,58 +46,49 @@ router.get("/my-replies/:userId", async (req, res) => {
       return res.status(400).json({ error: "User ID is required" });
     }
 
-    const sentRepliesList = await Reply.find({ senderId: userId }).populate(
+    // Fetch replies where the user is the sender (replies to others' letters)
+    const sentReplies = await Reply.find({ senderId: userId }).populate(
       "letterId"
     );
 
-    const receivedRepliesList = await Reply.find({
-      receiverId: userId,
-    }).populate({
-      path: "letterId",
-      match: { senderId: userId },
-    });
-    let unreadCount;
-
-    // console.log({unreadCount})
-    const filteredReceivedReplies = receivedRepliesList.filter(
-      (reply) => reply.letterId
+    // Fetch replies where the user is the receiver (replies to user's letters)
+    const receivedReplies = await Reply.find({ receiverId: userId }).populate(
+      "letterId"
     );
 
-    const allReplies = [...sentRepliesList, ...filteredReceivedReplies];
+    // Combine sent and received replies
+    const allReplies = [...sentReplies, ...receivedReplies];
 
-    allReplies.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    // Sort replies by creation date (newest first)
+    allReplies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-    const uniqueReplyIds = [
-      ...new Set(allReplies.map((reply) => reply._id.toString())),
-    ];
-    console.log({ uniqueReplyIds });
+    console.log(`Total replies found: ${allReplies.length}`);
 
-    // Fetch unread message counts for each unique replyId
-    const unreadCounts = await Promise.all(
-      uniqueReplyIds.map(async (replyId) => {
-        const count = await Message.countDocuments({
-          receiverId: userId,
-          replyId: replyId,
-          isRead: false,
-        });
-        return { replyId, count };
-      })
-    );
-
-    console.log({ unreadCounts });
-
+    // Build the final response with unread message counts
     const replies = await Promise.all(
       allReplies.map(async (reply) => {
         const sender = await User.findById(reply.senderId);
         const letter = reply.letterId;
-        const letterSenderId = letter ? letter.senderId : null;
+
+        // Count unread messages for this reply where the user is the receiver
+        const unreadCount = await Message.countDocuments({
+          replyId: reply._id,
+          receiverId: userId,
+          isRead: false,
+        });
+
+        console.log(`Reply ID: ${reply._id}, Unread messages: ${unreadCount}`);
 
         return {
           ...reply._doc,
           sender,
-          letterSenderId,
+          unreadMessagesCount: unreadCount,
         };
       })
+    );
+
+    console.log(
+      `Processed ${replies.length} replies with unread message counts`
     );
 
     return res.json(replies);
@@ -183,7 +147,6 @@ router.get("/letter/:id", async (req, res) => {
 router.post("/send-message", async (req, res) => {
   try {
     const { senderId, receiverId, replyId, messageContent } = req.body;
-    console.log({ senderId, receiverId, replyId, messageContent });
 
     if (!senderId || !receiverId || !replyId || !messageContent) {
       return res.status(400).json({ error: "Missing required fields" });

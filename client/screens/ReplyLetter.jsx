@@ -41,12 +41,7 @@ export default function ReplyLetter() {
         return;
       }
 
-      if (
-        !selectedItem ||
-        !selectedItem._id ||
-        !selectedItem.receiverId ||
-        !selectedItem.senderId
-      ) {
+      if (!selectedItem || !selectedItem._id || !selectedItem.senderId) {
         Alert.alert("Error", "No item selected or missing required IDs");
         return;
       }
@@ -60,7 +55,6 @@ export default function ReplyLetter() {
           senderId: senderId,
           content: replyContent,
           letterId: selectedItem._id,
-          receiverId: selectedItem.receiverId,
           letterSenderId: selectedItem.senderId,
         }),
       });

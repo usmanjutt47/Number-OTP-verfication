@@ -62,7 +62,7 @@ const AllChats = () => {
       if (response.ok) {
         setChats(data);
         const counts = data.reduce((acc, chat) => {
-          acc[chat._id] = chat.unreadCount || 0;
+          acc[chat._id] = chat.unreadMessagesCount || 0;
           return acc;
         }, {});
         setUnreadCounts(counts);
@@ -145,9 +145,9 @@ const AllChats = () => {
         </View>
         <View style={styles.chatRightSection}>
           <Text style={styles.chatTime}>{formatTime(item.createdAt)}</Text>
-          <Pressable style={styles.badge} onPress={() => handlePress(item)}>
+          {/* <Pressable style={styles.badge} onPress={() => handlePress(item)}>
             <Text style={styles.badgeText}>{unreadCounts[item._id]}</Text>
-          </Pressable>
+          </Pressable> */}
         </View>
       </View>
     </Pressable>
@@ -167,7 +167,7 @@ const AllChats = () => {
           <FlatList
             data={filteredChats}
             renderItem={renderItem}
-            keyExtractor={(item) => item._id}
+            keyExtractor={(item, index) => `${item._id}-${index}`}
             style={styles.chatList}
             showsVerticalScrollIndicator={false}
             onRefresh={onRefresh}

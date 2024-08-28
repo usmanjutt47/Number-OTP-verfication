@@ -77,7 +77,7 @@ export default function EmailVerification() {
             <Ionicons
               name="chevron-back"
               size={24}
-              color="black"
+              color="#4a4a4a"
               style={styles.icon}
             />
           </Pressable>
@@ -127,7 +127,7 @@ export default function EmailVerification() {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f3f3f3",
   },
   header: {
     flexDirection: "row",
@@ -136,9 +136,9 @@ const styles = StyleSheet.create({
     top: height * 0.06,
   },
   backButton: {
-    height: 52,
-    width: 52,
-    backgroundColor: "#f7f7f7",
+    height: 48,
+    width: 48,
+    backgroundColor: "#e3e1e1",
     borderRadius: 26,
     justifyContent: "center",
     alignItems: "center",

@@ -192,7 +192,7 @@ export default function OTPVerification({ navigation }) {
           <Ionicons
             name="chevron-back"
             size={24}
-            color="black"
+            color="#4a4a4a"
             style={styles.icon}
           />
         </Pressable>
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: width * 0.05,
-    backgroundColor: "#fff",
+    backgroundColor: "#f3f3f3",
   },
   header: {
     flexDirection: "row",
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   backButton: {
     height: 52,
     width: 52,
-    backgroundColor: "#f3f3f3",
+    backgroundColor: "#e3e1e1",
     borderRadius: 26,
     justifyContent: "center",
     alignItems: "center",

@@ -201,7 +201,7 @@ const ChatDetail = () => {
           <Ionicons
             name="chevron-back"
             size={24}
-            color="black"
+            color="#4a4a4a"
             style={styles.backIcon}
           />
         </Pressable>
@@ -211,51 +211,53 @@ const ChatDetail = () => {
           Anonymous
         </Text>
       </View>
-      <FlatList
-        ref={flatListRef}
-        data={messages}
-        renderItem={({ item }) => (
-          <View
-            style={[
-              styles.messageContainer,
-              isSender(item.sender)
-                ? styles.messageSender
-                : styles.messageReceiver,
-            ]}
-          >
-            {renderMessageHeader(item.sender)}
-            <Text
+      <View style={{ flex: 1, padding: 15, backgroundColor: "#f3f3f3" }}>
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          renderItem={({ item }) => (
+            <View
               style={[
-                styles.messageText,
+                styles.messageContainer,
                 isSender(item.sender)
-                  ? styles.messageSenderText
-                  : styles.messageReceiverText,
+                  ? styles.messageSender
+                  : styles.messageReceiver,
               ]}
             >
-              {item.text}
-            </Text>
-            <Text style={styles.messageTimestamp}>{item.timestamp}</Text>
-          </View>
-        )}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.messageList}
-        onScrollBeginDrag={handleScroll}
-      />
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Type a message"
-          value={messageText}
-          onChangeText={setMessageText}
+              {renderMessageHeader(item.sender)}
+              <Text
+                style={[
+                  styles.messageText,
+                  isSender(item.sender)
+                    ? styles.messageSenderText
+                    : styles.messageReceiverText,
+                ]}
+              >
+                {item.text}
+              </Text>
+              <Text style={styles.messageTimestamp}>{item.timestamp}</Text>
+            </View>
+          )}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.messageList}
+          onScrollBeginDrag={handleScroll}
         />
-        {messageText.trim().length > 0 && (
-          <Pressable style={styles.sendButton} onPress={sendMessage}>
-            <Image
-              source={require("../assets/icons/send.png")}
-              style={styles.sendImage}
-            />
-          </Pressable>
-        )}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Type a message"
+            value={messageText}
+            onChangeText={setMessageText}
+          />
+          {messageText.trim().length > 0 && (
+            <Pressable style={styles.sendButton} onPress={sendMessage}>
+              <Image
+                source={require("../assets/icons/send.png")}
+                style={styles.sendImage}
+              />
+            </Pressable>
+          )}
+        </View>
       </View>
     </View>
   );
@@ -264,22 +266,24 @@ const ChatDetail = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 15,
-    backgroundColor: "#fff",
+    backgroundColor: "#f3f3f3",
   },
   header: {
-    height: responsiveHeight(30),
-    marginTop: 25,
-    marginBottom: 15,
+    padding: 10,
     flexDirection: "row",
+    height: responsiveHeight(30),
     alignItems: "center",
-    width: "60%",
+    width: "100%",
+    height: 100,
+    borderBottomRightRadius: 30,
+    borderBottomLeftRadius: 30,
     justifyContent: "space-between",
+    backgroundColor: "#fff",
   },
   backButton: {
-    backgroundColor: "#F0F0F1",
-    height: responsiveHeight(52),
-    width: responsiveWidth(52),
+    backgroundColor: "#e3e1e1",
+    height: responsiveHeight(48),
+    width: responsiveWidth(48),
     justifyContent: "center",
     borderRadius: 41,
     alignSelf: "center",
@@ -341,7 +345,6 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     borderRadius: 28,
-    marginRight: 10,
     borderWidth: 1,
     borderColor: "#E0E0E0",
     padding: 10,
@@ -349,13 +352,13 @@ const styles = StyleSheet.create({
   sendButton: {
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F0F0F1",
+    backgroundColor: "#e3e1e1",
     height: responsiveHeight(45),
     width: responsiveWidth(45),
     borderRadius: 30,
     position: "absolute",
-    right: 13,
-    top: 2,
+    right: 8,
+    top: 4,
   },
   sendImage: {
     width: 20,

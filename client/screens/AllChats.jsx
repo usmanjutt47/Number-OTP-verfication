@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    backgroundColor: "#bcbaba",
+    backgroundColor: "#f3f3f3",
   },
   contentContainer: {
     width: "90%",
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   chatContainer: {
-    backgroundColor: "#F9F9F9",
+    backgroundColor: "#fff",
     height: 63,
     borderRadius: 15,
     marginBottom: 10,

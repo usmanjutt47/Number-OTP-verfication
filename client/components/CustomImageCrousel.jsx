@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,8 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  Modal,
+  Easing,
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -24,6 +26,10 @@ const responsiveFontSize = (size) => (size * width) / 375;
 const responsiveHeight = (size) => (size * height) / 812;
 const responsiveWidth = (size) => (size * height) / 812;
 const responsiveMargin = (size) => (size * height) / 812;
+
+const responsivePadding = (size) => {
+  return (size * width) / 375;
+};
 
 const formatDateTime = (dateString) => {
   const date = new Date(dateString);
@@ -51,6 +57,9 @@ export default function CustomImageCarousel() {
   const scrollX = new Animated.Value(0);
   const navigation = useNavigation();
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const scaleValue = useRef(new Animated.Value(1)).current;
+
   const fetchLetters = async () => {
     try {
       const userId = await AsyncStorage.getItem("userId");
@@ -59,7 +68,7 @@ export default function CustomImageCarousel() {
       }
 
       const response = await axios.get(
-        `http://192.168.100.140:8080/api/letter/all-excluding-creator/${userId}`
+        `http://192.168.100.175:8080/api/letter/all-excluding-creator/${userId}`
       );
 
       if (response.status === 200) {
@@ -85,6 +94,28 @@ export default function CustomImageCarousel() {
     return unsubscribe;
   }, [navigation]);
 
+  useEffect(() => {
+    const scaleAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleValue, {
+          toValue: 1.1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleValue, {
+          toValue: 1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    scaleAnimation.start();
+
+    return () => scaleAnimation.stop();
+  }, [scaleValue]);
+
   if (loading) {
     return (
       <ActivityIndicator size="large" color="#fff" style={styles.centered} />
@@ -99,7 +130,7 @@ export default function CustomImageCarousel() {
     try {
       // Convert `letterId` to a string if necessary
       const response = await axios.post(
-        `http://192.168.100.140:8080/api/letter/hide-letter/${String(letterId)}`
+        `http://192.168.100.175:8080/api/letter/hide-letter/${String(letterId)}`
       );
 
       if (response.status === 200) {
@@ -124,8 +155,58 @@ export default function CustomImageCarousel() {
   return (
     <View style={{ flex: 1 }}>
       {letters.length === 0 ? (
-        <View style={styles.centered}>
-          <Text style={styles.noPostsText}>No posts available</Text>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.imageWrapper}>
+              <Animated.View
+                style={[styles.circle, { transform: [{ scale: scaleValue }] }]}
+              />
+              <View style={styles.imageContainer}>
+                <Image
+                  source={require("../assets/icons/NoPost.png")}
+                  style={{
+                    height: responsiveHeight(23),
+                    width: responsiveHeight(23),
+                    tintColor: "#fff",
+                  }}
+                />
+              </View>
+            </View>
+            <Text style={styles.modalHeading}>You have currently no Post </Text>
+            <Text style={styles.modalText}>
+              Click the button and fill the information the create the Post
+            </Text>
+            <View
+              style={{
+                alignItems: "center",
+                width: "90%",
+                position: "absolute",
+                bottom: "5%",
+              }}
+            >
+              <Pressable
+                onPress={() => navigation.navigate("WriteLetter")}
+                style={{
+                  width: "55%",
+                  backgroundColor: "#075856",
+                  height: responsiveHeight(48),
+                  justifyContent: "center",
+                  borderRadius: 44,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: responsiveFontSize(15),
+                    color: "#fff",
+                    textAlign: "center",
+                    fontFamily: "Outfit_Bold",
+                  }}
+                >
+                  Create a post
+                </Text>
+              </Pressable>
+            </View>
+          </View>
         </View>
       ) : (
         <Animated.FlatList
@@ -415,5 +496,52 @@ const styles = StyleSheet.create({
   },
   flatList: {
     flex: 1,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f3f3f3",
+    height: "100%",
+    width: "100%",
+  },
+  modalContent: {
+    width: "90%",
+    height: responsiveHeight(250),
+    backgroundColor: "#fff",
+    borderRadius: 41,
+    alignItems: "center",
+  },
+  imageWrapper: {
+    marginTop: "6%",
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  circle: {
+    position: "absolute",
+    width: responsiveWidth(90),
+    height: responsiveHeight(90),
+    borderRadius: 100,
+    backgroundColor: "#E6eeee",
+  },
+  imageContainer: {
+    width: responsiveWidth(80),
+    height: responsiveHeight(80),
+    backgroundColor: "#075856",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 100,
+  },
+  modalText: {
+    fontFamily: "Outfit_Regular",
+    fontSize: 14,
+    width: "80%",
+    textAlign: "center",
+  },
+  modalHeading: {
+    fontFamily: "Inter_Bold",
+    fontSize: responsiveFontSize(20),
+    marginTop: responsivePadding(15),
   },
 });

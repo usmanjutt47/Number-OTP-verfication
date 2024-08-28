@@ -31,6 +31,6 @@ const styles = StyleSheet.create({
   mainContainer: {
     height: "100%",
     width: "100%",
-    backgroundColor: "#bcbaba",
+    backgroundColor: "#f3f3f3",
   },
 });

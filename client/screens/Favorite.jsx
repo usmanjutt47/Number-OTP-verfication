@@ -59,7 +59,7 @@ export default function Favorite() {
       try {
         const userId = await AsyncStorage.getItem("userId");
         const response = await axios.get(
-          `http://192.168.100.140:8080/api/letter/favorites/${userId}`
+          `http://192.168.100.175:8080/api/letter/favorites/${userId}`
         );
         if (response.data.favorites.length === 0) {
           setNoFavorites(true);
@@ -89,7 +89,7 @@ export default function Favorite() {
 
   if (noFavorites) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#bcbaba" }}>
+      <View style={{ flex: 1, backgroundColor: "#f3f3f3" }}>
         <View style={{ padding: "5%" }}>
           <CustomTopNav />
         </View>
@@ -234,11 +234,6 @@ export default function Favorite() {
 }
 
 const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   noFavoritesText: {
     fontSize: responsiveFontSize(20),
     color: "#000",

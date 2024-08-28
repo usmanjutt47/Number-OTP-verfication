@@ -43,6 +43,7 @@ export default function CustomTopNav() {
   const activeScreen = route.name;
   const [modalVisible, setModalVisible] = useState(false);
   const scaleValue = useRef(new Animated.Value(1)).current;
+
   const handlePress = (screen) => {
     navigation.navigate(screen);
   };
@@ -59,7 +60,7 @@ export default function CustomTopNav() {
     const scaleAnimation = Animated.loop(
       Animated.sequence([
         Animated.timing(scaleValue, {
-          toValue: 1.2,
+          toValue: 1.1,
           duration: 1000,
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
@@ -93,7 +94,11 @@ export default function CustomTopNav() {
           onPress={() => handlePress("Favorite")}
           disabled={modalVisible}
         >
-          <AntDesign name="staro" size={responsiveIconSize(24)} color="black" />
+          <AntDesign
+            name="staro"
+            size={responsiveIconSize(24)}
+            color="#4A4A4A"
+          />
         </Pressable>
 
         <Pressable
@@ -105,7 +110,11 @@ export default function CustomTopNav() {
           onPress={() => handlePress("AllChats")}
           disabled={modalVisible} // Disable if modal is active
         >
-          <AntDesign name="inbox" size={responsiveIconSize(24)} color="black" />
+          <AntDesign
+            name="inbox"
+            size={responsiveIconSize(24)}
+            color="#4A4A4A"
+          />
         </Pressable>
 
         {/* <Pressable
@@ -130,7 +139,14 @@ export default function CustomTopNav() {
         ]}
         onPress={handleLogoutPress}
       >
-        <MaterialCommunityIcons name="logout" size={24} color="black" />
+        <Image
+          source={require("../assets/icons/logout.png")}
+          style={{
+            height: responsiveHeight(23),
+            width: responsiveHeight(23),
+            tintColor: "#4A4A4A",
+          }}
+        />
       </Pressable>
 
       {/* Modal for the popup */}
@@ -147,10 +163,12 @@ export default function CustomTopNav() {
                 style={[styles.circle, { transform: [{ scale: scaleValue }] }]}
               />
               <View style={styles.imageContainer}>
-                <MaterialCommunityIcons
-                  name="logout"
-                  size={24}
-                  color="#075856"
+                <Image
+                  source={require("../assets/icons/logout.png")}
+                  style={{
+                    height: responsiveHeight(23),
+                    width: responsiveHeight(23),
+                  }}
                 />
               </View>
             </View>
@@ -226,43 +244,43 @@ const styles = StyleSheet.create({
     borderRadius: responsiveWidth(30),
   },
   activeLogoutButton: {
-    backgroundColor: "#f0f0f1",
+    backgroundColor: "#E3E1E1",
   },
   inactiveLogoutButton: {
     backgroundColor: "transparent",
   },
   activeButton: {
-    backgroundColor: "#e0e0e0",
+    backgroundColor: "#E3E1E1",
   },
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#bcbaba",
+    backgroundColor: "#f3f3f3",
     marginTop: responsivePadding(65),
     height: "100%",
     width: "100%",
   },
   modalContent: {
     width: "90%",
-    height: responsiveHeight(300),
+    height: responsiveHeight(250),
     backgroundColor: "#fff",
     borderRadius: 41,
     alignItems: "center",
   },
   modalHeading: {
     fontFamily: "Inter_Bold",
-    fontSize: responsiveFontSize(22),
-    marginTop: responsivePadding(40),
+    fontSize: responsiveFontSize(24),
+    marginTop: responsivePadding(15),
   },
   modalText: {
     fontFamily: "Outfit_Regular",
-    fontSize: 16,
+    fontSize: 14,
   },
   cancelButton: {
     backgroundColor: "#075856",
     width: responsiveWidth(148),
-    height: responsiveHeight(52),
+    height: responsiveHeight(48),
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 41,
@@ -275,7 +293,7 @@ const styles = StyleSheet.create({
   logoutButton: {
     backgroundColor: "#D42222",
     width: responsiveWidth(148),
-    height: responsiveHeight(52),
+    height: responsiveHeight(48),
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 41,
@@ -286,22 +304,22 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit_Bold",
   },
   imageWrapper: {
-    marginTop: "7%",
+    marginTop: "6%",
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
   },
   circle: {
     position: "absolute",
-    width: 80,
-    height: 80,
+    width: responsiveWidth(90),
+    height: responsiveHeight(90),
     borderRadius: 100,
-    backgroundColor: "#e9e9e9",
+    backgroundColor: "#E6eeee",
   },
   imageContainer: {
-    width: 70,
-    height: 70,
-    backgroundColor: "#e2e2e2",
+    width: responsiveWidth(80),
+    height: responsiveHeight(80),
+    backgroundColor: "#075856",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 100,

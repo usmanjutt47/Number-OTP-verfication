@@ -51,7 +51,7 @@ export default function ReplyLetter() {
         return;
       }
 
-      const response = await fetch("http://192.168.100.140:8080/api/reply", {
+      const response = await fetch("http://192.168.100.175:8080/api/reply", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

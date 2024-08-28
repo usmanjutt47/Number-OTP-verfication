@@ -535,8 +535,8 @@ const styles = StyleSheet.create({
   },
   modalText: {
     fontFamily: "Outfit_Regular",
-    fontSize: 14,
-    width: "80%",
+    fontSize: responsiveFontSize(12),
+    width: "90%",
     textAlign: "center",
   },
   modalHeading: {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Pressable,
   TouchableOpacity,
   Image,
+  Easing,
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -53,6 +54,7 @@ export default function Favorite() {
   const [noFavorites, setNoFavorites] = useState(false);
   const scrollX = new Animated.Value(0);
   const navigation = useNavigation();
+  const scaleValue = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     const fetchFavoriteLetters = async () => {
@@ -77,6 +79,27 @@ export default function Favorite() {
     fetchFavoriteLetters();
   }, []);
 
+  useEffect(() => {
+    const scaleAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleValue, {
+          toValue: 1.1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleValue, {
+          toValue: 1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    scaleAnimation.start();
+
+    return () => scaleAnimation.stop();
+  }, [scaleValue]);
   if (loading) {
     return (
       <ActivityIndicator size="large" color="#fff" style={styles.centered} />
@@ -93,8 +116,36 @@ export default function Favorite() {
         <View style={{ padding: "5%" }}>
           <CustomTopNav />
         </View>
-        <View style={styles.centered}>
-          <Text style={styles.noFavoritesText}>No favorite letters found</Text>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.imageWrapper}>
+              <Animated.View
+                style={[styles.circle, { transform: [{ scale: scaleValue }] }]}
+              />
+              <View style={styles.imageContainer}>
+                <Image
+                  source={require("../assets/icons/NoPost.png")}
+                  style={{
+                    height: responsiveHeight(23),
+                    width: responsiveHeight(23),
+                    tintColor: "#fff",
+                  }}
+                />
+              </View>
+            </View>
+            <Text style={styles.modalHeading}>You have currently no Post </Text>
+            <Text style={styles.modalText}>
+              Click the button and fill the information the create the Post
+            </Text>
+            <View
+              style={{
+                alignItems: "center",
+                width: "90%",
+                position: "absolute",
+                bottom: "5%",
+              }}
+            ></View>
+          </View>
         </View>
       </View>
     );
@@ -473,5 +524,52 @@ const styles = StyleSheet.create({
   },
   flatList: {
     flex: 1,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f3f3f3",
+    height: "100%",
+    width: "100%",
+  },
+  modalContent: {
+    width: "90%",
+    height: responsiveHeight(230),
+    backgroundColor: "#fff",
+    borderRadius: 41,
+    alignItems: "center",
+  },
+  imageWrapper: {
+    marginTop: responsiveMargin(15),
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  circle: {
+    position: "absolute",
+    width: responsiveWidth(90),
+    height: responsiveHeight(90),
+    borderRadius: 100,
+    backgroundColor: "#E6eeee",
+  },
+  imageContainer: {
+    width: responsiveWidth(80),
+    height: responsiveHeight(80),
+    backgroundColor: "#075856",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 100,
+  },
+  modalText: {
+    fontFamily: "Outfit_Regular",
+    fontSize: responsiveFontSize(12),
+    width: "90%",
+    textAlign: "center",
+  },
+  modalHeading: {
+    fontFamily: "Inter_Bold",
+    fontSize: responsiveFontSize(20),
+    marginTop: responsivePadding(25),
   },
 });

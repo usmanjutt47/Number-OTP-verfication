@@ -61,7 +61,7 @@ export default function Favorite() {
       try {
         const userId = await AsyncStorage.getItem("userId");
         const response = await axios.get(
-          `http://192.168.100.175:8080/api/letter/favorites/${userId}`
+          `http://192.168.10.14:8080/api/letter/favorites/${userId}`
         );
         if (response.data.favorites.length === 0) {
           setNoFavorites(true);
@@ -124,7 +124,7 @@ export default function Favorite() {
               />
               <View style={styles.imageContainer}>
                 <Image
-                  source={require("../assets/icons/NoPost.png")}
+                  source={require("../assets/icons/fillFav.png")}
                   style={{
                     height: responsiveHeight(23),
                     width: responsiveHeight(23),
@@ -133,9 +133,9 @@ export default function Favorite() {
                 />
               </View>
             </View>
-            <Text style={styles.modalHeading}>You have currently no Post </Text>
+            <Text style={styles.modalHeading}>Saved to Favorites!</Text>
             <Text style={styles.modalText}>
-              Click the button and fill the information the create the Post
+              You’ve Successfully added this item to favorite
             </Text>
             <View
               style={{
@@ -530,18 +530,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#f3f3f3",
-    height: "100%",
-    width: "100%",
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
   },
   modalContent: {
     width: "90%",
-    height: responsiveHeight(230),
+    height: responsiveHeight(200),
     backgroundColor: "#fff",
     borderRadius: 41,
     alignItems: "center",
+    justifyContent: "center",
   },
   imageWrapper: {
-    marginTop: responsiveMargin(15),
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",

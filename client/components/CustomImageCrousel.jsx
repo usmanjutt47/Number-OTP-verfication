@@ -68,7 +68,7 @@ export default function CustomImageCarousel() {
       }
 
       const response = await axios.get(
-        `http://192.168.100.175:8080/api/letter/all-excluding-creator/${userId}`
+        `http://192.168.10.14:8080/api/letter/all-excluding-creator/${userId}`
       );
 
       if (response.status === 200) {
@@ -130,7 +130,7 @@ export default function CustomImageCarousel() {
     try {
       // Convert `letterId` to a string if necessary
       const response = await axios.post(
-        `http://192.168.100.175:8080/api/letter/hide-letter/${String(letterId)}`
+        `http://192.168.10.14:8080/api/letter/hide-letter/${String(letterId)}`
       );
 
       if (response.status === 200) {
@@ -172,7 +172,9 @@ export default function CustomImageCarousel() {
                 />
               </View>
             </View>
-            <Text style={styles.modalHeading}>You have currently no Post </Text>
+            <Text style={styles.modalHeading}>
+              You have currently no Letter{" "}
+            </Text>
             <Text style={styles.modalText}>
               Click the button and fill the information the create the Post
             </Text>
@@ -360,6 +362,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     alignItems: "center",
     borderRadius: 20,
+    marginTop: responsiveMargin(150),
   },
   carouselImage: {
     width: ITEM_WIDTH,
@@ -446,7 +449,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
     borderRadius: 44,
-    marginTop: responsiveHeight(100),
   },
   replyButtonText: {
     fontSize: responsiveFontSize(16),
@@ -498,7 +500,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   modalOverlay: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#f3f3f3",

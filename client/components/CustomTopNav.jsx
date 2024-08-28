@@ -225,6 +225,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "100%",
     marginTop: "5%",
+    zIndex: 100,
+    position: "relative",
   },
   logo: {
     width: responsiveWidth(53),

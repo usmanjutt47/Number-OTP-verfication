@@ -55,7 +55,7 @@ const ChatDetail = () => {
     const fetchMessages = async () => {
       try {
         const response = await fetch(
-          `http://192.168.100.175:8080/api/reply/messages/${chatId}`
+          `http://192.168.10.14:8080/api/reply/messages/${chatId}`
         );
         if (response.ok) {
           const initialMessages = await response.json();
@@ -83,7 +83,7 @@ const ChatDetail = () => {
     };
 
     fetchMessages();
-    const intervalId = setInterval(fetchMessages, 1000);
+    // const intervalId = setInterval(fetchMessages, 1000);
 
     const channel = pusher.subscribe(`chat-${chatId}`);
     channel.bind("message", (data) => {
@@ -105,7 +105,7 @@ const ChatDetail = () => {
     return () => {
       channel.unbind_all();
       channel.unsubscribe();
-      clearInterval(intervalId);
+      // clearInterval(intervalId);
     };
   }, [chatId]);
 
@@ -125,7 +125,7 @@ const ChatDetail = () => {
       }
 
       const response = await fetch(
-        "http://192.168.100.175:8080/api/reply/send-message",
+        "http://192.168.10.14:8080/api/reply/send-message",
         {
           method: "POST",
           headers: {
@@ -357,8 +357,8 @@ const styles = StyleSheet.create({
     width: responsiveWidth(45),
     borderRadius: 30,
     position: "absolute",
-    right: 8,
-    top: 4,
+    right: 3,
+    top: 2,
   },
   sendImage: {
     width: 20,

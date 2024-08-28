@@ -55,7 +55,7 @@ const AllChats = () => {
       }
 
       const response = await fetch(
-        `http://192.168.100.175:8080/api/reply/my-replies/${userId}`
+        `http://192.168.10.14:8080/api/reply/my-replies/${userId}`
       );
       const data = await response.json();
 
@@ -116,6 +116,7 @@ const AllChats = () => {
   );
 
   const handlePress = (item) => {
+    console.log("reciverId", item.letterSenderId);
     navigation.navigate("ChatDetail", {
       chatId: item._id,
       chatContent: item.content,
@@ -123,7 +124,7 @@ const AllChats = () => {
       chatContent: item.latestReply || item.content || "No content",
       timestamp: item.createdAt,
       letterSenderId: item.letterSenderId,
-      letterReceiverId: item.receiverId,
+      letterReceiverId: item.letterSenderId,
     });
   };
 
@@ -144,11 +145,9 @@ const AllChats = () => {
         </View>
         <View style={styles.chatRightSection}>
           <Text style={styles.chatTime}>{formatTime(item.createdAt)}</Text>
-          {unreadCounts[item._id] > 0 && (
-            <Pressable style={styles.badge} onPress={() => handlePress(item)}>
-              <Text style={styles.badgeText}>{unreadCounts[item._id]}</Text>
-            </Pressable>
-          )}
+          <Pressable style={styles.badge} onPress={() => handlePress(item)}>
+            <Text style={styles.badgeText}>{unreadCounts[item._id]}</Text>
+          </Pressable>
         </View>
       </View>
     </Pressable>
@@ -159,14 +158,9 @@ const AllChats = () => {
       <View style={{ padding: "5%" }}>
         <CustomTopNav />
       </View>
+
       <StatusBar style="auto" />
       <View style={styles.contentContainer}>
-        <Pressable
-          style={styles.pressable}
-          onPress={() => navigation.navigate("WriteLetter")}
-        >
-          <Entypo name="plus" size={40} color="white" />
-        </Pressable>
         {loading ? (
           <ActivityIndicator size="large" color="#075856" />
         ) : filteredChats.length > 0 ? (
@@ -203,12 +197,18 @@ const AllChats = () => {
               <Text style={styles.modalHeading}>Empty Chat!</Text>
               <Text style={styles.modalText}>
                 Your chat is empty. Reach out to someone and get the
-                conversation going!{" "}
+                conversation going!
               </Text>
             </View>
           </View>
         )}
       </View>
+      <Pressable
+        style={styles.pressable}
+        onPress={() => navigation.navigate("WriteLetter")}
+      >
+        <Entypo name="plus" size={40} color="white" />
+      </Pressable>
     </View>
   );
 };
@@ -236,6 +236,7 @@ const styles = StyleSheet.create({
   },
   chatList: {
     marginTop: 20,
+    padding: "5%",
   },
   chatContainer: {
     backgroundColor: "#fff",

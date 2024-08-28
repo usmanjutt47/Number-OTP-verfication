@@ -19,7 +19,7 @@ export default function Home() {
   return (
     <View style={styles.mainContainer}>
       <StatusBar style="auto" />
-      <View style={{ padding: "5%" }}>
+      <View style={{ padding: "5%", position: "absolute" }}>
         <CustomTopNav />
       </View>
       <CustomImageCrousel />
@@ -29,8 +29,6 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   mainContainer: {
-    height: "100%",
-    width: "100%",
-    backgroundColor: "#f3f3f3",
+    flex: 1,
   },
 });

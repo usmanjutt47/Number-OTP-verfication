@@ -55,7 +55,7 @@ const AllChats = () => {
       }
 
       const response = await fetch(
-        `http://192.168.10.14:8080/api/reply/my-replies/${userId}`
+        `http://192.168.100.6:8080/api/reply/my-replies/${userId}`
       );
       const data = await response.json();
 

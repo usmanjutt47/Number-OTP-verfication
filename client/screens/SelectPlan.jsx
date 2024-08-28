@@ -55,7 +55,7 @@ const SelectPlan = () => {
 
       // Make sure the URL is correct and matches your backend route
       const response = await axios.post(
-        "http://192.168.10.14:8080/api/v1/auth/payments",
+        "http://192.168.100.6:8080/api/v1/auth/payments",
         {
           amount: Math.round(amount),
           userId: userId, // Include user ID in the request

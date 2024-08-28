@@ -10,14 +10,12 @@ router.post("/", async (req, res) => {
   try {
     const { senderId, content, letterId, receiverId } = req.body;
 
-    // Validate request data
     if (!senderId || !content || !letterId || !receiverId) {
       return res.status(400).json({
         error: "Sender ID, content, letter ID, and receiver ID are required",
       });
     }
 
-    // Find the letter and users
     const letter = await Letter.findById(letterId);
     if (!letter) {
       return res.status(404).json({ error: "Letter not found" });

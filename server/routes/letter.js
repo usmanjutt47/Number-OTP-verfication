@@ -19,20 +19,9 @@ router.post("/", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const users = await userModel.find({ _id: { $ne: senderId } });
-    if (users.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "No other users found to receive the letter" });
-    }
-
-    const receiverId = users[Math.floor(Math.random() * users.length)]._id;
-
     const letter = await letterModel.create({
       senderId,
-      receiverId,
       content,
-      title: "",
     });
 
     return res.status(201).json({ message: "Letter sent", letter });

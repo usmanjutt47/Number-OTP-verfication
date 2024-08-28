@@ -542,6 +542,6 @@ const styles = StyleSheet.create({
   modalHeading: {
     fontFamily: "Inter_Bold",
     fontSize: responsiveFontSize(20),
-    marginTop: responsivePadding(15),
+    marginTop: responsivePadding(25),
   },
 });

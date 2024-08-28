@@ -1,13 +1,15 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   View,
   Text,
   StyleSheet,
   Pressable,
-  TextInput,
+  Animated,
   FlatList,
   ActivityIndicator,
   Dimensions,
+  Easing,
+  Image,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -22,6 +24,10 @@ const responsiveFontSize = (size) => (size * width) / 375;
 const responsiveIconSize = (size) => (size * width) / 375;
 const responsiveWidth = (size) => (size * width) / 375;
 const responsiveHeight = (size) => (size * height) / 812;
+const responsiveMargin = (size) => (size * height) / 812;
+const responsivePadding = (size) => {
+  return (size * width) / 375;
+};
 
 const formatTime = (dateString) => {
   return new Date(dateString).toLocaleTimeString([], {
@@ -39,6 +45,7 @@ const AllChats = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [unreadCounts, setUnreadCounts] = useState({});
+  const scaleValue = useRef(new Animated.Value(1)).current;
 
   const fetchUserReplies = async () => {
     try {
@@ -75,6 +82,27 @@ const AllChats = () => {
     fetchUserReplies();
   }, []);
 
+  useEffect(() => {
+    const scaleAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleValue, {
+          toValue: 1.1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleValue, {
+          toValue: 1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    scaleAnimation.start();
+
+    return () => scaleAnimation.stop();
+  }, [scaleValue]);
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchUserReplies().finally(() => setRefreshing(false));
@@ -128,11 +156,17 @@ const AllChats = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
       <View style={{ padding: "5%" }}>
         <CustomTopNav />
       </View>
+      <StatusBar style="auto" />
       <View style={styles.contentContainer}>
+        <Pressable
+          style={styles.pressable}
+          onPress={() => navigation.navigate("WriteLetter")}
+        >
+          <Entypo name="plus" size={40} color="white" />
+        </Pressable>
         {loading ? (
           <ActivityIndicator size="large" color="#075856" />
         ) : filteredChats.length > 0 ? (
@@ -146,17 +180,35 @@ const AllChats = () => {
             refreshing={refreshing}
           />
         ) : (
-          <View style={styles.noChatsContainer}>
-            <Text style={styles.noChatsText}>You have currently no chats.</Text>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.imageWrapper}>
+                <Animated.View
+                  style={[
+                    styles.circle,
+                    { transform: [{ scale: scaleValue }] },
+                  ]}
+                />
+                <View style={styles.imageContainer}>
+                  <Image
+                    source={require("../assets/icons/noChat.png")}
+                    style={{
+                      height: responsiveHeight(23),
+                      width: responsiveHeight(23),
+                      tintColor: "#fff",
+                    }}
+                  />
+                </View>
+              </View>
+              <Text style={styles.modalHeading}>Empty Chat!</Text>
+              <Text style={styles.modalText}>
+                Your chat is empty. Reach out to someone and get the
+                conversation going!{" "}
+              </Text>
+            </View>
           </View>
         )}
       </View>
-      <Pressable
-        style={styles.pressable}
-        onPress={() => navigation.navigate("WriteLetter")}
-      >
-        <Entypo name="plus" size={40} color="white" />
-      </Pressable>
     </View>
   );
 };
@@ -164,23 +216,11 @@ const AllChats = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
     backgroundColor: "#f3f3f3",
   },
   contentContainer: {
-    width: "90%",
+    width: "100%",
     height: "100%",
-  },
-  searchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#e0e0e0",
-    borderRadius: 25,
-    paddingHorizontal: 10,
-    borderColor: "#D6D6D6",
-    borderWidth: 1,
-    marginTop: 20,
-    position: "relative",
   },
   searchInput: {
     height: 52,
@@ -237,12 +277,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 20,
   },
   noChatsText: {
     fontFamily: "Outfit_Regular",
     fontSize: 16,
-    color: "#fff",
+    color: "#000",
     textAlign: "center",
   },
   pressable: {
@@ -268,6 +307,52 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 12,
     fontFamily: "Outfit_Regular",
+  },
+  modalOverlay: {
+    alignItems: "center",
+    backgroundColor: "#f3f3f3",
+    height: "100%",
+    width: "100%",
+    marginTop: responsiveMargin(200),
+  },
+  modalContent: {
+    width: "90%",
+    height: responsiveHeight(200),
+    backgroundColor: "#fff",
+    borderRadius: 41,
+    alignItems: "center",
+  },
+  imageWrapper: {
+    marginTop: responsiveMargin(15),
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  circle: {
+    position: "absolute",
+    width: responsiveWidth(90),
+    height: responsiveHeight(90),
+    borderRadius: 100,
+    backgroundColor: "#E6eeee",
+  },
+  imageContainer: {
+    width: responsiveWidth(80),
+    height: responsiveHeight(80),
+    backgroundColor: "#075856",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 100,
+  },
+  modalText: {
+    fontFamily: "Outfit_Regular",
+    fontSize: responsiveFontSize(12),
+    width: "90%",
+    textAlign: "center",
+  },
+  modalHeading: {
+    fontFamily: "Inter_Bold",
+    fontSize: responsiveFontSize(20),
+    marginTop: responsivePadding(23),
   },
 });
 

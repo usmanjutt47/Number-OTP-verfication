@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -6,15 +6,33 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  Dimensions,
+  Image,
+  Animated,
+  Easing,
+  Pressable,
 } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
+
+const { width, height } = Dimensions.get("window");
+
+const responsiveFontSize = (size) => (size * width) / 375;
+const responsiveHeight = (size) => (size * height) / 812;
+const responsiveWidth = (size) => (size * height) / 812;
+const responsiveMargin = (size) => (size * height) / 812;
+
+const responsivePadding = (size) => {
+  return (size * width) / 375;
+};
 
 export default function WriteLetter() {
   const [content, setContent] = useState("");
   const [userId, setUserId] = useState(null);
-  const navigation = useNavigation();
+  const [modalVisible, setModalVisible] = useState(false);
+  const scaleValue = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     const getUserId = async () => {
@@ -33,9 +51,35 @@ export default function WriteLetter() {
     getUserId();
   }, []);
 
+  useEffect(() => {
+    const scaleAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleValue, {
+          toValue: 1.1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleValue, {
+          toValue: 1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    scaleAnimation.start();
+
+    return () => scaleAnimation.stop();
+  }, [scaleValue]);
+
   const sendLetter = async () => {
     if (!content.trim()) {
-      Alert.alert("Error", "Content cannot be empty");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Content cannot be empty",
+      });
       return;
     }
 
@@ -54,16 +98,85 @@ export default function WriteLetter() {
       const result = await response.json();
 
       if (response.status === 201) {
-        Alert.alert("Success", "Letter sent successfully");
+        setModalVisible(true);
         setContent("");
-        navigation.navigate("Home"); // Back to previous screen
       } else {
-        Alert.alert("Error", result.error || "Failed to send letter");
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: result.error || "Failed to send letter",
+        });
       }
     } catch (error) {
       console.error("Error sending letter:", error);
-      Alert.alert("Error", "An error occurred while sending the letter");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "An error occurred while sending the letter",
+      });
     }
+  };
+
+  const SuccessModal = ({ visible, onClose }) => {
+    if (!visible) return null;
+    const navigation = useNavigation();
+    return (
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <View style={styles.imageWrapper}>
+            <Animated.View
+              style={[styles.circle, { transform: [{ scale: scaleValue }] }]}
+            />
+            <View style={styles.imageContainer}>
+              <Image
+                source={require("../assets/icons/profile.png")}
+                style={{
+                  height: responsiveHeight(23),
+                  width: responsiveHeight(23),
+                  tintColor: "#fff",
+                }}
+              />
+            </View>
+          </View>
+          <Text style={styles.modalHeading}>Done!</Text>
+          <Text style={styles.modalText}>Letter sent successfully!</Text>
+          <View
+            style={{
+              alignItems: "center",
+              width: "90%",
+              position: "absolute",
+              bottom: "5%",
+            }}
+          >
+            <Pressable
+              onPress={() => navigation.navigate("Home")}
+              style={{
+                width: "40%",
+                backgroundColor: "#075856",
+                height: responsiveHeight(48),
+                justifyContent: "center",
+                borderRadius: 44,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: responsiveFontSize(15),
+                  color: "#fff",
+                  textAlign: "center",
+                  fontFamily: "Outfit_Bold",
+                }}
+              >
+                Okay
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
   };
 
   return (
@@ -88,17 +201,12 @@ export default function WriteLetter() {
           onChangeText={(text) => setContent(text)}
         />
         <TouchableOpacity style={styles.sendButton} onPress={sendLetter}>
-          <Text
-            style={{
-              color: "#fff",
-              alignSelf: "center",
-              fontFamily: "Outfit_Medium",
-            }}
-          >
-            Send Now
-          </Text>
+          <Text style={styles.sendButtonText}>Send Now</Text>
         </TouchableOpacity>
       </View>
+
+      <SuccessModal visible={modalVisible} onClose={closeModal} />
+      <Toast />
     </View>
   );
 }
@@ -121,7 +229,6 @@ const styles = StyleSheet.create({
     marginTop: "5%",
     alignItems: "center",
   },
-  icon: {},
   heading: {
     fontFamily: "Inter_Bold",
     marginLeft: "5%",
@@ -146,46 +253,57 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: "5%",
   },
-  mainContainer: {
+  sendButtonText: {
+    color: "#fff",
+    alignSelf: "center",
+    fontFamily: "Outfit_Medium",
+  },
+  modalOverlay: {
     flex: 1,
-    backgroundColor: "#BCBABA",
     justifyContent: "center",
-  },
-  contentContainer: {
+    alignItems: "center",
+    backgroundColor: "#f3f3f3",
+    height: "100%",
     width: "100%",
-    height: "90%",
-    paddingLeft: "5%",
-    backgroundColor: "#ffffff",
-    borderRadius: 23,
+    position: "absolute",
   },
-  headerContainer: {
-    flexDirection: "row",
-    marginTop: "5%",
+  modalContent: {
+    width: "90%",
+    height: responsiveHeight(250),
+    backgroundColor: "#fff",
+    borderRadius: 41,
     alignItems: "center",
   },
-  icon: {},
-  heading: {
-    fontFamily: "Inter_Bold",
-    marginLeft: "5%",
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  textInput: {
-    fontFamily: "Outfit_Regular",
-    marginTop: "5%",
-    fontSize: 18,
-    paddingRight: 20,
-    width: "70%",
-    textAlign: "justify",
-  },
-  sendButton: {
-    backgroundColor: "#075856",
-    width: "80%",
-    height: 62,
-    justifyContent: "center",
+  imageWrapper: {
+    marginTop: responsiveMargin(15),
     alignSelf: "center",
-    borderRadius: 35,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  circle: {
     position: "absolute",
-    bottom: "5%",
+    width: responsiveWidth(90),
+    height: responsiveHeight(90),
+    borderRadius: 100,
+    backgroundColor: "#E6eeee",
+  },
+  imageContainer: {
+    width: responsiveWidth(80),
+    height: responsiveHeight(80),
+    backgroundColor: "#075856",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 100,
+  },
+  modalText: {
+    fontFamily: "Outfit_Regular",
+    fontSize: responsiveFontSize(14),
+    width: "90%",
+    textAlign: "center",
+  },
+  modalHeading: {
+    fontFamily: "Inter_Bold",
+    fontSize: responsiveFontSize(20),
+    marginTop: responsivePadding(15),
   },
 });

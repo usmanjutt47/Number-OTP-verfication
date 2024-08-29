@@ -24,6 +24,7 @@ router.post("/", async (req, res) => {
       return res.status(404).json({ error: "Letter not found" });
     }
 
+    // Create a new reply
     const reply = new Reply({
       senderId,
       content,
@@ -32,9 +33,14 @@ router.post("/", async (req, res) => {
     });
     await reply.save();
 
+    // Update the letter's isHidden field to true
+    await Letter.findByIdAndUpdate(letterId, { hidden: true });
+
     console.log({ senderId, content, letterId, reciverId });
 
-    return res.status(201).json({ message: "Reply created", reply });
+    return res
+      .status(201)
+      .json({ message: "Reply created and letter updated", reply });
   } catch (err) {
     console.error("Error in reply route:", err);
     return res.status(500).json({ error: "Internal server error" });

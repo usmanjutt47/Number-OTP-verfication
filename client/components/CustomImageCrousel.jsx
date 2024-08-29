@@ -120,7 +120,7 @@ export default function CustomImageCarousel() {
 
   if (loading) {
     return (
-      <ActivityIndicator size="large" color="#fff" style={styles.centered} />
+      <ActivityIndicator size="large" color="#075856" style={styles.centered} />
     );
   }
 

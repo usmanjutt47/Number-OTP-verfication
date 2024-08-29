@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     marginVertical: height * 0.05,
   },
   input: {
-    backgroundColor: "#f7f7f7",
+    backgroundColor: "#fff",
     borderRadius: 19,
     fontSize: width * 0.1,
     textAlign: "center",

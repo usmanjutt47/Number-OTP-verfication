@@ -182,9 +182,9 @@ router.post("/send-message", async (req, res) => {
   try {
     console.log("Request Body:", req.body);
 
-    const { senderId, replyId, messageContent } = req.body;
+    const { senderId, receiverId, replyId, messageContent } = req.body;
 
-    if (!senderId || !replyId || !messageContent) {
+    if (!senderId || !receiverId || !replyId || !messageContent) {
       console.log("Missing required fields");
       return res.status(400).json({ error: "Missing required fields" });
     }
@@ -194,8 +194,6 @@ router.post("/send-message", async (req, res) => {
       console.log("Reply not found");
       return res.status(404).json({ error: "Reply not found" });
     }
-
-    const receiverId = reply.reciverId;
 
     const message = new Message({
       message: messageContent,
@@ -233,6 +231,21 @@ router.get("/messages/:replyId", async (req, res) => {
   } catch (err) {
     console.error("Error retrieving messages:", err.message);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.patch("/mark-as-read/:chatId", async (req, res) => {
+  const { chatId } = req.params;
+
+  try {
+    await Message.updateMany(
+      { replyId: chatId, isRead: false },
+      { $set: { isRead: true } }
+    );
+
+    res.status(200).send({ message: "Messages marked as read" });
+  } catch (error) {
+    res.status(500).send({ error: "Failed to mark messages as read" });
   }
 });
 

@@ -140,14 +140,35 @@ const AllChats = () => {
       chat.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handlePress = (item) => {
+  const markChatAsRead = async (chatId) => {
+    try {
+      const response = await fetch(
+        `http://192.168.100.6:8080/api/reply/mark-as-read/${chatId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to mark chat as read");
+      }
+    } catch (err) {
+      setError(err.message || "An unexpected error occurred");
+    }
+  };
+
+  const handlePress = async (item) => {
+    await markChatAsRead(item._id);
     navigation.navigate("ChatDetail", {
       chatId: item._id,
-      chatContent: item.latestReply || item.content || "No content",
-      senderName: item.sender?.name || "Anonymous",
+      chatContent: item.content || "No content",
+      senderName: item.senderId || "Anonymous",
       timestamp: item.createdAt,
-      letterSenderId: item.letterSenderId,
-      letterReceiverId: item.letterReceiverId,
+      letterSenderId: item.senderId,
+      letterReceiverId: item.reciverId,
     });
   };
 

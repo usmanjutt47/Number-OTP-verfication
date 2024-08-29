@@ -11,12 +11,13 @@ import {
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Pusher from "pusher-js/react-native";
-import { getUserId } from "../utils/asyncStorage";
+import { getUserId } from "../utils/asyncStorage"; // Ensure correct import
 import { Ionicons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 const responsiveHeight = (size) => (size * height) / 812;
 const responsiveWidth = (size) => (size * width) / 375;
+const responsiveMargin = (size) => (size * height) / 812;
 
 const pusher = new Pusher("1851485", {
   cluster: "us2",
@@ -29,6 +30,12 @@ const ChatDetail = () => {
   const { chatId, letterSenderId, letterReceiverId, chatContent, timestamp } =
     route.params;
 
+  const [messages, setMessages] = useState([]);
+  const [messageText, setMessageText] = useState("");
+  const [userId, setUserId] = useState(null);
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+  const navigation = useNavigation();
+  const flatListRef = useRef(null);
   const formatTime = (dateString) => {
     return new Date(dateString).toLocaleTimeString([], {
       hour: "2-digit",
@@ -37,22 +44,22 @@ const ChatDetail = () => {
     });
   };
 
-  const [messages, setMessages] = useState([]);
-  const [messageText, setMessageText] = useState("");
-  const [userId, setUserId] = useState(null);
-  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
-  const navigation = useNavigation();
-  const flatListRef = useRef(null);
-
+  // Ensure this function gets called when chatId changes
   useEffect(() => {
     const fetchUserId = async () => {
       const id = await getUserId();
-      setUserId(id);
+      if (id) {
+        setUserId(id);
+      } else {
+        console.error("User ID not found");
+      }
     };
     fetchUserId();
   }, []);
 
   useEffect(() => {
+    if (!userId) return;
+
     const fetchMessages = async () => {
       try {
         const response = await fetch(
@@ -101,14 +108,12 @@ const ChatDetail = () => {
       setShouldAutoScroll(true);
     });
 
-    channel.bind("pusher:subscription_succeeded", () => {});
-
     return () => {
       channel.unbind_all();
       channel.unsubscribe();
       clearInterval(intervalId);
     };
-  }, [chatId]);
+  }, [chatId, userId]);
 
   useEffect(() => {
     if (shouldAutoScroll && flatListRef.current) {
@@ -117,14 +122,12 @@ const ChatDetail = () => {
   }, [messages]);
 
   const sendMessage = async () => {
-    if (!messageText.trim()) return;
+    if (!messageText.trim() || !userId || !letterReceiverId) return;
+
+    const actualReceiverId =
+      letterSenderId === userId ? letterReceiverId : letterSenderId;
 
     try {
-      if (!userId) {
-        console.error("User ID not found");
-        return;
-      }
-
       const response = await fetch(
         "http://192.168.100.6:8080/api/reply/send-message",
         {
@@ -134,7 +137,7 @@ const ChatDetail = () => {
           },
           body: JSON.stringify({
             senderId: userId,
-            receiverId: letterReceiverId, // Ensure this is passed correctly
+            receiverId: actualReceiverId,
             replyId: chatId,
             messageContent: messageText,
           }),
@@ -174,7 +177,7 @@ const ChatDetail = () => {
 
   useEffect(() => {
     markMessagesAsRead();
-  }, []);
+  }, [userId]);
 
   const isSender = (senderId) => senderId === userId;
 
@@ -236,7 +239,16 @@ const ChatDetail = () => {
               >
                 {item.text}
               </Text>
-              <Text style={styles.messageTimestamp}>{item.timestamp}</Text>
+              <Text
+                style={[
+                  styles.messageTimestamp,
+                  isSender(item.sender)
+                    ? styles.messageSenderTimestamp
+                    : styles.messageReceiverTimestamp,
+                ]}
+              >
+                {item.timestamp}
+              </Text>
             </View>
           )}
           keyExtractor={(item) => item.id}
@@ -270,16 +282,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#f3f3f3",
   },
   header: {
-    padding: 10,
     flexDirection: "row",
     height: responsiveHeight(30),
     alignItems: "center",
     width: "100%",
-    height: 100,
-    borderBottomRightRadius: 30,
-    borderBottomLeftRadius: 30,
+    height: responsiveHeight(100),
+    borderBottomRightRadius: 35,
+    borderBottomLeftRadius: 35,
     justifyContent: "space-between",
     backgroundColor: "#fff",
+    paddingLeft: responsiveMargin(15),
+    paddingRight: responsiveMargin(20),
+    paddingTop: responsiveMargin(15),
   },
   backButton: {
     backgroundColor: "#e3e1e1",
@@ -293,7 +307,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   messageContainer: {
-    padding: 10,
+    padding: 15,
     borderRadius: 20,
     marginBottom: 10,
     maxWidth: "80%",
@@ -325,12 +339,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Outfit_Regular",
   },
-  messageTimestamp: {
-    fontSize: 12,
-    color: "#888",
-    marginTop: 5,
-    alignSelf: "flex-end",
-  },
+
   messageHeader: {
     fontSize: 16,
     fontFamily: "Outfit_Semi_Bold",
@@ -358,12 +367,26 @@ const styles = StyleSheet.create({
     width: responsiveWidth(45),
     borderRadius: 30,
     position: "absolute",
-    right: 3,
-    top: 2,
+    right: responsiveMargin(3),
+    top: responsiveMargin(2),
   },
   sendImage: {
     width: 20,
     height: 20,
+  },
+  messageTimestamp: {
+    fontSize: 12,
+    color: "#929BA4",
+    alignSelf: "flex-end",
+    position: "absolute",
+    bottom: responsiveMargin(-12),
+    fontFamily: "Outfit_Regular",
+  },
+  messageSenderTimestamp: {
+    alignSelf: "flex-end",
+  },
+  messageReceiverTimestamp: {
+    alignSelf: "flex-start",
   },
 });
 

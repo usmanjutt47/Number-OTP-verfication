@@ -46,16 +46,7 @@ export default function ReplyLetter() {
         return;
       }
 
-      // reciverId mein letter ki senderId save kar rahe hain
       const reciverId = selectedItem.senderId;
-
-      // Logging the data before sending the request
-      console.log({
-        senderId: senderId,
-        content: replyContent,
-        letterId: selectedItem._id,
-        reciverId: reciverId, // Letter senderId saved as reciverId
-      });
 
       const response = await fetch("http://192.168.100.6:8080/api/reply", {
         method: "POST",
@@ -66,7 +57,7 @@ export default function ReplyLetter() {
           senderId: senderId,
           content: replyContent,
           letterId: selectedItem._id,
-          reciverId: reciverId, // Send the letter's senderId as reciverId
+          reciverId: reciverId,
         }),
       });
 
@@ -76,7 +67,6 @@ export default function ReplyLetter() {
         Alert.alert("Success", "Reply sent successfully");
         setReplyContent("");
 
-        // Update local state to hide the letter
         setLetters((prevLetters) =>
           prevLetters.map((letter) =>
             letter._id === selectedItem._id

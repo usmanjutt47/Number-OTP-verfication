@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   Image,
   Alert,
-  Modal,
   Easing,
 } from "react-native";
 import axios from "axios";

@@ -7,11 +7,11 @@ import {
   ScrollView,
   Dimensions,
   StyleSheet,
-  Alert,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
 
 const { width, height } = Dimensions.get("window");
 
@@ -23,7 +23,6 @@ export default function ReplyFromHome() {
   const navigation = useNavigation();
   const route = useRoute();
 
-  // Extract parameters from route
   const { letterId, letterSenderId } = route.params || {};
 
   const handleReply = async () => {
@@ -31,54 +30,88 @@ export default function ReplyFromHome() {
       const senderId = await AsyncStorage.getItem("userId");
 
       if (!senderId) {
-        Alert.alert("Error", "User ID not found");
+        Toast.show({
+          type: "error",
+          position: "top",
+          text1: "Error",
+          text2: "User ID not found",
+          visibilityTime: 2000,
+        });
         return;
       }
 
       if (!replyContent.trim()) {
-        Alert.alert("Error", "Content cannot be empty");
+        Toast.show({
+          type: "error",
+          position: "top",
+          text1: "Error",
+          text2: "Reply cannot be empty",
+          visibilityTime: 2000,
+        });
         return;
       }
 
       if (!letterId || !letterSenderId) {
-        Alert.alert("Error", "Letter ID or Sender ID is missing");
+        Toast.show({
+          type: "error",
+          position: "top",
+          text1: "Error",
+          text2: "No item selected or missing required IDs",
+          visibilityTime: 2000,
+        });
         return;
       }
 
-      console.log({
-        senderId,
+      const payload = {
+        senderId: senderId,
         content: replyContent,
-        letterId,
-        receiverId: letterSenderId, // Ensure this is the ID of the letter's sender
-        letterSenderId, // This might not be needed unless your API requires it
-      });
+        letterId: letterId,
+        reciverId: letterSenderId,
+        hidden: true,
+      };
 
       const response = await fetch("http://192.168.100.6:8080/api/reply", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          senderId: senderId, // Your ID here
-          content: replyContent,
-          letterId: letterId, // Letter ID
-          receiverId: letterSenderId, // Sender ID from the letter as receiverId
-          // Optionally include letterSenderId if needed by your server
-        }),
+        body: JSON.stringify(payload),
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        Alert.alert("Success", "Reply sent successfully");
-        setReplyContent(""); // Clear the text input
-        navigation.navigate("Home");
+        Toast.show({
+          type: "success",
+          position: "top",
+          text1: "Success",
+          text2: "Reply sent successfully",
+          visibilityTime: 500,
+        });
+
+        // Navigate to Home after 1 second delay
+        setTimeout(() => {
+          setReplyContent("");
+          navigation.navigate("Home");
+        }, 1000);
       } else {
-        Alert.alert("Error", `Error: ${result.error || result.message}`);
+        Toast.show({
+          type: "error",
+          position: "top",
+          text1: "Error",
+          text2: `Error: ${result.error || result.message}`,
+          visibilityTime: 2000,
+        });
         console.error("Backend Error:", result);
       }
     } catch (error) {
-      Alert.alert("Error", `Failed to send reply: ${error.message}`);
+      Toast.show({
+        type: "error",
+        position: "top",
+        text1: "Error",
+        text2: `Failed to send reply: ${error.message}`,
+        visibilityTime: 2000,
+      });
       console.error("Catch Error:", error);
     }
   };
@@ -105,6 +138,7 @@ export default function ReplyFromHome() {
           </TouchableOpacity>
         </ScrollView>
       </View>
+      <Toast />
     </View>
   );
 }
@@ -140,9 +174,9 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit_Regular",
     fontSize: 18,
     paddingRight: 20,
-    width: "100%", // Adjusted to full width
+    width: "100%",
     textAlign: "justify",
-    marginBottom: responsiveHeight(20), // Add margin for better spacing
+    marginBottom: responsiveHeight(20),
   },
   sendButton: {
     backgroundColor: "#075856",

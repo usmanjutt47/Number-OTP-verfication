@@ -70,12 +70,19 @@ export default function ViewLetter() {
   };
 
   const handleReply = () => {
-    navigation.navigate("ReplyFromHome", {
-      letterId: letter._id,
-      letterSenderId: letter.senderId, // Make sure this is the correct ID for the sender
-    });
+    if (!letter) {
+      console.error("Letter object is undefined");
+      return;
+    }
 
-    console.log("ReplyFromHome", letter._id, letter.receiverId);
+    const { _id, senderId } = letter;
+    console.log("Letter ID:", _id);
+    console.log("Sender ID:", senderId);
+
+    navigation.navigate("ReplyFromHome", {
+      letterId: _id,
+      letterSenderId: senderId,
+    });
   };
 
   return (

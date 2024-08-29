@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -26,10 +26,7 @@ const responsiveFontSize = (size) => (size * width) / 375;
 const responsiveHeight = (size) => (size * height) / 812;
 const responsiveWidth = (size) => (size * height) / 812;
 const responsiveMargin = (size) => (size * height) / 812;
-
-const responsivePadding = (size) => {
-  return (size * width) / 375;
-};
+const responsivePadding = (size) => (size * width) / 375;
 
 const formatDateTime = (dateString) => {
   const date = new Date(dateString);
@@ -56,6 +53,7 @@ export default function CustomImageCarousel() {
   const [error, setError] = useState(null);
   const scrollX = new Animated.Value(0);
   const navigation = useNavigation();
+  const [refreshing, setRefreshing] = useState(false);
 
   const [modalVisible, setModalVisible] = useState(false);
   const scaleValue = useRef(new Animated.Value(1)).current;
@@ -116,6 +114,11 @@ export default function CustomImageCarousel() {
     return () => scaleAnimation.stop();
   }, [scaleValue]);
 
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchLetters().finally(() => setRefreshing(false));
+  }, []);
+
   if (loading) {
     return (
       <ActivityIndicator size="large" color="#fff" style={styles.centered} />
@@ -175,7 +178,7 @@ export default function CustomImageCarousel() {
               You have currently no Letter{" "}
             </Text>
             <Text style={styles.modalText}>
-              Click the button and fill the information the create the Post
+              Click the button and fill the information to create the Post
             </Text>
             <View
               style={{
@@ -220,6 +223,8 @@ export default function CustomImageCarousel() {
           )}
           data={letters}
           keyExtractor={(item) => item._id}
+          onRefresh={handleRefresh}
+          refreshing={refreshing}
           renderItem={({ item, index }) => {
             const inputRange = [
               (index - 1) * width,

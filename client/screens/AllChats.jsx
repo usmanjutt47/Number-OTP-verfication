@@ -8,7 +8,6 @@ import {
   FlatList,
   ActivityIndicator,
   Dimensions,
-  Easing,
   Image,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
@@ -16,6 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomTopNav from "../components/CustomTopNav";
 import { useUnreadMessages } from "../context/UnreadMessagesContext";
+import { debounce } from "lodash";
 
 const { width, height } = Dimensions.get("window");
 
@@ -44,19 +44,16 @@ const AllChats = () => {
   const [unreadCounts, setUnreadCounts] = useState({});
   const scaleValue = useRef(new Animated.Value(1)).current;
   const { setTotalUnreadMessages } = useUnreadMessages();
+  const [currentChatId, setCurrentChatId] = useState(null);
 
   const fetchUserReplies = async () => {
     try {
       const userId = await AsyncStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID not found");
-      }
+      if (!userId) throw new Error("User ID not found");
       const response = await fetch(
         `http://192.168.100.6:8080/api/reply/my-replies/${userId}`
       );
-      if (!response.ok) {
-        throw new Error("Failed to fetch user replies");
-      }
+      if (!response.ok) throw new Error("Failed to fetch user replies");
       const data = await response.json();
       return data;
     } catch (err) {
@@ -68,19 +65,13 @@ const AllChats = () => {
   const fetchUserLettersReplies = async () => {
     try {
       const userId = await AsyncStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID not found");
-      }
-
+      if (!userId) throw new Error("User ID not found");
       const response = await fetch(
         `http://192.168.100.6:8080/api/reply/my-letters-replies/${userId}`
       );
-      if (!response.ok) {
+      if (!response.ok)
         throw new Error("Failed to fetch user letters and unread messages");
-      }
-
       const data = await response.json();
-
       return {
         lettersReplies: data.lettersReplies,
         unreadMessages: data.unreadMessages,
@@ -117,7 +108,7 @@ const AllChats = () => {
       (acc, count) => acc + count,
       0
     );
-    setTotalUnreadMessages(totalUnread); // Update global state with total unread messages
+    setTotalUnreadMessages(totalUnread);
 
     setChats(combinedChats);
     setUnreadCounts(unreadCounts);
@@ -151,25 +142,41 @@ const AllChats = () => {
           },
         }
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to mark chat as read");
-      }
+      if (!response.ok) throw new Error("Failed to mark chat as read");
     } catch (err) {
       setError(err.message || "An unexpected error occurred");
     }
   };
 
-  const handlePress = async (item) => {
-    await markChatAsRead(item._id);
-    navigation.navigate("ChatDetail", {
-      chatId: item._id,
-      chatContent: item.content || "No content",
-      senderName: item.senderId || "Anonymous",
-      timestamp: item.createdAt,
-      letterSenderId: item.senderId,
-      letterReceiverId: item.reciverId,
-    });
+  useEffect(() => {
+    if (currentChatId !== null) {
+      console.log("Current Chat ID updated to:", currentChatId);
+    }
+  }, [currentChatId]);
+
+  const debouncedHandlePress = useCallback(
+    debounce(async (item) => {
+      if (currentChatId === item._id) return;
+      console.log("Handling press for:", item._id);
+
+      setCurrentChatId(item._id);
+      await markChatAsRead(item._id);
+
+      console.log("Navigating with chatId:", item._id);
+      navigation.navigate("ChatDetail", {
+        chatId: item._id,
+        chatContent: item.content || "No content",
+        senderName: item.senderId || "Anonymous",
+        timestamp: item.createdAt,
+        letterSenderId: item.senderId,
+        letterReceiverId: item.reciverId,
+      });
+    }, 300),
+    [currentChatId, navigation, markChatAsRead]
+  );
+
+  const handlePress = (item) => {
+    debouncedHandlePress(item);
   };
 
   const renderItem = ({ item }) => {
@@ -179,7 +186,7 @@ const AllChats = () => {
       <Pressable style={styles.chatContainer} onPress={() => handlePress(item)}>
         <View style={styles.chatDetails}>
           <View style={styles.chatContent}>
-            <Text style={{ fontSize: 16, fontFamily: "Outfit_Medium" }}>
+            <Text style={styles.senderName}>
               {item.sender?.name || "Anonymous"}
             </Text>
             <Text
@@ -187,30 +194,14 @@ const AllChats = () => {
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              <Text>{item.content} 💬</Text>
+              {item.content} 💬
             </Text>
           </View>
           <View style={styles.chatRightSection}>
             <Text style={styles.chatTime}>{formatTime(item.createdAt)}</Text>
             {unreadCount > 0 && (
-              <Pressable
-                style={{
-                  backgroundColor: "#075856",
-                  height: 20,
-                  width: 20,
-                  borderRadius: 44,
-                  justifyContent: "center",
-                }}
-              >
-                <Text
-                  style={{
-                    color: "#fff",
-                    textAlign: "center",
-                    fontFamily: "Outfit_Bold",
-                  }}
-                >
-                  {unreadCount}
-                </Text>
+              <Pressable style={styles.badge}>
+                <Text style={styles.badgeText}>{unreadCount}</Text>
               </Pressable>
             )}
           </View>
@@ -233,7 +224,7 @@ const AllChats = () => {
           <FlatList
             data={filteredChats}
             renderItem={renderItem}
-            keyExtractor={(item, index) => `${item._id}-${index}`}
+            keyExtractor={(item) => item._id}
             style={styles.chatList}
             showsVerticalScrollIndicator={false}
             onRefresh={onRefresh}
@@ -252,11 +243,7 @@ const AllChats = () => {
                 <View style={styles.imageContainer}>
                   <Image
                     source={require("../assets/icons/noChat.png")}
-                    style={{
-                      height: responsiveHeight(23),
-                      width: responsiveHeight(23),
-                      tintColor: "#fff",
-                    }}
+                    style={styles.noChatImage}
                   />
                 </View>
               </View>
@@ -275,17 +262,12 @@ const AllChats = () => {
       >
         <Image
           source={require("../assets/icons/add.png")}
-          style={{
-            height: responsiveHeight(25),
-            width: responsiveWidth(25),
-            resizeMode: "contain",
-          }}
+          style={{ height: responsiveHeight(25), width: responsiveWidth(25) }}
         />
       </Pressable>
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -25,9 +25,7 @@ const responsiveIconSize = (size) => (size * width) / 375;
 const responsiveWidth = (size) => (size * width) / 375;
 const responsiveHeight = (size) => (size * height) / 812;
 const responsiveMargin = (size) => (size * height) / 812;
-const responsivePadding = (size) => {
-  return (size * width) / 375;
-};
+const responsivePadding = (size) => (size * width) / 375;
 
 const formatTime = (dateString) => {
   return new Date(dateString).toLocaleTimeString([], {
@@ -53,59 +51,57 @@ const AllChats = () => {
       if (!userId) {
         throw new Error("User ID not found");
       }
-
       const response = await fetch(
         `http://192.168.100.6:8080/api/reply/my-replies/${userId}`
       );
-      const data = await response.json();
-
-      if (response.ok) {
-        setChats(data);
-        const counts = data.reduce((acc, chat) => {
-          acc[chat._id] = chat.unreadMessagesCount || 0;
-          return acc;
-        }, {});
-        setUnreadCounts(counts);
-      } else {
-        setError(data.error || "Failed to fetch replies");
-        console.error("Error fetching replies:", data.error);
+      if (!response.ok) {
+        throw new Error("Failed to fetch user replies");
       }
+      const data = await response.json();
+      return data;
     } catch (err) {
       setError(err.message || "An unexpected error occurred");
-      console.error("Error occurred:", err.message);
-    } finally {
-      setLoading(false);
+      return [];
     }
   };
 
+  const fetchUserLettersReplies = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID not found");
+      }
+
+      const response = await fetch(
+        `http://192.168.100.6:8080/api/reply/my-letters-replies/${userId}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch user letters replies");
+      }
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      setError(err.message || "An unexpected error occurred");
+      return [];
+    }
+  };
+
+  const fetchAllReplies = async () => {
+    setLoading(true);
+    const userReplies = await fetchUserReplies();
+    const userLettersReplies = await fetchUserLettersReplies();
+    const combinedData = [...userReplies, ...userLettersReplies];
+    setChats(combinedData);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    fetchUserReplies();
+    fetchAllReplies();
   }, []);
 
-  useEffect(() => {
-    const scaleAnimation = Animated.loop(
-      Animated.sequence([
-        Animated.timing(scaleValue, {
-          toValue: 1.1,
-          duration: 1000,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleValue, {
-          toValue: 1,
-          duration: 1000,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-      ])
-    );
-    scaleAnimation.start();
-
-    return () => scaleAnimation.stop();
-  }, [scaleValue]);
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchUserReplies().finally(() => setRefreshing(false));
+    fetchAllReplies().finally(() => setRefreshing(false));
   }, []);
 
   const filteredChats = chats.filter(
@@ -116,15 +112,15 @@ const AllChats = () => {
   );
 
   const handlePress = (item) => {
-    console.log("reciverId", item.letterSenderId);
+    console.log("Item:", item); // Console mein item ki details dekhne ke liye
+
     navigation.navigate("ChatDetail", {
       chatId: item._id,
-      chatContent: item.content,
-      senderName: item.sender?.name || "Anonymous",
       chatContent: item.latestReply || item.content || "No content",
+      senderName: item.sender?.name || "Anonymous",
       timestamp: item.createdAt,
       letterSenderId: item.letterSenderId,
-      letterReceiverId: item.letterSenderId,
+      letterReceiverId: item.letterReceiverId, // `letterReceiverId` aur `letterSenderId` ko sahi assign karein
     });
   };
 
@@ -145,9 +141,6 @@ const AllChats = () => {
         </View>
         <View style={styles.chatRightSection}>
           <Text style={styles.chatTime}>{formatTime(item.createdAt)}</Text>
-          {/* <Pressable style={styles.badge} onPress={() => handlePress(item)}>
-            <Text style={styles.badgeText}>{unreadCounts[item._id]}</Text>
-          </Pressable> */}
         </View>
       </View>
     </Pressable>

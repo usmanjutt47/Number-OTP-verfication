@@ -21,6 +21,7 @@ const responsiveWidth = (size) => (size * width) / 375;
 const pusher = new Pusher("1851485", {
   cluster: "us2",
   encrypted: true,
+  logToConsole: true,
 });
 
 const ChatDetail = () => {
@@ -83,7 +84,7 @@ const ChatDetail = () => {
     };
 
     fetchMessages();
-    // const intervalId = setInterval(fetchMessages, 1000);
+    const intervalId = setInterval(fetchMessages, 1000);
 
     const channel = pusher.subscribe(`chat-${chatId}`);
     channel.bind("message", (data) => {
@@ -105,7 +106,7 @@ const ChatDetail = () => {
     return () => {
       channel.unbind_all();
       channel.unsubscribe();
-      // clearInterval(intervalId);
+      clearInterval(intervalId);
     };
   }, [chatId]);
 
@@ -133,7 +134,7 @@ const ChatDetail = () => {
           },
           body: JSON.stringify({
             senderId: userId,
-            receiverId: letterReceiverId,
+            receiverId: letterReceiverId, // Ensure this is passed correctly
             replyId: chatId,
             messageContent: messageText,
           }),

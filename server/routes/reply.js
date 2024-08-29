@@ -8,9 +8,9 @@ const Message = require("../models/messages");
 
 router.post("/", async (req, res) => {
   try {
-    const { senderId, content, letterId, letterSenderId } = req.body;
+    const { senderId, content, letterId, reciverId } = req.body;
 
-    if (!senderId || !content || !letterId || !letterSenderId) {
+    if (!senderId || !content || !letterId || !reciverId) {
       return res.status(400).json({ error: "Required fields missing" });
     }
 
@@ -24,12 +24,15 @@ router.post("/", async (req, res) => {
       return res.status(404).json({ error: "Letter not found" });
     }
 
-    const reply = await Reply.create({
+    const reply = new Reply({
       senderId,
       content,
       letterId,
-      letterSenderId,
+      reciverId,
     });
+    await reply.save();
+
+    console.log({ senderId, content, letterId, reciverId });
 
     return res.status(201).json({ message: "Reply created", reply });
   } catch (err) {
@@ -46,31 +49,25 @@ router.get("/my-replies/:userId", async (req, res) => {
       return res.status(400).json({ error: "User ID is required" });
     }
 
-    // Fetch replies where the user is the sender (replies to others' letters)
     const sentReplies = await Reply.find({ senderId: userId }).populate(
       "letterId"
     );
 
-    // Fetch replies where the user is the receiver (replies to user's letters)
     const receivedReplies = await Reply.find({ receiverId: userId }).populate(
       "letterId"
     );
 
-    // Combine sent and received replies
     const allReplies = [...sentReplies, ...receivedReplies];
 
-    // Sort replies by creation date (newest first)
     allReplies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     console.log(`Total replies found: ${allReplies.length}`);
 
-    // Build the final response with unread message counts
     const replies = await Promise.all(
       allReplies.map(async (reply) => {
         const sender = await User.findById(reply.senderId);
         const letter = reply.letterId;
 
-        // Count unread messages for this reply where the user is the receiver
         const unreadCount = await Message.countDocuments({
           replyId: reply._id,
           receiverId: userId,
@@ -102,7 +99,7 @@ router.get("/my-letters-replies/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
 
-    const lettersReplies = await Reply.find({ senderId: userId }).populate({
+    const lettersReplies = await Reply.find({ reciverId: userId }).populate({
       path: "letterId",
       select: "receiverId",
       populate: { path: "receiverId", select: "name" },
@@ -146,12 +143,26 @@ router.get("/letter/:id", async (req, res) => {
 
 router.post("/send-message", async (req, res) => {
   try {
-    const { senderId, receiverId, replyId, messageContent } = req.body;
+    console.log("Request Body:", req.body);
 
-    if (!senderId || !receiverId || !replyId || !messageContent) {
+    const { senderId, replyId, messageContent } = req.body;
+
+    if (!senderId || !replyId || !messageContent) {
+      console.log("Missing required fields");
       return res.status(400).json({ error: "Missing required fields" });
     }
 
+    // ReplyId se related reply record find karna
+    const reply = await Reply.findById(replyId);
+    if (!reply) {
+      console.log("Reply not found");
+      return res.status(404).json({ error: "Reply not found" });
+    }
+
+    // Reply record se receiverId ko set karna
+    const receiverId = reply.reciverId;
+
+    // Naya message create karna
     const message = new Message({
       message: messageContent,
       replyId,
@@ -160,6 +171,9 @@ router.post("/send-message", async (req, res) => {
     });
     await message.save();
 
+    console.log("Message saved:", message);
+
+    // Pusher instance trigger karna
     pusherInstance.trigger(`chat-${replyId}`, "message", {
       _id: message._id,
       senderId,

@@ -135,7 +135,7 @@ export default function CustomTopNav() {
                 resizeMode: "contain",
               }}
             />
-            {activeScreen !== "AllChats" && (
+            {activeScreen !== "AllChats" && totalUnreadMessages > 0 && (
               <Pressable
                 style={{
                   height: 15,
@@ -149,7 +149,13 @@ export default function CustomTopNav() {
                   top: -7,
                 }}
               >
-                <Text style={{ fontSize: 10, textAlign: "center" }}>
+                <Text
+                  style={{
+                    fontSize: 10,
+                    textAlign: "center",
+                    fontFamily: "Outfit_Regular",
+                  }}
+                >
                   {totalUnreadMessages}
                 </Text>
               </Pressable>

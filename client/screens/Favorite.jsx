@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -55,28 +55,34 @@ export default function Favorite() {
   const scrollX = new Animated.Value(0);
   const navigation = useNavigation();
   const scaleValue = useRef(new Animated.Value(1)).current;
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchFavoriteLetters = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const response = await axios.get(
+        `http://192.168.100.6:8080/api/letter/favorites/${userId}`
+      );
+      if (response.data.favorites.length === 0) {
+        setNoFavorites(true);
+      } else {
+        setFavorites(response.data.favorites);
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching favorite letters:", error);
+      setError("Error fetching favorite letters");
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchFavoriteLetters = async () => {
-      try {
-        const userId = await AsyncStorage.getItem("userId");
-        const response = await axios.get(
-          `http://192.168.100.6:8080/api/letter/favorites/${userId}`
-        );
-        if (response.data.favorites.length === 0) {
-          setNoFavorites(true);
-        } else {
-          setFavorites(response.data.favorites);
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching favorite letters:", error);
-        setError("Error fetching favorite letters");
-        setLoading(false);
-      }
-    };
-
     fetchFavoriteLetters();
+  }, []);
+
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchFavoriteLetters().finally(() => setRefreshing(false));
   }, []);
 
   useEffect(() => {
@@ -100,6 +106,7 @@ export default function Favorite() {
 
     return () => scaleAnimation.stop();
   }, [scaleValue]);
+
   if (loading) {
     return (
       <ActivityIndicator size="large" color="#fff" style={styles.centered} />
@@ -173,7 +180,9 @@ export default function Favorite() {
             [{ nativeEvent: { contentOffset: { x: scrollX } } }],
             { useNativeDriver: true }
           )}
-          data={favorites} // Use the favorites data here
+          data={favorites}
+          onRefresh={handleRefresh}
+          refreshing={refreshing}
           keyExtractor={(item) => item._id}
           renderItem={({ item, index }) => {
             const inputRange = [

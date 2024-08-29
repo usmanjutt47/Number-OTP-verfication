@@ -20,6 +20,7 @@ import ChatDetail from "./components/ChatDetail";
 import ViewLetter from "./screens/ViewLetter";
 import ReplyLetter from "./screens/ReplyLetter";
 import ReplyFromHome from "./screens/ReplyFromHome";
+import { UnreadMessagesProvider } from "./context/UnreadMessagesContext";
 
 const Stack = createStackNavigator();
 
@@ -67,34 +68,36 @@ const App = () => {
     "pk_test_51PnyvfDw0HZ2rXEfHszzvJJfoiyLWKUpejcAP2xOWWkwj3e6eflY3zWFN8OK69FS9NLQPaoz2P1XcZ1XK3OVO79K00Avrtb4N6";
 
   return (
-    <StripeProvider publishableKey={PUBLISH_KEY}>
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName={initialRoute}
-          screenOptions={{ headerShown: false }}
-        >
-          <Stack.Screen name="CustomKeyboard" component={CustomKeyboard} />
-          <Stack.Screen name="CustomTopNav" component={CustomTopNav} />
+    <UnreadMessagesProvider>
+      <StripeProvider publishableKey={PUBLISH_KEY}>
+        <NavigationContainer>
+          <Stack.Navigator
+            initialRouteName={initialRoute}
+            screenOptions={{ headerShown: false }}
+          >
+            <Stack.Screen name="CustomKeyboard" component={CustomKeyboard} />
+            <Stack.Screen name="CustomTopNav" component={CustomTopNav} />
 
-          <Stack.Screen name="OnBoarding" component={OnBoarding} />
-          <Stack.Screen
-            name="EmailVerification"
-            component={EmailVerification}
-          />
-          <Stack.Screen name="OTPVerification" component={OTPVerification} />
-          <Stack.Screen name="Home" component={Home} />
-          <Stack.Screen name="Favorite" component={Favorite} />
-          <Stack.Screen name="AllChats" component={AllChats} />
-          <Stack.Screen name="Profile" component={Profile} />
-          <Stack.Screen name="WriteLetter" component={WriteLetter} />
-          <Stack.Screen name="SelectPlan" component={SelectPlan} />
-          <Stack.Screen name="ChatDetail" component={ChatDetail} />
-          <Stack.Screen name="ViewLetter" component={ViewLetter} />
-          <Stack.Screen name="ReplyLetter" component={ReplyLetter} />
-          <Stack.Screen name="ReplyFromHome" component={ReplyFromHome} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </StripeProvider>
+            <Stack.Screen name="OnBoarding" component={OnBoarding} />
+            <Stack.Screen
+              name="EmailVerification"
+              component={EmailVerification}
+            />
+            <Stack.Screen name="OTPVerification" component={OTPVerification} />
+            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="Favorite" component={Favorite} />
+            <Stack.Screen name="AllChats" component={AllChats} />
+            <Stack.Screen name="Profile" component={Profile} />
+            <Stack.Screen name="WriteLetter" component={WriteLetter} />
+            <Stack.Screen name="SelectPlan" component={SelectPlan} />
+            <Stack.Screen name="ChatDetail" component={ChatDetail} />
+            <Stack.Screen name="ViewLetter" component={ViewLetter} />
+            <Stack.Screen name="ReplyLetter" component={ReplyLetter} />
+            <Stack.Screen name="ReplyFromHome" component={ReplyFromHome} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </StripeProvider>
+    </UnreadMessagesProvider>
   );
 };
 

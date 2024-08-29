@@ -14,6 +14,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useUnreadMessages } from "../context/UnreadMessagesContext";
 
 const { width, height } = Dimensions.get("window");
 
@@ -44,6 +45,7 @@ export default function CustomTopNav() {
   const [modalVisible, setModalVisible] = useState(false);
   const scaleValue = useRef(new Animated.Value(1)).current;
   const [isFavorite, setIsFavorite] = useState(false);
+  const { totalUnreadMessages } = useUnreadMessages();
 
   const handlePress = (screen) => {
     navigation.navigate(screen);
@@ -119,19 +121,40 @@ export default function CustomTopNav() {
           onPress={() => handlePress("AllChats")}
           disabled={modalVisible}
         >
-          <Image
-            source={
-              activeScreen === "AllChats"
-                ? require("../assets/icons/fillInbox.png")
-                : require("../assets/icons/inbox.png")
-            }
-            style={{
-              height: 22,
-              width: 22,
-              tintColor: "#4A4A4A",
-              resizeMode: "contain",
-            }}
-          />
+          <View style={styles.imageWrapper}>
+            <Image
+              source={
+                activeScreen === "AllChats"
+                  ? require("../assets/icons/fillInbox.png")
+                  : require("../assets/icons/inbox.png")
+              }
+              style={{
+                height: 22,
+                width: 22,
+                tintColor: "#4A4A4A",
+                resizeMode: "contain",
+              }}
+            />
+            {activeScreen !== "AllChats" && (
+              <Pressable
+                style={{
+                  height: 15,
+                  width: 15,
+                  backgroundColor: "#fff",
+                  resizeMode: "contain",
+                  position: "absolute",
+                  justifyContent: "center",
+                  borderRadius: 44,
+                  right: -5,
+                  top: -7,
+                }}
+              >
+                <Text style={{ fontSize: 10, textAlign: "center" }}>
+                  {totalUnreadMessages}
+                </Text>
+              </Pressable>
+            )}
+          </View>
         </Pressable>
 
         {/* <Pressable

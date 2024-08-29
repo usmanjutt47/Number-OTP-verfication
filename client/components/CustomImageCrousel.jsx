@@ -9,13 +9,13 @@ import {
   Pressable,
   TouchableOpacity,
   Image,
-  Alert,
   Easing,
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { FontAwesome5 } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
 
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.9;
@@ -135,17 +135,36 @@ export default function CustomImageCarousel() {
       );
 
       if (response.status === 200) {
-        Alert.alert("Success", "Letter has been hidden.");
-        fetchLetters();
+        Toast.show({
+          type: "success",
+          position: "top",
+          text1: "Success",
+          text2: "Letter has been hidden.",
+          visibilityTime: 1000,
+        });
+
+        setTimeout(() => {
+          fetchLetters();
+        }, 500);
       } else {
-        Alert.alert("Error", "Failed to hide the letter.");
+        Toast.show({
+          type: "error",
+          position: "top",
+          text1: "Error",
+          text2: "Failed to hide the letter.",
+          visibilityTime: 2000,
+        });
       }
     } catch (err) {
       console.error("Error hiding letter:", err.response?.data || err.message);
-      Alert.alert(
-        "Error",
-        err.response?.data?.message || "An unexpected error occurred."
-      );
+
+      Toast.show({
+        type: "error",
+        position: "top",
+        text1: "Error",
+        text2: err.response?.data?.message || "An unexpected error occurred.",
+        visibilityTime: 2000,
+      });
     }
   };
 
@@ -339,6 +358,7 @@ export default function CustomImageCarousel() {
           }}
         />
       )}
+      <Toast />
     </View>
   );
 }

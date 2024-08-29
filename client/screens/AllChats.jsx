@@ -12,11 +12,10 @@ import {
   Image,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Entypo } from "@expo/vector-icons";
 import CustomTopNav from "../components/CustomTopNav";
+import { useUnreadMessages } from "../context/UnreadMessagesContext";
 
 const { width, height } = Dimensions.get("window");
 
@@ -44,6 +43,7 @@ const AllChats = () => {
   const [loading, setLoading] = useState(true);
   const [unreadCounts, setUnreadCounts] = useState({});
   const scaleValue = useRef(new Animated.Value(1)).current;
+  const { setTotalUnreadMessages } = useUnreadMessages();
 
   const fetchUserReplies = async () => {
     try {
@@ -76,22 +76,51 @@ const AllChats = () => {
         `http://192.168.100.6:8080/api/reply/my-letters-replies/${userId}`
       );
       if (!response.ok) {
-        throw new Error("Failed to fetch user letters replies");
+        throw new Error("Failed to fetch user letters and unread messages");
       }
+
       const data = await response.json();
-      return data;
+
+      return {
+        lettersReplies: data.lettersReplies,
+        unreadMessages: data.unreadMessages,
+      };
     } catch (err) {
       setError(err.message || "An unexpected error occurred");
-      return [];
+      return { lettersReplies: [], unreadMessages: [] };
     }
   };
 
   const fetchAllReplies = async () => {
     setLoading(true);
     const userReplies = await fetchUserReplies();
-    const userLettersReplies = await fetchUserLettersReplies();
-    const combinedData = [...userReplies, ...userLettersReplies];
-    setChats(combinedData);
+    const { lettersReplies, unreadMessages } = await fetchUserLettersReplies();
+
+    const combinedChats = [...userReplies, ...lettersReplies];
+
+    const unreadCounts = {};
+
+    combinedChats.forEach((chat) => {
+      unreadCounts[chat._id] = 0;
+    });
+
+    unreadMessages.forEach((msg) => {
+      if (!msg.isRead) {
+        const chatId = msg.replyId;
+        if (unreadCounts[chatId] !== undefined) {
+          unreadCounts[chatId]++;
+        }
+      }
+    });
+
+    const totalUnread = Object.values(unreadCounts).reduce(
+      (acc, count) => acc + count,
+      0
+    );
+    setTotalUnreadMessages(totalUnread); // Update global state with total unread messages
+
+    setChats(combinedChats);
+    setUnreadCounts(unreadCounts);
     setLoading(false);
   };
 
@@ -112,39 +141,62 @@ const AllChats = () => {
   );
 
   const handlePress = (item) => {
-    console.log("Item:", item); // Console mein item ki details dekhne ke liye
-
     navigation.navigate("ChatDetail", {
       chatId: item._id,
       chatContent: item.latestReply || item.content || "No content",
       senderName: item.sender?.name || "Anonymous",
       timestamp: item.createdAt,
       letterSenderId: item.letterSenderId,
-      letterReceiverId: item.letterReceiverId, // `letterReceiverId` aur `letterSenderId` ko sahi assign karein
+      letterReceiverId: item.letterReceiverId,
     });
   };
 
-  const renderItem = ({ item }) => (
-    <Pressable style={styles.chatContainer} onPress={() => handlePress(item)}>
-      <View style={styles.chatDetails}>
-        <View style={styles.chatContent}>
-          <Text style={{ fontSize: 16, fontFamily: "Outfit_Medium" }}>
-            {item.sender?.name || "Anonymous"}
-          </Text>
-          <Text
-            style={styles.chatMessage}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            <Text>{item.content} 💬</Text>
-          </Text>
+  const renderItem = ({ item }) => {
+    const unreadCount = unreadCounts[item._id] || 0;
+
+    return (
+      <Pressable style={styles.chatContainer} onPress={() => handlePress(item)}>
+        <View style={styles.chatDetails}>
+          <View style={styles.chatContent}>
+            <Text style={{ fontSize: 16, fontFamily: "Outfit_Medium" }}>
+              {item.sender?.name || "Anonymous"}
+            </Text>
+            <Text
+              style={styles.chatMessage}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              <Text>{item.content} 💬</Text>
+            </Text>
+          </View>
+          <View style={styles.chatRightSection}>
+            <Text style={styles.chatTime}>{formatTime(item.createdAt)}</Text>
+            {unreadCount > 0 && (
+              <Pressable
+                style={{
+                  backgroundColor: "#075856",
+                  height: 20,
+                  width: 20,
+                  borderRadius: 44,
+                  justifyContent: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    color: "#fff",
+                    textAlign: "center",
+                    fontFamily: "Outfit_Bold",
+                  }}
+                >
+                  {unreadCount}
+                </Text>
+              </Pressable>
+            )}
+          </View>
         </View>
-        <View style={styles.chatRightSection}>
-          <Text style={styles.chatTime}>{formatTime(item.createdAt)}</Text>
-        </View>
-      </View>
-    </Pressable>
-  );
+      </Pressable>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -200,7 +252,14 @@ const AllChats = () => {
         style={styles.pressable}
         onPress={() => navigation.navigate("WriteLetter")}
       >
-        <Entypo name="plus" size={40} color="white" />
+        <Image
+          source={require("../assets/icons/add.png")}
+          style={{
+            height: responsiveHeight(25),
+            width: responsiveWidth(25),
+            resizeMode: "contain",
+          }}
+        />
       </Pressable>
     </View>
   );

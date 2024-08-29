@@ -5,6 +5,7 @@ const Letter = require("../models/letter");
 const User = require("../models/user");
 const pusherInstance = require("../utils/pusher");
 const Message = require("../models/messages");
+const mongoose = require("mongoose");
 
 router.post("/", async (req, res) => {
   try {
@@ -58,13 +59,11 @@ router.get("/my-replies/:userId", async (req, res) => {
     const sentReplies = await Reply.find({ senderId: userId }).populate(
       "letterId"
     );
-
     const receivedReplies = await Reply.find({ receiverId: userId }).populate(
       "letterId"
     );
 
     const allReplies = [...sentReplies, ...receivedReplies];
-
     allReplies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     console.log(`Total replies found: ${allReplies.length}`);
@@ -80,12 +79,19 @@ router.get("/my-replies/:userId", async (req, res) => {
           isRead: false,
         });
 
+        const unreadMessages = await Message.find({
+          replyId: reply._id,
+          receiverId: userId,
+          isRead: false,
+        });
+
         console.log(`Reply ID: ${reply._id}, Unread messages: ${unreadCount}`);
 
         return {
           ...reply._doc,
           sender,
           unreadMessagesCount: unreadCount,
+          unreadMessages,
         };
       })
     );
@@ -105,13 +111,38 @@ router.get("/my-letters-replies/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
 
+    const objectIdUserId = new mongoose.Types.ObjectId(userId);
+
     const lettersReplies = await Reply.find({ reciverId: userId }).populate({
       path: "letterId",
       select: "receiverId",
       populate: { path: "receiverId", select: "name" },
     });
 
-    res.json(lettersReplies);
+    const unreadMessagesCount = await Message.aggregate([
+      { $match: { receiverId: objectIdUserId, isRead: false } },
+      { $count: "unreadCount" },
+    ]);
+
+    console.log(
+      "Unread Messages Count:",
+      unreadMessagesCount.length > 0 ? unreadMessagesCount[0].unreadCount : 0
+    );
+
+    const unreadMessages = await Message.find({
+      receiverId: objectIdUserId,
+      isRead: false,
+    }).populate({
+      path: "senderId",
+      select: "name",
+    });
+
+    res.json({
+      lettersReplies,
+      unreadCount:
+        unreadMessagesCount.length > 0 ? unreadMessagesCount[0].unreadCount : 0,
+      unreadMessages,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -158,17 +189,14 @@ router.post("/send-message", async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    // ReplyId se related reply record find karna
     const reply = await Reply.findById(replyId);
     if (!reply) {
       console.log("Reply not found");
       return res.status(404).json({ error: "Reply not found" });
     }
 
-    // Reply record se receiverId ko set karna
     const receiverId = reply.reciverId;
 
-    // Naya message create karna
     const message = new Message({
       message: messageContent,
       replyId,
@@ -179,7 +207,6 @@ router.post("/send-message", async (req, res) => {
 
     console.log("Message saved:", message);
 
-    // Pusher instance trigger karna
     pusherInstance.trigger(`chat-${replyId}`, "message", {
       _id: message._id,
       senderId,

@@ -1,10 +1,9 @@
-// UnreadMessagesContext.js
 import React, { createContext, useState, useContext } from "react";
 
 const UnreadMessagesContext = createContext();
 
 export const UnreadMessagesProvider = ({ children }) => {
-  const [totalUnreadMessages, setTotalUnreadMessages] = useState(0);
+  const [totalUnreadMessages, setTotalUnreadMessages] = useState();
 
   return (
     <UnreadMessagesContext.Provider

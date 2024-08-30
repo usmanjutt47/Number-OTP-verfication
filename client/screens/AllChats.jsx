@@ -186,9 +186,7 @@ const AllChats = () => {
       <Pressable style={styles.chatContainer} onPress={() => handlePress(item)}>
         <View style={styles.chatDetails}>
           <View style={styles.chatContent}>
-            <Text style={styles.senderName}>
-              {item.sender?.name || "Anonymous"}
-            </Text>
+            <Text style={styles.name}>{item.sender?.name || "Anonymous"}</Text>
             <Text
               style={styles.chatMessage}
               numberOfLines={1}
@@ -227,8 +225,8 @@ const AllChats = () => {
             keyExtractor={(item) => item._id}
             style={styles.chatList}
             showsVerticalScrollIndicator={false}
-            onRefresh={onRefresh}
-            refreshing={refreshing}
+            // onRefresh={onRefresh}
+            // refreshing={refreshing}
           />
         ) : (
           <View style={styles.modalOverlay}>
@@ -320,7 +318,7 @@ const styles = StyleSheet.create({
   },
   chatMessage: {
     fontFamily: "Outfit_Regular",
-    fontSize: 14,
+    fontSize: 12,
     color: "#AAAAB4",
     alignItems: "center",
   },
@@ -409,6 +407,10 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_Bold",
     fontSize: responsiveFontSize(20),
     marginTop: responsivePadding(23),
+  },
+  name: {
+    fontSize: responsiveFontSize(16),
+    fontFamily: "Outfit_Medium",
   },
 });
 

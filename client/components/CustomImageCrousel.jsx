@@ -65,7 +65,7 @@ export default function CustomImageCarousel() {
       }
 
       const response = await axios.get(
-        `http://192.168.100.6:8080/api/letter/all-excluding-creator/${userId}`
+        `http://192.168.100.175:8080/api/letter/all-excluding-creator/${userId}`
       );
 
       if (response.status === 200) {
@@ -131,7 +131,7 @@ export default function CustomImageCarousel() {
   const handleHideLetter = async (letterId) => {
     try {
       const response = await axios.post(
-        `http://192.168.100.6:8080/api/letter/hide-letter/${String(letterId)}`
+        `http://192.168.100.175:8080/api/letter/hide-letter/${String(letterId)}`
       );
 
       if (response.status === 200) {

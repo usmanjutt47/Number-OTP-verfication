@@ -15,6 +15,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useUnreadMessages } from "../context/UnreadMessagesContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -55,8 +56,14 @@ export default function CustomTopNav() {
     setModalVisible(true);
   };
 
-  const handleCloseModal = () => {
-    setModalVisible(false);
+  const handleCloseModal = async () => {
+    try {
+      await AsyncStorage.removeItem("userId");
+      setModalVisible(true);
+      console.log("User ID removed successfully");
+    } catch (error) {
+      console.error("Failed to remove the user ID:", error);
+    }
   };
 
   useEffect(() => {

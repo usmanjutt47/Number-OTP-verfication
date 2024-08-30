@@ -51,7 +51,7 @@ const AllChats = () => {
       const userId = await AsyncStorage.getItem("userId");
       if (!userId) throw new Error("User ID not found");
       const response = await fetch(
-        `http://192.168.100.6:8080/api/reply/my-replies/${userId}`
+        `http://192.168.100.175:8080/api/reply/my-replies/${userId}`
       );
       if (!response.ok) throw new Error("Failed to fetch user replies");
       const data = await response.json();
@@ -67,7 +67,7 @@ const AllChats = () => {
       const userId = await AsyncStorage.getItem("userId");
       if (!userId) throw new Error("User ID not found");
       const response = await fetch(
-        `http://192.168.100.6:8080/api/reply/my-letters-replies/${userId}`
+        `http://192.168.100.175:8080/api/reply/my-letters-replies/${userId}`
       );
       if (!response.ok)
         throw new Error("Failed to fetch user letters and unread messages");
@@ -134,7 +134,7 @@ const AllChats = () => {
   const markChatAsRead = async (chatId) => {
     try {
       const response = await fetch(
-        `http://192.168.100.6:8080/api/reply/mark-as-read/${chatId}`,
+        `http://192.168.100.175:8080/api/reply/mark-as-read/${chatId}`,
         {
           method: "PATCH",
           headers: {

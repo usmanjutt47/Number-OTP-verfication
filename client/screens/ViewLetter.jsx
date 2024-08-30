@@ -11,6 +11,8 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SERVER_URL } from "@env";
+import Toast from "react-native-toast-message";
 
 const { width, height } = Dimensions.get("window");
 
@@ -50,22 +52,37 @@ export default function ViewLetter() {
       }
 
       const response = await axios.put(
-        `http://192.168.100.175:8080/api/letter/toggle-favorite/${letter._id}`,
+        `${SERVER_URL}/letter/toggle-favorite/${letter._id}`,
         {
           userId,
         }
       );
 
-      setIsFavorite(!isFavorite);
+      const newFavoriteStatus = !isFavorite;
+      setIsFavorite(newFavoriteStatus);
       await AsyncStorage.setItem(
         `favorite-${letter._id}`,
-        !isFavorite ? "true" : "false"
+        newFavoriteStatus ? "true" : "false"
       );
+
+      setTimeout(() => {
+        Toast.show({
+          type: "success",
+          text1: "Success",
+          text2: newFavoriteStatus
+            ? "Added to Favorites"
+            : "Removed from Favorites",
+        });
+      }, 500);
     } catch (error) {
       console.error("Error toggling favorite:", error);
-      alert("An error occurred. Please try again.");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "An error occurred. Please try again.",
+      });
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
@@ -140,6 +157,7 @@ export default function ViewLetter() {
           <Text style={styles.replyButtonText}>Reply Now</Text>
         </TouchableOpacity>
       </View>
+      <Toast />
     </View>
   );
 }

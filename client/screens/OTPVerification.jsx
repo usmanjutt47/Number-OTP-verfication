@@ -39,12 +39,12 @@ export default function OTPVerification({ navigation }) {
           return prevCountdown - 1;
         });
       }, 1000);
+      timerRef.current = timer; // Store the timer ID
     };
 
     startTimer(); // Start the timer initially
-    timerRef.current = startTimer; // Store the function to be called later
 
-    return () => clearInterval(timer); // Cleanup timer on unmount
+    return () => clearInterval(timerRef.current); // Cleanup timer on unmount
   }, []);
 
   useEffect(() => {
@@ -162,7 +162,17 @@ export default function OTPVerification({ navigation }) {
     setLoading(true);
     setCountdown(60); // Reset countdown to 60 seconds
     setIsResendEnabled(false);
-    timerRef.current(); // Start the timer again
+    clearInterval(timerRef.current); // Clear any existing timer
+    timerRef.current = setInterval(() => {
+      setCountdown((prevCountdown) => {
+        if (prevCountdown <= 1) {
+          clearInterval(timerRef.current);
+          setIsResendEnabled(true);
+          return 0;
+        }
+        return prevCountdown - 1;
+      });
+    }, 1000); // Start a new timer
     try {
       const response = await axios.post(
         "http://192.168.100.175:8080/api/user/",
@@ -228,21 +238,19 @@ export default function OTPVerification({ navigation }) {
       {loading ? (
         <ActivityIndicator size="large" color="#075856" />
       ) : (
-        <>
-          <View style={styles.resendContainer}>
-            {countdown > 0 ? (
-              <>
-                <Text>Resend code in </Text>
-                <Text style={styles.countdownText}>{countdown}</Text>
-                <Text>s</Text>
-              </>
-            ) : (
-              <Pressable onPress={handleSubmit}>
-                <Text style={styles.resendText}>Resend Code</Text>
-              </Pressable>
-            )}
-          </View>
-        </>
+        <View style={styles.resendContainer}>
+          {countdown > 0 ? (
+            <>
+              <Text>Resend code in </Text>
+              <Text style={styles.countdownText}>{countdown}</Text>
+              <Text>s</Text>
+            </>
+          ) : (
+            <Pressable onPress={handleSubmit}>
+              <Text style={styles.resendText}>Resend Code</Text>
+            </Pressable>
+          )}
+        </View>
       )}
       <View style={styles.buttonContainer}>
         <Pressable style={styles.button} onPress={handleOtpSubmit}>
@@ -341,10 +349,5 @@ const styles = StyleSheet.create({
   },
   resendText: {
     color: "#075856",
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
   },
 });

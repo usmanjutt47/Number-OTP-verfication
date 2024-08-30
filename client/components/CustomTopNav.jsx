@@ -11,33 +11,16 @@ import {
   Image,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import Feather from "@expo/vector-icons/Feather";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useUnreadMessages } from "../context/UnreadMessagesContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 
-const responsiveFontSize = (size) => {
-  return (size * width) / 375;
-};
-
-const responsiveIconSize = (size) => {
-  return (size * width) / 375;
-};
-
-const responsiveWidth = (size) => {
-  return (size * width) / 375;
-};
-
-const responsiveHeight = (size) => {
-  return (size * height) / 812;
-};
-
-const responsivePadding = (size) => {
-  return (size * width) / 375;
-};
+const responsiveFontSize = (size) => (size * width) / 375;
+const responsiveIconSize = (size) => (size * width) / 375;
+const responsiveWidth = (size) => (size * width) / 375;
+const responsiveHeight = (size) => (size * height) / 812;
+const responsivePadding = (size) => (size * width) / 375;
 
 export default function CustomTopNav() {
   const navigation = useNavigation();
@@ -45,7 +28,6 @@ export default function CustomTopNav() {
   const activeScreen = route.name;
   const [modalVisible, setModalVisible] = useState(false);
   const scaleValue = useRef(new Animated.Value(1)).current;
-  const [isFavorite, setIsFavorite] = useState(false);
   const { totalUnreadMessages } = useUnreadMessages();
 
   const handlePress = (screen) => {
@@ -56,11 +38,16 @@ export default function CustomTopNav() {
     setModalVisible(true);
   };
 
-  const handleCloseModal = async () => {
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
+
+  const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem("userId");
-      setModalVisible(true);
       console.log("User ID removed successfully");
+      setModalVisible(false);
+      navigation.navigate("OnBoarding");
     } catch (error) {
       console.error("Failed to remove the user ID:", error);
     }
@@ -169,18 +156,6 @@ export default function CustomTopNav() {
             )}
           </View>
         </Pressable>
-
-        {/* <Pressable
-          style={[
-            styles.button,
-            activeScreen === "Profile" && styles.activeButton,
-            modalVisible && styles.inactiveButton, // Disable button if modal is visible
-          ]}
-          onPress={() => handlePress("Profile")}
-          disabled={modalVisible} // Disable if modal is active
-        >
-          <Feather name="send" size={responsiveIconSize(24)} color="black" />
-        </Pressable> */}
       </View>
 
       <Pressable
@@ -188,7 +163,7 @@ export default function CustomTopNav() {
           styles.logout,
           modalVisible
             ? styles.activeLogoutButton
-            : styles.inactiveLogoutButton, // Change styles based on modal visibility
+            : styles.inactiveLogoutButton,
         ]}
         onPress={handleLogoutPress}
       >
@@ -202,7 +177,6 @@ export default function CustomTopNav() {
         />
       </Pressable>
 
-      {/* Modal for the popup */}
       <Modal
         animationType="fade"
         transparent={true}
@@ -240,10 +214,7 @@ export default function CustomTopNav() {
               <Pressable style={styles.cancelButton} onPress={handleCloseModal}>
                 <Text style={styles.cancelButtonText}>Discard</Text>
               </Pressable>
-              <Pressable
-                style={styles.logoutButton}
-                onPress={() => navigation.navigate("OnBoarding")}
-              >
+              <Pressable style={styles.logoutButton} onPress={handleLogout}>
                 <Text style={styles.logoutButtonText}>Logout</Text>
               </Pressable>
             </View>
@@ -333,7 +304,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   cancelButton: {
-    backgroundColor: "#075856",
+    backgroundColor: "#F0F0F0",
     width: responsiveWidth(148),
     height: responsiveHeight(48),
     justifyContent: "center",
@@ -341,12 +312,12 @@ const styles = StyleSheet.create({
     borderRadius: 41,
   },
   cancelButtonText: {
-    color: "#fff",
+    color: "#075856",
     fontSize: 16,
     fontFamily: "Outfit_Regular",
   },
   logoutButton: {
-    backgroundColor: "#D42222",
+    backgroundColor: "#FFE7E7",
     width: responsiveWidth(148),
     height: responsiveHeight(48),
     justifyContent: "center",
@@ -354,7 +325,7 @@ const styles = StyleSheet.create({
     borderRadius: 41,
   },
   logoutButtonText: {
-    color: "#fff",
+    color: "#D42222",
     fontSize: 16,
     fontFamily: "Outfit_Bold",
   },

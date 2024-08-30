@@ -8,18 +8,20 @@ import {
   Pressable,
   Image,
   Dimensions,
+  ScrollView,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Pusher from "pusher-js/react-native";
 import { getUserId } from "../utils/asyncStorage"; // Ensure correct import
 import { Ionicons } from "@expo/vector-icons";
+import { SERVER_URL } from "@env";
 
 const { width, height } = Dimensions.get("window");
 const responsiveHeight = (size) => (size * height) / 812;
 const responsiveWidth = (size) => (size * width) / 375;
 const responsiveMargin = (size) => (size * height) / 812;
 
-const pusher = new Pusher("1851485", {
+const pusher = new Pusher("fd4b5a435caa149d3a10", {
   cluster: "us2",
   encrypted: true,
   logToConsole: true,
@@ -34,8 +36,10 @@ const ChatDetail = () => {
   const [messageText, setMessageText] = useState("");
   const [userId, setUserId] = useState(null);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+  const [isManualScrolling, setIsManualScrolling] = useState(false);
   const navigation = useNavigation();
   const flatListRef = useRef(null);
+  const [isSending, setIsSending] = useState(false);
   const formatTime = (dateString) => {
     return new Date(dateString).toLocaleTimeString([], {
       hour: "2-digit",
@@ -61,9 +65,7 @@ const ChatDetail = () => {
 
     const fetchMessages = async () => {
       try {
-        const response = await fetch(
-          `http://192.168.100.175:8080/api/reply/messages/${chatId}`
-        );
+        const response = await fetch(`${SERVER_URL}/reply/messages/${chatId}`);
         if (response.ok) {
           const initialMessages = await response.json();
           setMessages([
@@ -91,58 +93,66 @@ const ChatDetail = () => {
     };
 
     fetchMessages();
-    const intervalId = setInterval(fetchMessages, 1000);
 
     const channel = pusher.subscribe(`chat-${chatId}`);
-    channel.bind("message", (data) => {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          id: data._id,
-          text: data.messageContent,
-          sender: data.senderId,
-          timestamp: formatTime(data.createdAt),
-          read: false,
-        },
-      ]);
+
+    const handleMessage = (data) => {
+      setMessages((prevMessages) => {
+        // Check if the message already exists
+        if (prevMessages.some((msg) => msg.id === data._id)) {
+          return prevMessages;
+        }
+
+        return [
+          ...prevMessages,
+          {
+            id: data._id,
+            text: data.messageContent,
+            sender: data.senderId,
+            timestamp: formatTime(data.createdAt),
+            read: false,
+          },
+        ];
+      });
       setShouldAutoScroll(true);
-    });
+    };
+
+    channel.bind("message", handleMessage);
 
     return () => {
-      channel.unbind_all();
+      channel.unbind("message", handleMessage);
       channel.unsubscribe();
-      clearInterval(intervalId);
     };
   }, [chatId, userId]);
 
   useEffect(() => {
-    if (shouldAutoScroll && flatListRef.current) {
+    if (shouldAutoScroll && !isManualScrolling && flatListRef.current) {
       flatListRef.current.scrollToEnd({ animated: true });
     }
-  }, [messages]);
+  }, [messages, shouldAutoScroll, isManualScrolling]);
 
   const sendMessage = async () => {
-    if (!messageText.trim() || !userId || !letterReceiverId) return;
+    if (!messageText.trim() || !userId || !letterReceiverId || isSending)
+      return;
+
+    setIsSending(true);
 
     const actualReceiverId =
       letterSenderId === userId ? letterReceiverId : letterSenderId;
 
     try {
-      const response = await fetch(
-        "http://192.168.100.175:8080/api/reply/send-message",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            senderId: userId,
-            receiverId: actualReceiverId,
-            replyId: chatId,
-            messageContent: messageText,
-          }),
-        }
-      );
+      const response = await fetch(`${SERVER_URL}/reply/send-message`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          senderId: userId,
+          receiverId: actualReceiverId,
+          replyId: chatId,
+          messageContent: messageText,
+        }),
+      });
 
       if (response.ok) {
         const responseData = await response.json();
@@ -164,6 +174,8 @@ const ChatDetail = () => {
       }
     } catch (error) {
       console.error("Error sending message:", error);
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -181,8 +193,15 @@ const ChatDetail = () => {
 
   const isSender = (senderId) => senderId === userId;
 
-  const handleScroll = () => {
-    setShouldAutoScroll(false);
+  const handleScroll = (event) => {
+    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+    const contentHeight = contentSize.height;
+    const layoutHeight = layoutMeasurement.height;
+    const offsetY = contentOffset.y;
+
+    // Check if the user is scrolling close to the bottom
+    setIsManualScrolling(offsetY + layoutHeight < contentHeight - 100);
+    setShouldAutoScroll(offsetY + layoutHeight >= contentHeight - 100);
   };
 
   const renderMessageHeader = (senderId) => {
@@ -242,9 +261,13 @@ const ChatDetail = () => {
               <Text style={styles.messageTimestamp}>{item.timestamp}</Text>
             </View>
           )}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, index) =>
+            `${item.id || item.timestamp}-${index}`
+          } // Ensure unique key
           contentContainerStyle={styles.messageList}
-          onScrollBeginDrag={handleScroll}
+          onScroll={handleScroll}
+          onScrollBeginDrag={() => setIsManualScrolling(true)}
+          onScrollEndDrag={() => setIsManualScrolling(false)}
         />
         <View style={styles.inputContainer}>
           <TextInput
@@ -253,7 +276,7 @@ const ChatDetail = () => {
             value={messageText}
             onChangeText={setMessageText}
           />
-          {messageText.trim().length > 0 && (
+          {messageText.trim().length > 0 && !isSending && (
             <Pressable style={styles.sendButton} onPress={sendMessage}>
               <Image
                 source={require("../assets/icons/send.png")}

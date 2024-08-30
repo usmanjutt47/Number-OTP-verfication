@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
     position: "absolute",
     top: 0,
+    tintColor: "#FEFEFE",
   },
   logoText: {
     color: "#000000",

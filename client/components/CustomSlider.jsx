@@ -95,7 +95,7 @@ const CustomSlider = ({ onSwipe }) => {
                 textAlign: "center",
               }}
             >
-              Send Now
+              Explore Now
             </Text>
           </View>
         </Animated.View>

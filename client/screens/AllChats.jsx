@@ -17,6 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomTopNav from "../components/CustomTopNav";
 import { useUnreadMessages } from "../context/UnreadMessagesContext";
 import { debounce } from "lodash";
+import { SERVER_URL } from "@env";
 
 const { width, height } = Dimensions.get("window");
 
@@ -51,9 +52,7 @@ const AllChats = () => {
     try {
       const userId = await AsyncStorage.getItem("userId");
       if (!userId) throw new Error("User ID not found");
-      const response = await fetch(
-        `http://192.168.100.175:8080/api/reply/my-replies/${userId}`
-      );
+      const response = await fetch(`${SERVER_URL}/reply/my-replies/${userId}`);
       if (!response.ok) throw new Error("Failed to fetch user replies");
       const data = await response.json();
       return data;
@@ -68,7 +67,7 @@ const AllChats = () => {
       const userId = await AsyncStorage.getItem("userId");
       if (!userId) throw new Error("User ID not found");
       const response = await fetch(
-        `http://192.168.100.175:8080/api/reply/my-letters-replies/${userId}`
+        `${SERVER_URL}/reply/my-letters-replies/${userId}`
       );
       if (!response.ok)
         throw new Error("Failed to fetch user letters and unread messages");
@@ -135,7 +134,7 @@ const AllChats = () => {
   const markChatAsRead = async (chatId) => {
     try {
       const response = await fetch(
-        `http://192.168.100.175:8080/api/reply/mark-as-read/${chatId}`,
+        `${SERVER_URL}/reply/mark-as-read/${chatId}`,
         {
           method: "PATCH",
           headers: {

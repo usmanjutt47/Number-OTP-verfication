@@ -12,6 +12,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
+import { SERVER_URL } from "@env";
 
 const { width, height } = Dimensions.get("window");
 
@@ -70,7 +71,7 @@ export default function ReplyFromHome() {
         hidden: true,
       };
 
-      const response = await fetch("http://192.168.100.175:8080/api/reply", {
+      const response = await fetch(`${SERVER_URL}/reply`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -89,7 +90,6 @@ export default function ReplyFromHome() {
           visibilityTime: 500,
         });
 
-        // Navigate to Home after 1 second delay
         setTimeout(() => {
           setReplyContent("");
           navigation.navigate("Home");

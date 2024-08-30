@@ -28,17 +28,17 @@ export default function OnBoarding() {
         />
         <Text style={styles.logoText}>Logo</Text>
         <View style={styles.headingContainer}>
-          <Text style={styles.mainHeading}>Modern Way Of</Text>
-          <Text style={styles.mainHeading}>Managing Finance</Text>
+          <Text style={styles.mainHeading}>Discover the Full</Text>
+          <Text style={styles.mainHeading}>Potential of Our App</Text>
         </View>
         <View style={styles.punchLineContainer}>
           <Text style={styles.punchLineText}>
-            In publishing and graphic design, Lorem ipsum is a
+            Get started with a 1-month free trial and explore
           </Text>
           <Text style={styles.punchLineText}>
-            placeholder text commonly used to form of a
+            everything our app has to offer. No credit card
           </Text>
-          <Text style={styles.punchLineText}>document or a typeface.</Text>
+          <Text style={styles.punchLineText}>required, no obligations.</Text>
         </View>
         <View style={styles.sliderContainer}>
           <CustomSlider
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   punchLineText: {
-    fontSize: width * 0.04,
+    fontSize: 16,
     color: "#fff",
     fontFamily: "Outfit_Regular",
     textAlign: "center",

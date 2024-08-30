@@ -16,6 +16,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import CustomTopNav from "../components/CustomTopNav";
+import { SERVER_URL } from "@env";
 
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.9;
@@ -61,7 +62,7 @@ export default function Favorite() {
     try {
       const userId = await AsyncStorage.getItem("userId");
       const response = await axios.get(
-        `http://192.168.100.175:8080/api/letter/favorites/${userId}`
+        `${SERVER_URL}/letter/favorites/${userId}`
       );
       if (response.data.favorites.length === 0) {
         setNoFavorites(true);

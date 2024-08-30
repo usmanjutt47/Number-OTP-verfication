@@ -44,7 +44,6 @@ const ChatDetail = () => {
     });
   };
 
-  // Ensure this function gets called when chatId changes
   useEffect(() => {
     const fetchUserId = async () => {
       const id = await getUserId();
@@ -73,6 +72,7 @@ const ChatDetail = () => {
               text: chatContent,
               sender: letterSenderId,
               timestamp: formatTime(timestamp),
+              read: letterSenderId !== userId ? false : true,
             },
             ...initialMessages.map((msg) => ({
               id: msg._id,
@@ -170,7 +170,7 @@ const ChatDetail = () => {
   const markMessagesAsRead = () => {
     setMessages((prevMessages) =>
       prevMessages.map((msg) =>
-        msg.sender !== userId ? { ...msg, read: true } : msg
+        msg.sender !== userId && !msg.read ? { ...msg, read: true } : msg
       )
     );
   };
@@ -210,7 +210,7 @@ const ChatDetail = () => {
           />
         </Pressable>
         <Text
-          style={{ color: "#000", fontFamily: "Outfit_Bold", fontSize: 20 }}
+          style={{ color: "#000", fontFamily: "Outfit_Bold", fontSize: 25 }}
         >
           Anonymous
         </Text>
@@ -330,7 +330,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Outfit_Regular",
   },
-
   messageHeader: {
     fontSize: 16,
     fontFamily: "Outfit_Semi_Bold",
@@ -370,6 +369,9 @@ const styles = StyleSheet.create({
     color: "#929BA4",
     alignSelf: "flex-end",
     fontFamily: "Outfit_Regular",
+    position: "absolute",
+    bottom: 2,
+    right: 19,
   },
 });
 

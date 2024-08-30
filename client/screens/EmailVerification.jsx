@@ -13,7 +13,7 @@ import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import axios from "axios";
-import { API_URL } from "@env";
+import { SERVER_URL } from "@env";
 
 const { height, width } = Dimensions.get("window");
 
@@ -39,7 +39,9 @@ export default function EmailVerification() {
 
     setLoading(true);
     try {
-      const response = await axios.post(`${API_URL}/user/`, {
+      const response = await axios.post(
+        `${SERVER_URL}/user/`, 
+        {
         email,
       });
 

@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Dimensions,
   Image,
+  TouchableOpacity,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
@@ -185,7 +186,10 @@ const AllChats = () => {
     return (
       <Pressable style={styles.chatContainer} onPress={() => handlePress(item)}>
         <View style={styles.chatDetails}>
-          <View style={styles.chatContent}>
+          <TouchableOpacity
+            style={styles.chatContent}
+            onPress={() => handlePress(item)}
+          >
             <Text style={styles.name}>{item.sender?.name || "Anonymous"}</Text>
             <Text
               style={styles.chatMessage}
@@ -194,7 +198,7 @@ const AllChats = () => {
             >
               {item.content} 💬
             </Text>
-          </View>
+          </TouchableOpacity>
           <View style={styles.chatRightSection}>
             <Text style={styles.chatTime}>{formatTime(item.createdAt)}</Text>
             {unreadCount > 0 && (
@@ -225,8 +229,8 @@ const AllChats = () => {
             keyExtractor={(item) => item._id}
             style={styles.chatList}
             showsVerticalScrollIndicator={false}
-            // onRefresh={onRefresh}
-            // refreshing={refreshing}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
           />
         ) : (
           <View style={styles.modalOverlay}>
@@ -241,7 +245,11 @@ const AllChats = () => {
                 <View style={styles.imageContainer}>
                   <Image
                     source={require("../assets/icons/noChat.png")}
-                    style={styles.noChatImage}
+                    style={{
+                      height: responsiveHeight(23),
+                      width: responsiveHeight(23),
+                      tintColor: "#fff",
+                    }}
                   />
                 </View>
               </View>
@@ -250,6 +258,14 @@ const AllChats = () => {
                 Your chat is empty. Reach out to someone and get the
                 conversation going!
               </Text>
+              <View
+                style={{
+                  alignItems: "center",
+                  width: "90%",
+                  position: "absolute",
+                  bottom: "5%",
+                }}
+              ></View>
             </View>
           </View>
         )}

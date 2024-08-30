@@ -3,9 +3,9 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const connectDataBase = require("./config/DataBase");
-const user = require("../server/routes/user");
-const letter = require("../server/routes/letter");
-const reply = require("../server/routes/reply");
+const user = require("./routes/user");
+const letter = require("./routes/letter");
+const reply = require("./routes/reply");
 const colors = require("colors");
 
 connectDataBase();

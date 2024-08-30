@@ -16,6 +16,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
+import { API_URL } from "@env";
 
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.9;
@@ -65,7 +66,7 @@ export default function CustomImageCarousel() {
       }
 
       const response = await axios.get(
-        `http://192.168.100.175:8080/api/letter/all-excluding-creator/${userId}`
+        `${API_URL}/letter/all-excluding-creator/${userId}`
       );
 
       if (response.status === 200) {
@@ -131,7 +132,7 @@ export default function CustomImageCarousel() {
   const handleHideLetter = async (letterId) => {
     try {
       const response = await axios.post(
-        `http://192.168.100.175:8080/api/letter/hide-letter/${String(letterId)}`
+        `${API_URL}/letter/hide-letter/${String(letterId)}`
       );
 
       if (response.status === 200) {

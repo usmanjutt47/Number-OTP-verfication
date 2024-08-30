@@ -2,12 +2,11 @@ import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
-  StyleSheet,
   Pressable,
   TextInput,
   ActivityIndicator,
   Dimensions,
+  StyleSheet,
 } from "react-native";
 import axios from "axios";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -29,18 +28,23 @@ export default function OTPVerification({ navigation }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prevCountdown) => {
-        if (prevCountdown <= 1) {
-          clearInterval(timer);
-          setIsResendEnabled(true);
-          return 0;
-        }
-        return prevCountdown - 1;
-      });
-    }, 1000);
+    const startTimer = () => {
+      const timer = setInterval(() => {
+        setCountdown((prevCountdown) => {
+          if (prevCountdown <= 1) {
+            clearInterval(timer);
+            setIsResendEnabled(true);
+            return 0;
+          }
+          return prevCountdown - 1;
+        });
+      }, 1000);
+    };
 
-    return () => clearInterval(timer);
+    startTimer(); // Start the timer initially
+    timerRef.current = startTimer; // Store the function to be called later
+
+    return () => clearInterval(timer); // Cleanup timer on unmount
   }, []);
 
   useEffect(() => {
@@ -156,6 +160,9 @@ export default function OTPVerification({ navigation }) {
 
   const handleSubmit = async () => {
     setLoading(true);
+    setCountdown(60); // Reset countdown to 60 seconds
+    setIsResendEnabled(false);
+    timerRef.current(); // Start the timer again
     try {
       const response = await axios.post(
         "http://192.168.100.175:8080/api/user/",
@@ -192,7 +199,7 @@ export default function OTPVerification({ navigation }) {
           <Ionicons
             name="chevron-back"
             size={24}
-            color="#4a4a4a"
+            color="#1E1E1E"
             style={styles.icon}
           />
         </Pressable>
@@ -223,23 +230,25 @@ export default function OTPVerification({ navigation }) {
       ) : (
         <>
           <View style={styles.resendContainer}>
-            <Text>Resend code in </Text>
-            <Text style={styles.countdownText}>{countdown} </Text>
-            <Text>s</Text>
-            {isResendEnabled && (
-              <TouchableOpacity onPress={handleSubmit}>
-                <Text style={styles.resendText}> Resend Code</Text>
-              </TouchableOpacity>
+            {countdown > 0 ? (
+              <>
+                <Text>Resend code in </Text>
+                <Text style={styles.countdownText}>{countdown}</Text>
+                <Text>s</Text>
+              </>
+            ) : (
+              <Pressable onPress={handleSubmit}>
+                <Text style={styles.resendText}>Resend Code</Text>
+              </Pressable>
             )}
-          </View>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={handleOtpSubmit}>
-              <Text style={styles.buttonText}>Verify OTP</Text>
-            </TouchableOpacity>
           </View>
         </>
       )}
-
+      <View style={styles.buttonContainer}>
+        <Pressable style={styles.button} onPress={handleOtpSubmit}>
+          <Text style={styles.buttonText}>Verify OTP</Text>
+        </Pressable>
+      </View>
       <Toast />
     </View>
   );
@@ -257,9 +266,9 @@ const styles = StyleSheet.create({
     marginVertical: height * 0.03,
   },
   backButton: {
-    height: 52,
-    width: 52,
-    backgroundColor: "#e3e1e1",
+    height: 43,
+    width: 43,
+    backgroundColor: "#fff",
     borderRadius: 26,
     justifyContent: "center",
     alignItems: "center",

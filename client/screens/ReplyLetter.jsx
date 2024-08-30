@@ -13,6 +13,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { SERVER_URL } from "@env";
+import Toast from "react-native-toast-message";
 
 const { width, height } = Dimensions.get("window");
 
@@ -32,23 +34,35 @@ export default function ReplyLetter() {
       const senderId = await AsyncStorage.getItem("userId");
 
       if (!senderId) {
-        Alert.alert("Error", "User ID not found");
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: "User ID not found",
+        });
         return;
       }
 
       if (!replyContent.trim()) {
-        Alert.alert("Error", "Content cannot be empty");
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: "Content cannot be empty",
+        });
         return;
       }
 
       if (!selectedItem || !selectedItem._id || !selectedItem.senderId) {
-        Alert.alert("Error", "No item selected or missing required IDs");
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: "No item selected or missing required IDs",
+        });
         return;
       }
 
       const reciverId = selectedItem.senderId;
 
-      const response = await fetch("http://192.168.100.175:8080/api/reply", {
+      const response = await fetch(`${SERVER_URL}/reply`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -64,7 +78,16 @@ export default function ReplyLetter() {
       const result = await response.json();
 
       if (response.ok) {
-        Alert.alert("Success", "Reply sent successfully");
+        Toast.show({
+          type: "success",
+          text1: "Success",
+          text2: "Reply sent successfully",
+        });
+
+        setTimeout(() => {
+          navigation.navigate("Home");
+        }, 1000);
+
         setReplyContent("");
 
         setLetters((prevLetters) =>
@@ -74,14 +97,20 @@ export default function ReplyLetter() {
               : letter
           )
         );
-
-        navigation.navigate("Home");
       } else {
-        Alert.alert("Error", `Error: ${result.error || result.message}`);
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: `Error: ${result.error || result.message}`,
+        });
         console.error("Backend Error:", result);
       }
     } catch (error) {
-      Alert.alert("Error", `Failed to send reply: ${error.message}`);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: `Failed to send reply: ${error.message}`,
+      });
       console.error("Catch Error:", error);
     }
   };
@@ -108,6 +137,7 @@ export default function ReplyLetter() {
           </TouchableOpacity>
         </ScrollView>
       </View>
+      <Toast />
     </View>
   );
 }

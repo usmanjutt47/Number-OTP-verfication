@@ -193,7 +193,7 @@ export default function CustomImageCarousel() {
               </View>
             </View>
             <Text style={styles.modalHeading}>
-              You have currently no Letter{" "}
+              You have currently no Letter
             </Text>
             <Text style={styles.modalText}>
               Click the button and fill the information to create the Post
@@ -203,7 +203,7 @@ export default function CustomImageCarousel() {
                 alignItems: "center",
                 width: "90%",
                 position: "absolute",
-                bottom: "5%",
+                bottom: "10%",
               }}
             >
               <Pressable
@@ -224,7 +224,7 @@ export default function CustomImageCarousel() {
                     fontFamily: "Outfit_Bold",
                   }}
                 >
-                  Create a post
+                  Send A Letter
                 </Text>
               </Pressable>
             </View>
@@ -531,13 +531,13 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: "90%",
-    height: responsiveHeight(250),
+    height: responsiveHeight(270),
     backgroundColor: "#fff",
     borderRadius: 41,
     alignItems: "center",
   },
   imageWrapper: {
-    marginTop: responsiveMargin(15),
+    marginTop: responsiveMargin(25),
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",

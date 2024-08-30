@@ -239,16 +239,7 @@ const ChatDetail = () => {
               >
                 {item.text}
               </Text>
-              <Text
-                style={[
-                  styles.messageTimestamp,
-                  isSender(item.sender)
-                    ? styles.messageSenderTimestamp
-                    : styles.messageReceiverTimestamp,
-                ]}
-              >
-                {item.timestamp}
-              </Text>
+              <Text style={styles.messageTimestamp}>{item.timestamp}</Text>
             </View>
           )}
           keyExtractor={(item) => item.id}
@@ -296,9 +287,9 @@ const styles = StyleSheet.create({
     paddingTop: responsiveMargin(15),
   },
   backButton: {
-    backgroundColor: "#e3e1e1",
-    height: responsiveHeight(48),
-    width: responsiveWidth(48),
+    backgroundColor: "#F3F3F3",
+    height: responsiveHeight(43),
+    width: responsiveWidth(43),
     justifyContent: "center",
     borderRadius: 41,
     alignSelf: "center",
@@ -378,15 +369,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#929BA4",
     alignSelf: "flex-end",
-    position: "absolute",
-    bottom: responsiveMargin(-12),
     fontFamily: "Outfit_Regular",
-  },
-  messageSenderTimestamp: {
-    alignSelf: "flex-end",
-  },
-  messageReceiverTimestamp: {
-    alignSelf: "flex-start",
   },
 });
 

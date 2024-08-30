@@ -10,13 +10,14 @@ import {
 } from "react-native";
 import axios from "axios";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_URL } from "@env";
 
 const { height, width } = Dimensions.get("window");
 
-export default function OTPVerification({ navigation }) {
+export default function OTPVerification() {
   const [inputValues, setInputValues] = useState(["", "", "", ""]);
   const [otp, setOtp] = useState("");
   const inputRefs = useRef([]);
@@ -26,6 +27,7 @@ export default function OTPVerification({ navigation }) {
   const [countdown, setCountdown] = useState(60);
   const [isResendEnabled, setIsResendEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const startTimer = () => {
@@ -39,12 +41,12 @@ export default function OTPVerification({ navigation }) {
           return prevCountdown - 1;
         });
       }, 1000);
-      timerRef.current = timer; // Store the timer ID
+      timerRef.current = timer;
     };
 
-    startTimer(); // Start the timer initially
+    startTimer();
 
-    return () => clearInterval(timerRef.current); // Cleanup timer on unmount
+    return () => clearInterval(timerRef.current);
   }, []);
 
   useEffect(() => {
@@ -116,29 +118,27 @@ export default function OTPVerification({ navigation }) {
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        "http://192.168.100.175:8080/api/user/verify",
-        {
-          email,
-          otp,
-        }
-      );
+      const response = await axios.post(`${API_URL}/user/verify`, {
+        email,
+        otp,
+      });
 
       if (response.status === 200) {
         const { userId, message } = response.data;
 
         if (userId) {
-          // Store user ID in AsyncStorage
           await AsyncStorage.setItem("userId", userId);
           console.log("_id", userId);
 
           Toast.show({
             type: "success",
             text1: "Success",
-            text2: message, // Use the message from the response
+            text2: message,
           });
 
-          navigation.navigate("Home");
+          setTimeout(() => {
+            navigation.navigate("Home");
+          }, 1000);
         } else {
           Toast.show({
             type: "error",
@@ -160,9 +160,9 @@ export default function OTPVerification({ navigation }) {
 
   const handleSubmit = async () => {
     setLoading(true);
-    setCountdown(60); // Reset countdown to 60 seconds
+    setCountdown(60);
     setIsResendEnabled(false);
-    clearInterval(timerRef.current); // Clear any existing timer
+    clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setCountdown((prevCountdown) => {
         if (prevCountdown <= 1) {
@@ -172,14 +172,11 @@ export default function OTPVerification({ navigation }) {
         }
         return prevCountdown - 1;
       });
-    }, 1000); // Start a new timer
+    }, 1000);
     try {
-      const response = await axios.post(
-        "http://192.168.100.175:8080/api/user/",
-        {
-          email,
-        }
-      );
+      const response = await axios.post(`${API_URL}/user/`, {
+        email,
+      });
 
       if (response.status === 200) {
         Toast.show({

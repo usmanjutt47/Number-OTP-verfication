@@ -13,7 +13,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { API_URL } from "@env";
+import { SERVER_URL } from "@env";
 
 const { height, width } = Dimensions.get("window");
 
@@ -118,7 +118,7 @@ export default function OTPVerification() {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API_URL}/user/verify`, {
+      const response = await axios.post(`${SERVER_URL}/user/verify`, {
         email,
         otp,
       });
@@ -174,7 +174,7 @@ export default function OTPVerification() {
       });
     }, 1000);
     try {
-      const response = await axios.post(`${API_URL}/user/`, {
+      const response = await axios.post(`${SERVER_URL}/user/`, {
         email,
       });
 

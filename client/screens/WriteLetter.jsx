@@ -16,6 +16,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
+import { SERVER_URL } from "@env";
 
 const { width, height } = Dimensions.get("window");
 
@@ -41,7 +42,12 @@ export default function WriteLetter() {
         if (storedUserId) {
           setUserId(storedUserId);
         } else {
-          Alert.alert("Error", "User ID not found in storage");
+          Toast.show({
+            type: "error",
+            text1: "Error",
+            text2: "User ID not found in storage",
+          });
+          return;
         }
       } catch (error) {
         console.error("Failed to load user ID:", error);
@@ -84,7 +90,7 @@ export default function WriteLetter() {
     }
 
     try {
-      const response = await fetch("http://192.168.100.175:8080/api/letter/", {
+      const response = await fetch(`${SERVER_URL}/letter/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

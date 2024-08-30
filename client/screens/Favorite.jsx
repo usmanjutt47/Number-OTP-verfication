@@ -140,9 +140,10 @@ export default function Favorite() {
                 />
               </View>
             </View>
-            <Text style={styles.modalHeading}>Saved to Favorites!</Text>
+            <Text style={styles.modalHeading}>No Favorites Yet</Text>
             <Text style={styles.modalText}>
-              You’ve Successfully added this item to favorite
+              It looks like you haven't added any items to your favorites yet.
+              Start adding items to create your favorite list!
             </Text>
             <View
               style={{

@@ -90,7 +90,7 @@ export default function EmailVerification() {
           <Ionicons
             name="mail-outline"
             size={24}
-            color="black"
+            color="#040404"
             style={styles.mailIcon}
           />
           <TextInput
@@ -98,6 +98,7 @@ export default function EmailVerification() {
             placeholder="example@gmail.com"
             placeholderTextColor={"#434343"}
             keyboardType="email-address"
+            cursorColor={"#040404"}
             value={email}
             onChangeText={(text) => setEmail(text)}
           />
@@ -136,9 +137,9 @@ const styles = StyleSheet.create({
     top: height * 0.06,
   },
   backButton: {
-    height: 48,
-    width: 48,
-    backgroundColor: "#e3e1e1",
+    height: 43,
+    width: 43,
+    backgroundColor: "#fff",
     borderRadius: 26,
     justifyContent: "center",
     alignItems: "center",
@@ -162,6 +163,8 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.01,
     marginLeft: width * 0.03,
     alignSelf: "flex-start",
+    fontFamily: "Outfit_Medium",
+    color: "#040404",
   },
   emailInputContainer: {
     position: "relative",
@@ -178,13 +181,14 @@ const styles = StyleSheet.create({
   emailInput: {
     width: "100%",
     height: "100%",
-    borderColor: "#6c6c6c",
+    borderColor: "#6C6C6C",
     borderWidth: 1,
     borderRadius: width * 0.09,
     paddingLeft: width * 0.12,
     paddingRight: width * 0.05,
-    backgroundColor: "#fff",
+    backgroundColor: "#f3f3f3",
     zIndex: 0,
+    fontFamily: "Outfit_Regular",
   },
   buttonContainer: {
     justifyContent: "flex-end",

@@ -199,37 +199,19 @@ export default function CustomImageCarousel() {
             <Text style={styles.modalText}>
               Click the button and fill the information to create the Post
             </Text>
-            <View
-              style={{
-                alignItems: "center",
-                width: "90%",
-                position: "absolute",
-                bottom: "10%",
-              }}
-            >
-              <Pressable
-                onPress={() => navigation.navigate("WriteLetter")}
-                style={{
-                  width: "55%",
-                  backgroundColor: "#075856",
-                  height: responsiveHeight(48),
-                  justifyContent: "center",
-                  borderRadius: 44,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: responsiveFontSize(15),
-                    color: "#fff",
-                    textAlign: "center",
-                    fontFamily: "Outfit_Bold",
-                  }}
-                >
-                  Send A Letter
-                </Text>
-              </Pressable>
-            </View>
           </View>
+          <Pressable
+            style={styles.pressable}
+            onPress={() => navigation.navigate("WriteLetter")}
+          >
+            <Image
+              source={require("../assets/icons/add.png")}
+              style={{
+                height: responsiveHeight(25),
+                width: responsiveWidth(25),
+              }}
+            />
+          </Pressable>
         </View>
       ) : (
         <Animated.FlatList
@@ -567,7 +549,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: "90%",
-    height: responsiveHeight(270),
+    height: responsiveHeight(200),
     backgroundColor: "#fff",
     borderRadius: 41,
     alignItems: "center",
@@ -603,5 +585,16 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_Bold",
     fontSize: responsiveFontSize(20),
     marginTop: responsivePadding(25),
+  },
+  pressable: {
+    position: "absolute",
+    bottom: responsiveHeight(20),
+    right: responsiveWidth(20),
+    backgroundColor: "#075856",
+    borderRadius: 50,
+    width: responsiveWidth(60),
+    height: responsiveWidth(60),
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

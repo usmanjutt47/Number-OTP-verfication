@@ -161,11 +161,12 @@ export default function CustomTopNav() {
       <Pressable
         style={[
           styles.logout,
+          (activeScreen === "Logout" && styles.activeLogoutButton) ||
           modalVisible
             ? styles.activeLogoutButton
             : styles.inactiveLogoutButton,
         ]}
-        onPress={handleLogoutPress}
+        onPress={() => handlePress("Logout")}
       >
         <Image
           source={require("../assets/icons/logout.png")}

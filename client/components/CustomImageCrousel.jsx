@@ -308,7 +308,7 @@ export default function CustomImageCarousel() {
                       </View>
                       <View style={styles.infoRow}>
                         <Text style={styles.infoSubtitle}>
-                          The Number 1 Secret Of Success
+                          {/* The Number 1 Secret Of Success */}
                         </Text>
                         <Text style={styles.infoDate}>{date}</Text>
                       </View>
@@ -333,25 +333,60 @@ export default function CustomImageCarousel() {
                   ]}
                 >
                   <TouchableOpacity
-                    style={styles.button}
+                    style={[
+                      styles.button,
+                      { backgroundColor: "#E0E7E6", borderWidth: 0 },
+                    ]}
                     onPress={() => {
                       navigation.navigate("ReplyLetter", {
                         selectedItem: item,
                       });
                     }}
                   >
-                    <FontAwesome5 name="pen" size={20} style={styles.icon} />
+                    <Pressable
+                      style={{
+                        height: responsiveHeight(47),
+                        width: responsiveWidth(47),
+                        backgroundColor: "#fff",
+                        borderRadius: 44,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <FontAwesome5 name="pen" size={20} style={styles.icon} />
+                    </Pressable>
                     <Text style={styles.buttonText}>Reply</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={styles.button}
+                    style={[
+                      styles.button,
+                      { backgroundColor: "#FFF2F2", borderColor: "#D42222" },
+                    ]}
                     onPress={() => handleHideLetter(item._id)}
                   >
-                    <Image
-                      source={require("../assets/icons/pass.png")}
-                      style={styles.imageIcon}
-                    />
-                    <Text style={styles.buttonText}>Pass</Text>
+                    <Pressable
+                      style={{
+                        height: responsiveHeight(47),
+                        width: responsiveWidth(47),
+                        backgroundColor: "#fff",
+                        borderRadius: 44,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Image
+                        source={require("../assets/icons/pass.png")}
+                        style={styles.imageIcon}
+                      />
+                    </Pressable>
+                    <Text
+                      style={[
+                        styles.buttonText,
+                        { marginLeft: responsiveMargin(10) },
+                      ]}
+                    >
+                      Pass
+                    </Text>
                   </TouchableOpacity>
                 </Animated.View>
               </Pressable>
@@ -443,7 +478,7 @@ const styles = StyleSheet.create({
     marginTop: responsiveHeight(60),
   },
   textContent: {
-    fontSize: responsiveFontSize(27),
+    fontSize: responsiveFontSize(22),
     fontFamily: "Outfit_Medium",
     color: "#000",
     alignSelf: "center",
@@ -490,19 +525,19 @@ const styles = StyleSheet.create({
   button: {
     height: responsiveHeight(62),
     width: responsiveWidth(160),
-    backgroundColor: "#fff",
     borderRadius: responsiveHeight(34),
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
+    borderWidth: 1,
   },
   icon: {
-    color: "#515151",
+    color: "#075856",
   },
   imageIcon: {
     height: responsiveHeight(25),
     width: responsiveHeight(25),
-    tintColor: "#515151",
+    tintColor: "#D42222",
   },
   buttonText: {
     fontSize: responsiveFontSize(19),

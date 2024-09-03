@@ -17,6 +17,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import { SERVER_URL } from "@env";
+import { ScrollView } from "react-native-gesture-handler";
+import { Ionicons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -78,6 +80,24 @@ export default function WriteLetter() {
 
     return () => scaleAnimation.stop();
   }, [scaleValue]);
+
+  const countWords = (text) => {
+    return text.trim().split(/\s+/).length;
+  };
+
+  const handleTextChange = (text) => {
+    const words = countWords(text);
+
+    if (words <= 500) {
+      setContent(text);
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Limit Exceeded",
+        text2: "You can only type up to 500 words.",
+      });
+    }
+  };
 
   const sendLetter = async () => {
     if (!content.trim()) {
@@ -184,11 +204,25 @@ export default function WriteLetter() {
   const closeModal = () => {
     setModalVisible(false);
   };
+  const navigation = useNavigation();
 
   return (
     <View style={styles.mainContainer}>
       <View style={styles.contentContainer}>
         <View style={styles.headerContainer}>
+          <View>
+            <Pressable
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons
+                name="chevron-back"
+                size={24}
+                color="#4a4a4a"
+                style={styles.icon}
+              />
+            </Pressable>
+          </View>
           <MaterialCommunityIcons
             name="email-edit-outline"
             size={28}
@@ -197,18 +231,22 @@ export default function WriteLetter() {
           />
           <Text style={styles.heading}>Write Letter</Text>
         </View>
-        <TextInput
-          style={styles.textInput}
-          placeholder="Type here . . ."
-          placeholderTextColor="#999"
-          multiline={true}
-          textAlignVertical="top"
-          value={content}
-          onChangeText={(text) => setContent(text)}
-        />
-        <TouchableOpacity style={styles.sendButton} onPress={sendLetter}>
-          <Text style={styles.sendButtonText}>Send Now</Text>
-        </TouchableOpacity>
+        <ScrollView>
+          <TextInput
+            style={styles.textInput}
+            placeholder="Type here . . ."
+            placeholderTextColor="#999"
+            multiline={true}
+            textAlignVertical="top"
+            value={content}
+            onChangeText={handleTextChange}
+          />
+        </ScrollView>
+        <View style={{ marginBottom: 20 }}>
+          <TouchableOpacity style={styles.sendButton} onPress={sendLetter}>
+            <Text style={styles.sendButtonText}>Send Now</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <SuccessModal visible={modalVisible} onClose={closeModal} />
@@ -256,8 +294,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignSelf: "center",
     borderRadius: 35,
-    position: "absolute",
-    bottom: "5%",
   },
   sendButtonText: {
     color: "#fff",
@@ -311,5 +347,16 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_Bold",
     fontSize: responsiveFontSize(20),
     marginTop: responsivePadding(15),
+  },
+  backButton: {
+    height: 43,
+    width: 43,
+    backgroundColor: "#f3f3f3",
+    borderRadius: 26,
+    justifyContent: "center",
+    marginRight: responsiveMargin(50),
+  },
+  icon: {
+    alignSelf: "center",
   },
 });

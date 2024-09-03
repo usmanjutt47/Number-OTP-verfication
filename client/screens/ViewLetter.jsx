@@ -171,15 +171,6 @@ export default function ViewLetter() {
           <Text style={{ fontSize: 18, marginBottom: responsivePadding(10) }}>
             {letter.content}
           </Text>
-          <View
-            style={{
-              // backgroundColor: "red",
-              position: "absolute",
-              bottom: 0,
-              right: 0,
-              left: 0,
-            }}
-          ></View>
         </ScrollView>
         <TouchableOpacity style={styles.replyButton} onPress={handleReply}>
           <Text style={styles.replyButtonText}>Reply Now</Text>

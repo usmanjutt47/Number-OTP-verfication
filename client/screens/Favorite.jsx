@@ -146,15 +146,19 @@ export default function Favorite() {
               It looks like you haven't added any items to your favorites yet.
               Start adding items to create your favorite list!
             </Text>
-            <View
-              style={{
-                alignItems: "center",
-                width: "90%",
-                position: "absolute",
-                bottom: "5%",
-              }}
-            ></View>
           </View>
+          <Pressable
+            style={styles.pressable}
+            onPress={() => navigation.navigate("WriteLetter")}
+          >
+            <Image
+              source={require("../assets/icons/add.png")}
+              style={{
+                height: responsiveHeight(25),
+                width: responsiveWidth(25),
+              }}
+            />
+          </Pressable>
         </View>
       </View>
     );
@@ -250,7 +254,7 @@ export default function Favorite() {
                       </View>
                       <View style={styles.infoRow}>
                         <Text style={styles.infoSubtitle}>
-                          The Number 1 Secret Of Success
+                          {/* The Number 1 Secret Of Success */}
                         </Text>
                         <Text style={styles.infoDate}>{date}</Text>
                       </View>
@@ -274,16 +278,54 @@ export default function Favorite() {
                     },
                   ]}
                 >
-                  <TouchableOpacity style={styles.button}>
-                    <FontAwesome5 name="pen" size={20} style={styles.icon} />
+                  <TouchableOpacity
+                    style={[
+                      styles.button,
+                      { backgroundColor: "#E0E7E6", borderWidth: 0 },
+                    ]}
+                  >
+                    <Pressable
+                      style={{
+                        height: responsiveHeight(47),
+                        width: responsiveWidth(47),
+                        backgroundColor: "#fff",
+                        borderRadius: 44,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <FontAwesome5 name="pen" size={20} style={styles.icon} />
+                    </Pressable>
                     <Text style={styles.buttonText}>Reply</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.button}>
-                    <Image
-                      source={require("../assets/icons/pass.png")}
-                      style={styles.imageIcon}
-                    />
-                    <Text style={styles.buttonText}>Pass</Text>
+                  <TouchableOpacity
+                    style={[
+                      styles.button,
+                      {
+                        backgroundColor: "#FFF2F2",
+                        borderColor: "#D42222",
+                        borderWidth: 1,
+                      },
+                    ]}
+                  >
+                    <Pressable
+                      style={{
+                        height: responsiveHeight(47),
+                        width: responsiveWidth(47),
+                        backgroundColor: "#fff",
+                        borderRadius: 44,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Image
+                        source={require("../assets/icons/pass.png")}
+                        style={styles.imageIcon}
+                      />
+                    </Pressable>
+                    <Text style={[styles.buttonText, { color: "#D42222" }]}>
+                      Pass
+                    </Text>
                   </TouchableOpacity>
                 </Animated.View>
               </Pressable>
@@ -515,12 +557,12 @@ const styles = StyleSheet.create({
   imageIcon: {
     height: responsiveHeight(25),
     width: responsiveHeight(25),
-    tintColor: "#515151",
+    tintColor: "#D42222",
   },
   buttonText: {
     fontSize: responsiveFontSize(19),
     fontFamily: "Outfit_Medium",
-    color: "#515151",
+    color: "#075856",
     marginRight: responsiveMargin(40),
   },
   bottomSheetContainer: {
@@ -586,5 +628,16 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_Bold",
     fontSize: responsiveFontSize(20),
     marginTop: responsivePadding(25),
+  },
+  pressable: {
+    position: "absolute",
+    bottom: responsiveHeight(20),
+    right: responsiveWidth(20),
+    backgroundColor: "#075856",
+    borderRadius: 50,
+    width: responsiveWidth(60),
+    height: responsiveWidth(60),
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

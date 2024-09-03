@@ -21,6 +21,7 @@ import ViewLetter from "./screens/ViewLetter";
 import ReplyLetter from "./screens/ReplyLetter";
 import ReplyFromHome from "./screens/ReplyFromHome";
 import { UnreadMessagesProvider } from "./context/UnreadMessagesContext";
+import Logout from "./screens/Logout";
 
 const Stack = createStackNavigator();
 
@@ -94,6 +95,7 @@ const App = () => {
             <Stack.Screen name="ViewLetter" component={ViewLetter} />
             <Stack.Screen name="ReplyLetter" component={ReplyLetter} />
             <Stack.Screen name="ReplyFromHome" component={ReplyFromHome} />
+            <Stack.Screen name="Logout" component={Logout} />
           </Stack.Navigator>
         </NavigationContainer>
       </StripeProvider>

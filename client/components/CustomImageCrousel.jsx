@@ -364,7 +364,7 @@ export default function CustomImageCarousel() {
                     <Text
                       style={[
                         styles.buttonText,
-                        { marginLeft: responsiveMargin(10) },
+                        { marginLeft: responsiveMargin(10), color: "#D42222" },
                       ]}
                     >
                       Pass
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: responsiveFontSize(19),
     fontFamily: "Outfit_Medium",
-    color: "#515151",
+    color: "#075856",
     marginRight: responsiveMargin(40),
   },
   bottomSheetContainer: {

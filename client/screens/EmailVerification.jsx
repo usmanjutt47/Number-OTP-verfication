@@ -39,9 +39,7 @@ export default function EmailVerification() {
 
     setLoading(true);
     try {
-      const response = await axios.post(
-        `${SERVER_URL}/user/`, 
-        {
+      const response = await axios.post(`${SERVER_URL}/user/`, {
         email,
       });
 
@@ -69,20 +67,6 @@ export default function EmailVerification() {
     <View style={styles.mainContainer}>
       <StatusBar style="auto" />
       <View style={styles.contentContainer}>
-        <View style={styles.header}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons
-              name="chevron-back"
-              size={24}
-              color="#4a4a4a"
-              style={styles.icon}
-            />
-          </Pressable>
-        </View>
-
         <Text style={styles.logo}>Logo</Text>
 
         <Text style={styles.emailLable}>Enter Email</Text>
@@ -96,7 +80,7 @@ export default function EmailVerification() {
           <TextInput
             style={styles.emailInput}
             placeholder="example@gmail.com"
-            placeholderTextColor={"#434343"}
+            placeholderTextColor={"gray"}
             keyboardType="email-address"
             cursorColor={"#040404"}
             value={email}
@@ -136,14 +120,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: height * 0.06,
   },
-  backButton: {
-    height: 43,
-    width: 43,
-    backgroundColor: "#fff",
-    borderRadius: 26,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+
   icon: {
     alignSelf: "center",
   },
@@ -174,13 +151,13 @@ const styles = StyleSheet.create({
   mailIcon: {
     position: "absolute",
     left: width * 0.04,
-    top: "50%",
+    top: "45%",
     transform: [{ translateY: -12 }],
     zIndex: 1,
   },
   emailInput: {
     width: "100%",
-    height: "100%",
+    height: "90%",
     borderColor: "#6C6C6C",
     borderWidth: 1,
     borderRadius: width * 0.09,

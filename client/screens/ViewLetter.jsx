@@ -5,10 +5,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-  ActivityIndicator, // Import ActivityIndicator
+  ActivityIndicator,
+  ScrollView,
+  Pressable, // Import ActivityIndicator
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SERVER_URL } from "@env";
@@ -64,16 +66,6 @@ export default function ViewLetter() {
         `favorite-${letter._id}`,
         newFavoriteStatus ? "true" : "false"
       );
-
-      setTimeout(() => {
-        Toast.show({
-          type: "success",
-          text1: "Success",
-          text2: newFavoriteStatus
-            ? "Added to Favorites"
-            : "Removed from Favorites",
-        });
-      }, 500);
     } catch (error) {
       console.error("Error toggling favorite:", error);
       Toast.show({
@@ -116,24 +108,48 @@ export default function ViewLetter() {
           padding: responsivePadding(20),
         }}
       >
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <Text style={{ fontSize: 24, fontFamily: "Inter_Bold" }}>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <Pressable
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons
+              name="chevron-back"
+              size={24}
+              color="#4a4a4a"
+              style={styles.icon}
+            />
+          </Pressable>
+          <Text
+            style={{
+              fontSize: 24,
+              fontFamily: "Inter_Bold",
+              justifyContent: "flex-end",
+              textAlign: "center",
+              alignSelf: "center",
+            }}
+          >
             Anonymous
           </Text>
           <TouchableOpacity
             style={{
               alignSelf: "flex-start",
-              height: responsiveHeight(53),
-              width: responsiveWidth(53),
+              height: responsiveHeight(48),
+              width: responsiveWidth(48),
               backgroundColor: "#FFF8E4",
               justifyContent: "center",
               borderRadius: 50,
             }}
             onPress={toggleFavorite}
-            disabled={loading} // Disable button while loading
+            disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator size="small" color="gray" /> // Show loader
+              <ActivityIndicator size="small" color="gray" />
             ) : isFavorite ? (
               <AntDesign
                 name="star"
@@ -151,8 +167,20 @@ export default function ViewLetter() {
             )}
           </TouchableOpacity>
         </View>
-        <Text style={{ fontSize: 18, marginBottom: 20 }}>{letter.content}</Text>
-
+        <ScrollView contentContainerStyle={{ justifyContent: "space-between" }}>
+          <Text style={{ fontSize: 18, marginBottom: responsivePadding(10) }}>
+            {letter.content}
+          </Text>
+          <View
+            style={{
+              // backgroundColor: "red",
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              left: 0,
+            }}
+          ></View>
+        </ScrollView>
         <TouchableOpacity style={styles.replyButton} onPress={handleReply}>
           <Text style={styles.replyButtonText}>Reply Now</Text>
         </TouchableOpacity>
@@ -169,15 +197,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#075856",
     justifyContent: "center",
     borderRadius: 44,
-    marginTop: responsiveHeight(100),
-    position: "absolute",
-    bottom: responsiveHeight(20),
     alignSelf: "center",
+    marginBottom: "auto",
   },
   replyButtonText: {
     fontSize: responsiveFontSize(16),
     fontFamily: "Outfit_Medium",
     textAlign: "center",
     color: "#fff",
+  },
+  backButton: {
+    height: 43,
+    width: 43,
+    backgroundColor: "#f3f3f3",
+    borderRadius: 26,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  icon: {
+    alignSelf: "center",
   },
 });

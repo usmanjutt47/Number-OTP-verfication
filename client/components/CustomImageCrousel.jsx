@@ -252,6 +252,22 @@ export default function CustomImageCarousel() {
               >
                 <Animated.View
                   style={[
+                    styles.cardBehind,
+                    {
+                      transform: [{ translateY: translateY }, { scale: scale }],
+                    },
+                  ]}
+                />
+                <Animated.View
+                  style={[
+                    styles.cardBehind2,
+                    {
+                      transform: [{ translateY: translateY }, { scale: scale }],
+                    },
+                  ]}
+                />
+                <Animated.View
+                  style={[
                     styles.carouselImageContainer,
                     {
                       width: ITEM_WIDTH,
@@ -261,15 +277,10 @@ export default function CustomImageCarousel() {
                   ]}
                 >
                   <Animated.Image
-                    source={{ uri: item.content }}
+                    source={{ uri: item.image }}
                     style={[
                       styles.carouselImage,
-                      {
-                        transform: [
-                          { translateY: translateY },
-                          { scale: scale },
-                        ],
-                      },
+                      { transform: [{ scale: scale }] },
                     ]}
                   />
                   <Animated.View
@@ -404,6 +415,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 20,
     marginTop: responsiveMargin(150),
+    position: "relative",
+  },
+  cardBehind: {
+    position: "absolute",
+    top: responsiveHeight(180),
+    width: "85%",
+    height: 50,
+    borderRadius: 20,
+    backgroundColor: "#E0E7E6",
+    zIndex: -1,
+  },
+  cardBehind2: {
+    position: "absolute",
+    top: responsiveHeight(167),
+    width: "78%",
+    height: 50,
+    borderRadius: 20,
+    backgroundColor: "#E7EBEB",
+    zIndex: -2,
   },
   carouselImage: {
     width: ITEM_WIDTH,
@@ -453,7 +483,7 @@ const styles = StyleSheet.create({
   textContainer: {
     height: "65%",
     width: "90%",
-    backgroundColor: "#F0F0F1",
+    backgroundColor: "#F5F5F5",
     justifyContent: "center",
     borderRadius: 24,
     padding: "5%",

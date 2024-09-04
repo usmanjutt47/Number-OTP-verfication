@@ -10,7 +10,7 @@ import {
   Dimensions,
   Image,
   TouchableOpacity,
-  Easing,
+  ScrollView,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
@@ -183,31 +183,9 @@ const AllChats = () => {
   const renderItem = ({ item }) => {
     const unreadCount = unreadCounts[item._id] || 0;
 
-    useEffect(() => {
-      const scaleAnimation = Animated.loop(
-        Animated.sequence([
-          Animated.timing(scaleValue, {
-            toValue: 1.1,
-            duration: 1000,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-          Animated.timing(scaleValue, {
-            toValue: 1,
-            duration: 1000,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-        ])
-      );
-      scaleAnimation.start();
-
-      return () => scaleAnimation.stop();
-    }, [scaleValue]);
-
     return (
       <Pressable style={styles.chatContainer} onPress={() => handlePress(item)}>
-        <View style={styles.chatDetails}>
+        <ScrollView contentContainerStyle={styles.chatDetails}>
           <TouchableOpacity
             style={styles.chatContent}
             onPress={() => handlePress(item)}
@@ -221,7 +199,7 @@ const AllChats = () => {
               {item.content} 💬
             </Text>
           </TouchableOpacity>
-          <View style={styles.chatRightSection}>
+          <View contentContainerStyle={styles.chatRightSection}>
             <Text style={styles.chatTime}>{formatTime(item.createdAt)}</Text>
             {unreadCount > 0 && (
               <Pressable style={styles.badge}>
@@ -229,32 +207,10 @@ const AllChats = () => {
               </Pressable>
             )}
           </View>
-        </View>
+        </ScrollView>
       </Pressable>
     );
   };
-
-  useEffect(() => {
-    const scaleAnimation = Animated.loop(
-      Animated.sequence([
-        Animated.timing(scaleValue, {
-          toValue: 1.1,
-          duration: 1000,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleValue, {
-          toValue: 1,
-          duration: 1000,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-      ])
-    );
-    scaleAnimation.start();
-
-    return () => scaleAnimation.stop();
-  }, [scaleValue]);
 
   return (
     <View style={styles.container}>
@@ -302,14 +258,6 @@ const AllChats = () => {
                 Your chat is empty. Reach out to someone and get the
                 conversation going!
               </Text>
-              <View
-                style={{
-                  alignItems: "center",
-                  width: "90%",
-                  position: "absolute",
-                  bottom: "5%",
-                }}
-              ></View>
             </View>
           </View>
         )}
@@ -326,6 +274,7 @@ const AllChats = () => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -364,6 +313,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     height: "100%",
     width: "100%",
+    marginBottom: 50,
   },
   chatContent: {
     flex: 1,
@@ -386,6 +336,7 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit_Regular",
     fontSize: 12,
     color: "#AAAAB4",
+    marginRight: 15,
   },
   noChatsContainer: {
     flex: 1,
@@ -444,8 +395,8 @@ const styles = StyleSheet.create({
   },
   circle: {
     position: "absolute",
-    width: responsiveWidth(85),
-    height: responsiveHeight(85),
+    width: responsiveWidth(90),
+    height: responsiveHeight(90),
     borderRadius: 100,
     backgroundColor: "#E6eeee",
   },

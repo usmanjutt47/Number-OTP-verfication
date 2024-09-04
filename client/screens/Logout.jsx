@@ -186,8 +186,8 @@ const styles = StyleSheet.create({
   },
   circle: {
     position: "absolute",
-    width: responsiveWidth(90),
-    height: responsiveHeight(90),
+    width: responsiveWidth(85),
+    height: responsiveHeight(85),
     borderRadius: 100,
     backgroundColor: "#E6eeee",
   },

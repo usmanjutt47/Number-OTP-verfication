@@ -7,8 +7,9 @@ import {
   ScrollView,
   Dimensions,
   StyleSheet,
+  Pressable,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
@@ -18,6 +19,7 @@ const { width, height } = Dimensions.get("window");
 
 const responsiveFontSize = (size) => (size * width) / 375;
 const responsiveHeight = (size) => (size * height) / 812;
+const responsiveMargin = (size) => (size * height) / 812;
 
 export default function ReplyFromHome() {
   const [replyContent, setReplyContent] = useState("");
@@ -120,7 +122,20 @@ export default function ReplyFromHome() {
     <View style={styles.mainContainer}>
       <View style={styles.contentContainer}>
         <View style={styles.header}>
-          <MaterialIcons name="mail-outline" size={20} color="#000" />
+          <View>
+            <Pressable
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons
+                name="chevron-back"
+                size={24}
+                color="#4a4a4a"
+                style={styles.icon}
+              />
+            </Pressable>
+          </View>
+          <MaterialIcons name="mail-outline" size={24} color="#000" />
           <Text style={styles.headerText}>Write Reply</Text>
         </View>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -192,5 +207,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: responsiveFontSize(18),
     color: "#fff",
+  },
+  backButton: {
+    height: 43,
+    width: 43,
+    backgroundColor: "#f3f3f3",
+    borderRadius: 26,
+    justifyContent: "center",
+    marginRight: responsiveMargin(50),
+  },
+  icon: {
+    alignSelf: "center",
   },
 });

@@ -224,10 +224,7 @@ export default function CustomImageCarousel() {
             const { time, date } = formatDateTime(item.createdAt);
 
             return (
-              <Pressable
-                onPress={() => handleOpenBottomSheet(item)}
-                style={styles.carouselItem}
-              >
+              <Pressable style={styles.carouselItem}>
                 <Animated.View
                   style={[
                     styles.cardBehind,
@@ -284,7 +281,10 @@ export default function CustomImageCarousel() {
                         <Text style={styles.infoDate}>{date}</Text>
                       </View>
                     </View>
-                    <Animated.View style={styles.textContainer}>
+                    <Pressable
+                      style={styles.textContainer}
+                      onPress={() => handleOpenBottomSheet(item)}
+                    >
                       <Text
                         style={styles.textContent}
                         numberOfLines={4}
@@ -292,7 +292,7 @@ export default function CustomImageCarousel() {
                       >
                         {item.content}
                       </Text>
-                    </Animated.View>
+                    </Pressable>
                   </Animated.View>
                 </Animated.View>
                 <Animated.View

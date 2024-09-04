@@ -10,6 +10,7 @@ import {
   Dimensions,
   Image,
   TouchableOpacity,
+  Easing,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
@@ -182,6 +183,28 @@ const AllChats = () => {
   const renderItem = ({ item }) => {
     const unreadCount = unreadCounts[item._id] || 0;
 
+    useEffect(() => {
+      const scaleAnimation = Animated.loop(
+        Animated.sequence([
+          Animated.timing(scaleValue, {
+            toValue: 1.1,
+            duration: 1000,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true,
+          }),
+          Animated.timing(scaleValue, {
+            toValue: 1,
+            duration: 1000,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true,
+          }),
+        ])
+      );
+      scaleAnimation.start();
+
+      return () => scaleAnimation.stop();
+    }, [scaleValue]);
+
     return (
       <Pressable style={styles.chatContainer} onPress={() => handlePress(item)}>
         <View style={styles.chatDetails}>
@@ -210,6 +233,28 @@ const AllChats = () => {
       </Pressable>
     );
   };
+
+  useEffect(() => {
+    const scaleAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleValue, {
+          toValue: 1.1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleValue, {
+          toValue: 1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    scaleAnimation.start();
+
+    return () => scaleAnimation.stop();
+  }, [scaleValue]);
 
   return (
     <View style={styles.container}>
@@ -399,8 +444,8 @@ const styles = StyleSheet.create({
   },
   circle: {
     position: "absolute",
-    width: responsiveWidth(90),
-    height: responsiveHeight(90),
+    width: responsiveWidth(85),
+    height: responsiveHeight(85),
     borderRadius: 100,
     backgroundColor: "#E6eeee",
   },

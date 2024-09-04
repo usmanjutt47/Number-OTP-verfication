@@ -19,6 +19,7 @@ import Toast from "react-native-toast-message";
 import { SERVER_URL } from "@env";
 import { ScrollView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
+import LottieView from "lottie-react-native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -146,55 +147,30 @@ export default function WriteLetter() {
   const SuccessModal = ({ visible, onClose }) => {
     if (!visible) return null;
     const navigation = useNavigation();
+
+    useEffect(() => {
+      if (visible) {
+        const timer = setTimeout(() => {
+          navigation.navigate("Home");
+        }, 2000);
+
+        return () => clearTimeout(timer);
+      }
+    }, [visible, navigation]);
+
     return (
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <View style={styles.imageWrapper}>
-            <Animated.View
-              style={[styles.circle, { transform: [{ scale: scaleValue }] }]}
-            />
-            <View style={styles.imageContainer}>
-              <Image
-                source={require("../assets/icons/profile.png")}
-                style={{
-                  height: responsiveHeight(23),
-                  width: responsiveHeight(23),
-                  tintColor: "#fff",
-                }}
-              />
-            </View>
-          </View>
-          <Text style={styles.modalHeading}>Done!</Text>
-          <Text style={styles.modalText}>Letter sent successfully!</Text>
-          <View
-            style={{
-              alignItems: "center",
-              width: "90%",
-              position: "absolute",
-              bottom: "5%",
-            }}
-          >
-            <Pressable
-              onPress={() => navigation.navigate("Home")}
+            <LottieView
+              source={require("../assets/lottie/success.json")}
               style={{
-                width: "40%",
-                backgroundColor: "#075856",
-                height: responsiveHeight(48),
-                justifyContent: "center",
-                borderRadius: 44,
+                height: 300,
+                width: 300,
+                alignSelf: "center",
               }}
-            >
-              <Text
-                style={{
-                  fontSize: responsiveFontSize(15),
-                  color: "#fff",
-                  textAlign: "center",
-                  fontFamily: "Outfit_Bold",
-                }}
-              >
-                Okay
-              </Text>
-            </Pressable>
+              autoPlay
+            />
           </View>
         </View>
       </View>
@@ -312,7 +288,7 @@ const styles = StyleSheet.create({
   modalContent: {
     width: "90%",
     height: responsiveHeight(250),
-    backgroundColor: "#fff",
+    backgroundColor: "transparent",
     borderRadius: 41,
     alignItems: "center",
   },

@@ -54,9 +54,11 @@ export default function CustomImageCarousel() {
   const scrollX = new Animated.Value(0);
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
+  const [animating, setAnimating] = useState(false);
 
   const [modalVisible, setModalVisible] = useState(false);
   const scaleValue = useRef(new Animated.Value(1)).current;
+  const animatedOpacity = useRef(new Animated.Value(0)).current;
 
   const fetchLetters = async () => {
     try {
@@ -130,19 +132,16 @@ export default function CustomImageCarousel() {
   }
 
   const handleHideLetter = async (letterId) => {
+    setLoading(true); // Loading state ko true set karna
     try {
       const response = await axios.post(
         `${SERVER_URL}/letter/hide-letter/${String(letterId)}`
       );
-
-      if (response.status === 200) {
-        setTimeout(() => {
-          fetchLetters();
-        }, 500);
-      } else {
-      }
+      await fetchLetters(); // Naye letters fetch karne ke liye fetchLetters function ko call karna
     } catch (err) {
       console.error("Error hiding letter:", err.response?.data || err.message);
+    } finally {
+      setLoading(false); // Jab sab kuch ho jaye, to loading state ko false karna
     }
   };
 
@@ -332,25 +331,31 @@ export default function CustomImageCarousel() {
                     </Pressable>
                     <Text style={styles.buttonText}>Reply</Text>
                   </TouchableOpacity>
+
                   <TouchableOpacity
                     style={[styles.button, { backgroundColor: "#FFF2F2" }]}
                     onPress={() => handleHideLetter(item._id)}
+                    disabled={loading}
                   >
-                    <Pressable
-                      style={{
-                        height: responsiveHeight(47),
-                        width: responsiveWidth(47),
-                        backgroundColor: "#fff",
-                        borderRadius: 44,
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Image
-                        source={require("../assets/icons/pass.png")}
-                        style={styles.imageIcon}
-                      />
-                    </Pressable>
+                    {loading ? (
+                      <ActivityIndicator size="small" color="#D42222" />
+                    ) : (
+                      <Pressable
+                        style={{
+                          height: responsiveHeight(47),
+                          width: responsiveWidth(47),
+                          backgroundColor: "#fff",
+                          borderRadius: 44,
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Image
+                          source={require("../assets/icons/pass.png")}
+                          style={styles.imageIcon}
+                        />
+                      </Pressable>
+                    )}
                     <Text
                       style={[
                         styles.buttonText,

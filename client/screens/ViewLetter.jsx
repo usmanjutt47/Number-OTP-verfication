@@ -7,7 +7,7 @@ import {
   Dimensions,
   ActivityIndicator,
   ScrollView,
-  Pressable, // Import ActivityIndicator
+  Pressable,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
@@ -28,7 +28,7 @@ export default function ViewLetter() {
   const navigation = useNavigation();
   const { letter } = route.params;
   const [isFavorite, setIsFavorite] = useState(letter.isFavorite);
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchFavoriteStatus = async () => {

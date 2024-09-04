@@ -136,36 +136,13 @@ export default function CustomImageCarousel() {
       );
 
       if (response.status === 200) {
-        Toast.show({
-          type: "success",
-          position: "top",
-          text1: "Success",
-          text2: "Letter has been hidden.",
-          visibilityTime: 1000,
-        });
-
         setTimeout(() => {
           fetchLetters();
         }, 500);
       } else {
-        Toast.show({
-          type: "error",
-          position: "top",
-          text1: "Error",
-          text2: "Failed to hide the letter.",
-          visibilityTime: 2000,
-        });
       }
     } catch (err) {
       console.error("Error hiding letter:", err.response?.data || err.message);
-
-      Toast.show({
-        type: "error",
-        position: "top",
-        text1: "Error",
-        text2: err.response?.data?.message || "An unexpected error occurred.",
-        visibilityTime: 2000,
-      });
     }
   };
 
@@ -225,6 +202,7 @@ export default function CustomImageCarousel() {
           data={letters}
           keyExtractor={(item) => item._id}
           onRefresh={handleRefresh}
+          scrollEnabled={false}
           refreshing={refreshing}
           renderItem={({ item, index }) => {
             const inputRange = [
@@ -328,7 +306,11 @@ export default function CustomImageCarousel() {
                   <TouchableOpacity
                     style={[
                       styles.button,
-                      { backgroundColor: "#E0E7E6", borderWidth: 0 },
+                      {
+                        backgroundColor: "#E0E7E6",
+                        borderWidth: 1,
+                        borderColor: "#075856",
+                      },
                     ]}
                     onPress={() => {
                       navigation.navigate("ReplyLetter", {
@@ -351,10 +333,7 @@ export default function CustomImageCarousel() {
                     <Text style={styles.buttonText}>Reply</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[
-                      styles.button,
-                      { backgroundColor: "#FFF2F2", borderColor: "#D42222" },
-                    ]}
+                    style={[styles.button, { backgroundColor: "#FFF2F2" }]}
                     onPress={() => handleHideLetter(item._id)}
                   >
                     <Pressable
@@ -541,7 +520,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    borderWidth: 1,
+    // borderWidth: 1,
   },
   icon: {
     color: "#075856",

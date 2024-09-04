@@ -84,6 +84,7 @@ export default function Favorite() {
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
     fetchFavoriteLetters().finally(() => setRefreshing(false));
+    // fetchLetters().finally(() => setRefreshing(false));
   }, []);
 
   useEffect(() => {
@@ -117,6 +118,61 @@ export default function Favorite() {
   if (error) {
     return <Text style={styles.centered}>{error}</Text>;
   }
+
+  const handleHideLetter = async (letterId) => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `${SERVER_URL}/letter/hide-letter/${String(letterId)}`
+      );
+    } catch (err) {
+      console.error("Error hiding letter:", err.response?.data || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // const toggleFavorite = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const userId = await AsyncStorage.getItem("userId");
+  //     if (!userId) {
+  //       throw new Error("User ID not found");
+  //     }
+
+  //     // Determine the new favorite status
+  //     const newFavoriteStatus = !isFavorite;
+
+  //     // Update favorite status on the server
+  //     await axios.put(`${SERVER_URL}/letter/toggle-favorite/${letter._id}`, {
+  //       userId,
+  //     });
+
+  //     // Update local state and AsyncStorage
+  //     setIsFavorite(newFavoriteStatus);
+  //     await AsyncStorage.setItem(
+  //       `favorite-${letter._id}`,
+  //       newFavoriteStatus ? "true" : "false"
+  //     );
+
+  //     // Hide the letter
+  //     await axios.put(`${SERVER_URL}/letter/hide/${letter._id}`, {
+  //       userId,
+  //       isVisible: false, // or true if you want to show it again
+  //     });
+
+  //     navigation.goBack();
+  //   } catch (error) {
+  //     console.error("Error toggling favorite:", error);
+  //     Toast.show({
+  //       type: "error",
+  //       text1: "Error",
+  //       text2: "An error occurred. Please try again.",
+  //     });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   if (noFavorites) {
     return (
@@ -174,8 +230,41 @@ export default function Favorite() {
         <CustomTopNav />
       </View>
       {favorites.length === 0 ? (
-        <View style={styles.centered}>
-          <Text style={styles.noPostsText}>No posts available</Text>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.imageWrapper}>
+              <Animated.View
+                style={[styles.circle, { transform: [{ scale: scaleValue }] }]}
+              />
+              <View style={styles.imageContainer}>
+                <Image
+                  source={require("../assets/icons/fillFav.png")}
+                  style={{
+                    height: responsiveHeight(23),
+                    width: responsiveHeight(23),
+                    tintColor: "#fff",
+                  }}
+                />
+              </View>
+            </View>
+            <Text style={styles.modalHeading}>No Favorites Yet</Text>
+            <Text style={styles.modalText}>
+              It looks like you haven't added any items to your favorites yet.
+              Start adding items to create your favorite list!
+            </Text>
+          </View>
+          <Pressable
+            style={styles.pressable}
+            onPress={() => navigation.navigate("WriteLetter")}
+          >
+            <Image
+              source={require("../assets/icons/add.png")}
+              style={{
+                height: responsiveHeight(25),
+                width: responsiveWidth(25),
+              }}
+            />
+          </Pressable>
         </View>
       ) : (
         <Animated.FlatList
@@ -214,6 +303,22 @@ export default function Favorite() {
                 onPress={() => handleOpenBottomSheet(item)}
                 style={styles.carouselItem}
               >
+                <Animated.View
+                  style={[
+                    styles.cardBehind,
+                    {
+                      transform: [{ translateY: translateY }, { scale: scale }],
+                    },
+                  ]}
+                />
+                <Animated.View
+                  style={[
+                    styles.cardBehind2,
+                    {
+                      transform: [{ translateY: translateY }, { scale: scale }],
+                    },
+                  ]}
+                />
                 <Animated.View
                   style={[
                     styles.carouselImageContainer,
@@ -281,8 +386,17 @@ export default function Favorite() {
                   <TouchableOpacity
                     style={[
                       styles.button,
-                      { backgroundColor: "#E0E7E6", borderWidth: 0 },
+                      {
+                        backgroundColor: "#E0E7E6",
+                        borderWidth: 1,
+                        borderColor: "#075856",
+                      },
                     ]}
+                    onPress={() => {
+                      navigation.navigate("ReplyLetter", {
+                        selectedItem: item,
+                      });
+                    }}
                   >
                     <Pressable
                       style={{
@@ -298,32 +412,37 @@ export default function Favorite() {
                     </Pressable>
                     <Text style={styles.buttonText}>Reply</Text>
                   </TouchableOpacity>
+
                   <TouchableOpacity
-                    style={[
-                      styles.button,
-                      {
-                        backgroundColor: "#FFF2F2",
-                        borderColor: "#D42222",
-                        borderWidth: 1,
-                      },
-                    ]}
+                    style={[styles.button, { backgroundColor: "#FFF2F2" }]}
+                    onPress={() => handleHideLetter(item._id)}
+                    disabled={loading} // Disable button while loading
                   >
-                    <Pressable
-                      style={{
-                        height: responsiveHeight(47),
-                        width: responsiveWidth(47),
-                        backgroundColor: "#fff",
-                        borderRadius: 44,
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
+                    {loading ? (
+                      <ActivityIndicator size="small" color="#D42222" />
+                    ) : (
+                      <Pressable
+                        style={{
+                          height: responsiveHeight(47),
+                          width: responsiveWidth(47),
+                          backgroundColor: "#fff",
+                          borderRadius: 44,
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Image
+                          source={require("../assets/icons/pass.png")}
+                          style={styles.imageIcon}
+                        />
+                      </Pressable>
+                    )}
+                    <Text
+                      style={[
+                        styles.buttonText,
+                        { marginLeft: responsiveMargin(10), color: "#D42222" },
+                      ]}
                     >
-                      <Image
-                        source={require("../assets/icons/pass.png")}
-                        style={styles.imageIcon}
-                      />
-                    </Pressable>
-                    <Text style={[styles.buttonText, { color: "#D42222" }]}>
                       Pass
                     </Text>
                   </TouchableOpacity>
@@ -355,10 +474,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: height * 0.3,
   },
-  carouselImageContainer: {
-    overflow: "hidden",
-    alignItems: "center",
+  cardBehind: {
+    position: "absolute",
+    top: responsiveHeight(50),
+    width: "85%",
+    height: 50,
     borderRadius: 20,
+    backgroundColor: "#E0E7E6",
+    zIndex: -1,
+  },
+  cardBehind2: {
+    position: "absolute",
+    top: responsiveHeight(35),
+    width: "78%",
+    height: 50,
+    borderRadius: 20,
+    backgroundColor: "#E7EBEB",
+    zIndex: -2,
   },
   carouselImage: {
     width: ITEM_WIDTH,
@@ -441,6 +573,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     alignItems: "center",
     borderRadius: 20,
+    position: "relative",
   },
   carouselImage: {
     width: ITEM_WIDTH,

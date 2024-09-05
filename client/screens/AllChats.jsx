@@ -185,7 +185,7 @@ const AllChats = () => {
 
     return (
       <Pressable style={styles.chatContainer} onPress={() => handlePress(item)}>
-        <ScrollView contentContainerStyle={styles.chatDetails}>
+        <View style={styles.chatDetails}>
           <TouchableOpacity
             style={styles.chatContent}
             onPress={() => handlePress(item)}
@@ -207,7 +207,7 @@ const AllChats = () => {
               </Pressable>
             )}
           </View>
-        </ScrollView>
+        </View>
       </Pressable>
     );
   };
@@ -221,14 +221,17 @@ const AllChats = () => {
       <StatusBar style="auto" />
       <View style={styles.contentContainer}>
         {loading ? (
-          <ActivityIndicator size="large" color="#075856" />
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <ActivityIndicator size="large" color="#075856" />
+          </View>
         ) : filteredChats.length > 0 ? (
           <FlatList
             data={filteredChats}
             renderItem={renderItem}
             keyExtractor={(item) => item._id}
-            style={styles.chatList}
-            showsVerticalScrollIndicator={false}
+            style={{ flex: 1 }}
             onRefresh={onRefresh}
             refreshing={refreshing}
           />
@@ -246,8 +249,8 @@ const AllChats = () => {
                   <Image
                     source={require("../assets/icons/noChat.png")}
                     style={{
-                      height: responsiveHeight(23),
-                      width: responsiveHeight(23),
+                      height: responsiveHeight(120),
+                      width: responsiveWidth(120),
                       tintColor: "#fff",
                     }}
                   />
@@ -281,73 +284,96 @@ const styles = StyleSheet.create({
     backgroundColor: "#f3f3f3",
   },
   contentContainer: {
-    width: "100%",
-    height: "100%",
-  },
-  searchInput: {
-    height: 52,
+    paddingHorizontal: responsivePadding(20),
+    paddingBottom: responsivePadding(20),
     flex: 1,
-    fontFamily: "Outfit_Regular",
-    fontSize: 16,
-    left: 15,
-  },
-  searchIcon: {
-    position: "absolute",
-    right: 20,
-    color: "#AAAAB4",
-  },
-  chatList: {
-    marginTop: 20,
-    padding: "5%",
   },
   chatContainer: {
     backgroundColor: "#fff",
-    height: 63,
+    minHeight: 63,
     borderRadius: 15,
     marginBottom: 10,
+    paddingHorizontal: 10,
   },
   chatDetails: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginLeft: 10,
-    height: "100%",
-    width: "100%",
-    marginBottom: 50,
+    paddingVertical: responsivePadding(15),
   },
   chatContent: {
-    flex: 1,
-    alignSelf: "center",
-    height: "100%",
-    justifyContent: "center",
+    width: "70%",
+  },
+  name: {
+    color: "#000",
+    fontFamily: "Outfit_Bold",
+    fontSize: responsiveFontSize(14),
+    marginBottom: 3,
+  },
+  chatMessage: {
+    color: "#000",
+    fontFamily: "Outfit_Regular",
+    fontSize: responsiveFontSize(12),
   },
   chatRightSection: {
     alignItems: "flex-end",
-    justifyContent: "center",
-    marginRight: 20,
-  },
-  chatMessage: {
-    fontFamily: "Outfit_Regular",
-    fontSize: 12,
-    color: "#AAAAB4",
-    alignItems: "center",
   },
   chatTime: {
+    color: "#8a8a8a",
     fontFamily: "Outfit_Regular",
-    fontSize: 12,
-    color: "#AAAAB4",
-    marginRight: 15,
+    fontSize: responsiveFontSize(12),
   },
-  noChatsContainer: {
-    flex: 1,
+  badge: {
+    height: 24,
+    width: 24,
+    backgroundColor: "#ff6347",
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 5,
+  },
+  badgeText: {
+    color: "#fff",
+    fontSize: 14,
+    fontFamily: "Outfit_Regular",
+  },
+  modalOverlay: {
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f3f3f3",
+    height: "100%",
+    width: "100%",
+  },
+  modalContent: {
     justifyContent: "center",
     alignItems: "center",
   },
-  noChatsText: {
-    fontFamily: "Outfit_Regular",
-    fontSize: 16,
-    color: "#000",
+  modalHeading: {
+    fontSize: responsiveFontSize(20),
+    fontFamily: "Outfit_Bold",
+    marginVertical: responsiveMargin(15),
     textAlign: "center",
+  },
+  modalText: {
+    fontSize: responsiveFontSize(16),
+    fontFamily: "Outfit_Regular",
+    textAlign: "center",
+  },
+  imageWrapper: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  circle: {
+    height: 160,
+    width: 160,
+    borderRadius: 80,
+    backgroundColor: "#43bf91",
+    opacity: 0.2,
+    position: "absolute",
+  },
+  imageContainer: {
+    justifyContent: "center",
+    alignItems: "center",
   },
   pressable: {
     position: "absolute",
@@ -359,69 +385,6 @@ const styles = StyleSheet.create({
     height: responsiveWidth(60),
     justifyContent: "center",
     alignItems: "center",
-  },
-  badge: {
-    height: 20,
-    width: 20,
-    backgroundColor: "#075856",
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  badgeText: {
-    color: "#fff",
-    fontSize: 12,
-    fontFamily: "Outfit_Regular",
-  },
-  modalOverlay: {
-    alignItems: "center",
-    backgroundColor: "#f3f3f3",
-    height: "100%",
-    width: "100%",
-    marginTop: responsiveMargin(200),
-  },
-  modalContent: {
-    width: "90%",
-    height: responsiveHeight(200),
-    backgroundColor: "#fff",
-    borderRadius: 41,
-    alignItems: "center",
-  },
-  imageWrapper: {
-    marginTop: responsiveMargin(15),
-    alignSelf: "center",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  circle: {
-    position: "absolute",
-    width: responsiveWidth(90),
-    height: responsiveHeight(90),
-    borderRadius: 100,
-    backgroundColor: "#E6eeee",
-  },
-  imageContainer: {
-    width: responsiveWidth(80),
-    height: responsiveHeight(80),
-    backgroundColor: "#075856",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 100,
-  },
-  modalText: {
-    fontFamily: "Outfit_Regular",
-    fontSize: responsiveFontSize(12),
-    width: "90%",
-    textAlign: "center",
-  },
-  modalHeading: {
-    fontFamily: "Inter_Bold",
-    fontSize: responsiveFontSize(20),
-    marginTop: responsivePadding(23),
-  },
-  name: {
-    fontSize: responsiveFontSize(16),
-    fontFamily: "Outfit_Medium",
   },
 });
 

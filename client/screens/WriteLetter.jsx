@@ -153,7 +153,6 @@ export default function WriteLetter() {
         const timer = setTimeout(() => {
           navigation.navigate("Home");
         }, 2000);
-
         return () => clearTimeout(timer);
       }
     }, [visible, navigation]);
@@ -173,6 +172,15 @@ export default function WriteLetter() {
             />
           </View>
         </View>
+        <Text
+          style={{
+            fontSize: responsiveFontSize(25),
+            color: "#075856",
+            fontFamily: "Kanit_Bold",
+          }}
+        >
+          Sending . . .
+        </Text>
       </View>
     );
   };

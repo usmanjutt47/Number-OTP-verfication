@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,17 +14,24 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { SERVER_URL } from "@env";
+import LottieView from "lottie-react-native";
 
 const { width, height } = Dimensions.get("window");
 
 const responsiveFontSize = (size) => (size * width) / 375;
 const responsiveHeight = (size) => (size * height) / 812;
+const responsiveWidth = (size) => (size * height) / 812;
 const responsiveMargin = (size) => (size * height) / 812;
+
+const responsivePadding = (size) => {
+  return (size * width) / 375;
+};
 
 export default function ReplyFromHome() {
   const [replyContent, setReplyContent] = useState("");
   const navigation = useNavigation();
   const route = useRoute();
+  const [modalVisible, setModalVisible] = useState(false);
 
   const { letterId, letterSenderId } = route.params || {};
 
@@ -84,18 +91,8 @@ export default function ReplyFromHome() {
       const result = await response.json();
 
       if (response.ok) {
-        Toast.show({
-          type: "success",
-          position: "top",
-          text1: "Success",
-          text2: "Reply sent successfully",
-          visibilityTime: 500,
-        });
-
-        setTimeout(() => {
-          setReplyContent("");
-          navigation.navigate("Home");
-        }, 1000);
+        setModalVisible(true);
+        setReplyContent("");
       } else {
         Toast.show({
           type: "error",
@@ -116,6 +113,51 @@ export default function ReplyFromHome() {
       });
       console.error("Catch Error:", error);
     }
+  };
+
+  const SuccessModal = ({ visible, onClose }) => {
+    if (!visible) return null;
+    const navigation = useNavigation();
+
+    useEffect(() => {
+      if (visible) {
+        const timer = setTimeout(() => {
+          navigation.navigate("Home");
+        }, 2000);
+        return () => clearTimeout(timer);
+      }
+    }, [visible, navigation]);
+
+    return (
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <View style={styles.imageWrapper}>
+            <LottieView
+              source={require("../assets/lottie/success.json")}
+              style={{
+                height: 300,
+                width: 300,
+                alignSelf: "center",
+              }}
+              autoPlay
+            />
+          </View>
+        </View>
+        <Text
+          style={{
+            fontSize: responsiveFontSize(25),
+            color: "#075856",
+            fontFamily: "Kanit_Bold",
+          }}
+        >
+          Sending . . .
+        </Text>
+      </View>
+    );
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
   };
 
   return (
@@ -153,6 +195,8 @@ export default function ReplyFromHome() {
           </TouchableOpacity>
         </ScrollView>
       </View>
+      <SuccessModal visible={modalVisible} onClose={closeModal} />
+
       <Toast />
     </View>
   );
@@ -207,6 +251,65 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: responsiveFontSize(18),
     color: "#fff",
+  },
+  backButton: {
+    height: 43,
+    width: 43,
+    backgroundColor: "#f3f3f3",
+    borderRadius: 26,
+    justifyContent: "center",
+    marginRight: responsiveMargin(50),
+  },
+  icon: {
+    alignSelf: "center",
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f3f3f3",
+    height: "100%",
+    width: "100%",
+    position: "absolute",
+  },
+  modalContent: {
+    width: "90%",
+    height: responsiveHeight(250),
+    backgroundColor: "transparent",
+    borderRadius: 41,
+    alignItems: "center",
+  },
+  imageWrapper: {
+    marginTop: responsiveMargin(15),
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  circle: {
+    position: "absolute",
+    width: responsiveWidth(90),
+    height: responsiveHeight(90),
+    borderRadius: 100,
+    backgroundColor: "#E6eeee",
+  },
+  imageContainer: {
+    width: responsiveWidth(80),
+    height: responsiveHeight(80),
+    backgroundColor: "#075856",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 100,
+  },
+  modalText: {
+    fontFamily: "Outfit_Regular",
+    fontSize: responsiveFontSize(14),
+    width: "90%",
+    textAlign: "center",
+  },
+  modalHeading: {
+    fontFamily: "Inter_Bold",
+    fontSize: responsiveFontSize(20),
+    marginTop: responsivePadding(15),
   },
   backButton: {
     height: 43,

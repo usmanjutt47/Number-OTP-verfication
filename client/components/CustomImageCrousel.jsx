@@ -132,16 +132,16 @@ export default function CustomImageCarousel() {
   }
 
   const handleHideLetter = async (letterId) => {
-    setLoading(true); // Loading state ko true set karna
+    setLoading(true);
     try {
       const response = await axios.post(
         `${SERVER_URL}/letter/hide-letter/${String(letterId)}`
       );
-      await fetchLetters(); // Naye letters fetch karne ke liye fetchLetters function ko call karna
+      await fetchLetters();
     } catch (err) {
       console.error("Error hiding letter:", err.response?.data || err.message);
     } finally {
-      setLoading(false); // Jab sab kuch ho jaye, to loading state ko false karna
+      setLoading(false);
     }
   };
 

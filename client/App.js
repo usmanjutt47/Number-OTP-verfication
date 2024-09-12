@@ -97,24 +97,24 @@ const App = () => {
             <Stack.Screen
               name="WriteLetter"
               component={WriteLetter}
-              options={{ ...TransitionPresets.ModalPresentationIOS }}
+              options={{ ...TransitionPresets.ModalSlideFromBottomIOS }}
             />
             <Stack.Screen name="SelectPlan" component={SelectPlan} />
             <Stack.Screen name="ChatDetail" component={ChatDetail} />
             <Stack.Screen
               name="ViewLetter"
               component={ViewLetter}
-              options={{ ...TransitionPresets.ModalPresentationIOS }}
+              options={{ ...TransitionPresets.ModalSlideFromBottomIOS }}
             />
             <Stack.Screen
               name="ReplyLetter"
               component={ReplyLetter}
-              options={{ ...TransitionPresets.ModalPresentationIOS }}
+              options={{ ...TransitionPresets.ModalSlideFromBottomIOS }}
             />
             <Stack.Screen
               name="ReplyFromHome"
               component={ReplyFromHome}
-              options={{ ...TransitionPresets.ModalPresentationIOS }}
+              options={{ ...TransitionPresets.ModalSlideFromBottomIOS }}
             />
             <Stack.Screen name="Logout" component={Logout} />
           </Stack.Navigator>

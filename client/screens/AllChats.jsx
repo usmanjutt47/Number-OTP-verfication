@@ -11,6 +11,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  Easing,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
@@ -62,6 +63,28 @@ const AllChats = () => {
       return [];
     }
   };
+
+  useEffect(() => {
+    const scaleAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleValue, {
+          toValue: 1.1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleValue, {
+          toValue: 1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    scaleAnimation.start();
+
+    return () => scaleAnimation.stop();
+  }, [scaleValue]);
 
   const fetchUserLettersReplies = async () => {
     try {
@@ -214,7 +237,7 @@ const AllChats = () => {
 
   return (
     <View style={styles.container}>
-      <View style={{ padding: "5%" }}>
+      <View style={{ padding: "5%", position: "absolute", zIndex: 5 }}>
         <CustomTopNav />
       </View>
 
@@ -245,12 +268,18 @@ const AllChats = () => {
                     { transform: [{ scale: scaleValue }] },
                   ]}
                 />
+                <Animated.View
+                  style={[
+                    styles.circle,
+                    { transform: [{ scale: scaleValue }] },
+                  ]}
+                />
                 <View style={styles.imageContainer}>
                   <Image
                     source={require("../assets/icons/noChat.png")}
                     style={{
-                      height: responsiveHeight(120),
-                      width: responsiveWidth(120),
+                      height: responsiveHeight(23),
+                      width: responsiveHeight(23),
                       tintColor: "#fff",
                     }}
                   />
@@ -262,6 +291,18 @@ const AllChats = () => {
                 conversation going!
               </Text>
             </View>
+            <Pressable
+              style={styles.pressable}
+              onPress={() => navigation.navigate("WriteLetter")}
+            >
+              <Image
+                source={require("../assets/icons/add.png")}
+                style={{
+                  height: responsiveHeight(25),
+                  width: responsiveWidth(25),
+                }}
+              />
+            </Pressable>
           </View>
         )}
       </View>
@@ -338,42 +379,55 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit_Regular",
   },
   modalOverlay: {
-    alignItems: "center",
+    flex: 1,
     justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "#f3f3f3",
-    height: "100%",
-    width: "100%",
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
   },
   modalContent: {
-    justifyContent: "center",
+    width: "90%",
+    height: responsiveHeight(200),
+    backgroundColor: "#fff",
+    borderRadius: 41,
     alignItems: "center",
-  },
-  modalHeading: {
-    fontSize: responsiveFontSize(20),
-    fontFamily: "Outfit_Bold",
-    marginVertical: responsiveMargin(15),
-    textAlign: "center",
-  },
-  modalText: {
-    fontSize: responsiveFontSize(16),
-    fontFamily: "Outfit_Regular",
-    textAlign: "center",
+    justifyContent: "center",
   },
   imageWrapper: {
-    justifyContent: "center",
+    alignSelf: "center",
     alignItems: "center",
+    justifyContent: "center",
   },
   circle: {
-    height: 160,
-    width: 160,
-    borderRadius: 80,
-    backgroundColor: "#43bf91",
-    opacity: 0.2,
     position: "absolute",
+    width: responsiveWidth(90),
+    height: responsiveHeight(90),
+    borderRadius: 100,
+    backgroundColor: "#E6eeee",
   },
   imageContainer: {
-    justifyContent: "center",
+    width: responsiveWidth(80),
+    height: responsiveHeight(80),
+    backgroundColor: "#075856",
     alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 100,
+  },
+  modalText: {
+    fontFamily: "Outfit_Regular",
+    fontSize: responsiveFontSize(12),
+    width: "90%",
+    textAlign: "center",
+  },
+  modalHeading: {
+    fontFamily: "Inter_Bold",
+    fontSize: responsiveFontSize(20),
+    marginTop: responsivePadding(25),
   },
   pressable: {
     position: "absolute",

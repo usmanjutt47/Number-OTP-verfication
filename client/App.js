@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+import {
+  createStackNavigator,
+  TransitionPresets,
+} from "@react-navigation/stack";
 import { useFonts } from "expo-font";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomKeyboard from "./components/CustomKeyboard";
@@ -74,7 +77,9 @@ const App = () => {
         <NavigationContainer>
           <Stack.Navigator
             initialRouteName={initialRoute}
-            screenOptions={{ headerShown: false }}
+            screenOptions={{
+              headerShown: false,
+            }}
           >
             <Stack.Screen name="CustomKeyboard" component={CustomKeyboard} />
             <Stack.Screen name="CustomTopNav" component={CustomTopNav} />
@@ -89,12 +94,28 @@ const App = () => {
             <Stack.Screen name="Favorite" component={Favorite} />
             <Stack.Screen name="AllChats" component={AllChats} />
             <Stack.Screen name="Profile" component={Profile} />
-            <Stack.Screen name="WriteLetter" component={WriteLetter} />
+            <Stack.Screen
+              name="WriteLetter"
+              component={WriteLetter}
+              options={{ ...TransitionPresets.ModalPresentationIOS }}
+            />
             <Stack.Screen name="SelectPlan" component={SelectPlan} />
             <Stack.Screen name="ChatDetail" component={ChatDetail} />
-            <Stack.Screen name="ViewLetter" component={ViewLetter} />
-            <Stack.Screen name="ReplyLetter" component={ReplyLetter} />
-            <Stack.Screen name="ReplyFromHome" component={ReplyFromHome} />
+            <Stack.Screen
+              name="ViewLetter"
+              component={ViewLetter}
+              options={{ ...TransitionPresets.ModalPresentationIOS }}
+            />
+            <Stack.Screen
+              name="ReplyLetter"
+              component={ReplyLetter}
+              options={{ ...TransitionPresets.ModalPresentationIOS }}
+            />
+            <Stack.Screen
+              name="ReplyFromHome"
+              component={ReplyFromHome}
+              options={{ ...TransitionPresets.ModalPresentationIOS }}
+            />
             <Stack.Screen name="Logout" component={Logout} />
           </Stack.Navigator>
         </NavigationContainer>

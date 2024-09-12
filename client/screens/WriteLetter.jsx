@@ -242,15 +242,18 @@ export default function WriteLetter() {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: "#BCBABA",
+    backgroundColor: "transparent",
     justifyContent: "center",
   },
   contentContainer: {
     width: "100%",
-    height: "90%",
+    height: "95%",
     paddingLeft: "5%",
     backgroundColor: "#ffffff",
     borderRadius: 23,
+    position: "absolute",
+    bottom: 0,
+    elevation: 2,
   },
   headerContainer: {
     flexDirection: "row",

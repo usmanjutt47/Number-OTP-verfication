@@ -749,7 +749,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#075856",
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 100,
+    borderRadius: 99,
+    maxHeight: responsiveHeight(80),
+    maxWidth: responsiveWidth(80),
   },
   modalText: {
     fontFamily: "Outfit_Regular",
